@@ -1,0 +1,54 @@
+.TH "LOCALE-GEN" "8" 
+.SH "NAME" 
+locale-gen \(em generates localisation files from templates 
+.SH "SYNOPSIS" 
+.PP 
+\fBlocale-gen\fR [\fB\-\-keep-existing\fP]  
+.SH "DESCRIPTION" 
+.PP 
+This manual page documents briefly the 
+\fBlocale-gen\fR command. 
+.PP 
+By default, the locale package which provides the base support for 
+localisation of libc-based programs does not contain usable localisation 
+files for every supported language. This limitation has became necessary 
+because of the substantial size of such files and the large number of 
+languages supported by libc. As a result, Debian uses a special 
+mechanism where we prepare the actual localisation files on the target 
+host and distribute only the templates for them. 
+.PP 
+\fBlocale-gen\fR is a program that reads the file 
+\fB/etc/locale.gen\fP and invokes 
+\fBlocaledef\fR for the chosen localisation profiles. 
+Run \fBlocale-gen\fR after you have modified the \fB/etc/locale.gen\fP file. 
+ 
+ 
+.SH "OPTIONS" 
+.IP "\fB\-\-keep-existing\fP" 10 
+By default, \fBlocale-gen\fR removes all 
+existing locales and generates new ones afresh. The 
+\fB\-\-keep-existing\fP option prevents this, so that 
+only locales which do not already exist are generated. This may be 
+useful if calling locale-gen a number of times in 
+succession. 
+.SH "FILES" 
+.PP 
+\fB/etc/locale.gen\fP 
+.PP 
+The main configuration file, which has a simple format: every 
+line that is not empty and does not begin with a # is treated as a 
+locale definition that is to be built. 
+ 
+.SH "SEE ALSO" 
+.PP 
+localedef (1), locale (1), locale.alias (5), locale.gen (5). 
+.SH "AUTHOR" 
+.PP 
+This manual page was written by Eduard Bloch <blade@debian.org> for 
+the \fBDebian GNU/Linux\fP system (but may be used by others).  Permission is 
+granted to copy, distribute and/or modify this document under 
+the terms of the GNU Free Documentation 
+License, Version 1.1 or any later version published by the Free 
+Software Foundation; with no Invariant Sections, no Front-Cover 
+Texts and no Back-Cover Texts. 
+.\" created by instant / docbook-to-man, Thu 10 Mar 2005, 16:39 
