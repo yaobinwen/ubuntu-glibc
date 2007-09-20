@@ -1,3 +1,10 @@
+glibc (2.6.1-1ubuntu6) gutsy; urgency=low
+
+  * Do not print "ldconfig: wrapper deferring update (trigger activated)"
+    message (unless LDCONFIG_TRIGGER_DEBUG is set).
+
+ -- Ian Jackson <iwj@ubuntu.com>  Thu, 20 Sep 2007 14:20:30 +0100
+
 glibc (2.6.1-1ubuntu5) gutsy; urgency=low
 
   * Do not install the ppu symlinks in the powerpc packages.
