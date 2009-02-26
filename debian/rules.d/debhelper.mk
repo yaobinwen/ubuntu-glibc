@@ -57,6 +57,13 @@ $(patsubst %,$(stamp)binaryinst_%,$(DEB_ARCH_REGULAR_PACKAGES) $(DEB_INDEP_REGUL
 	    dh_install -p$(curpass) debian/bug/$(curpass) usr/share/bug; \
 	fi
 
+	set -ex; case $(curpass) in libc6|libc6.1) \
+		mv debian/$(curpass)/sbin/ldconfig \
+			debian/$(curpass)/sbin/ldconfig.real; \
+		install -m755 -o0 -g0 debian/local/ldconfig_wrap \
+			debian/$(curpass)/sbin/ldconfig; \
+		;; esac
+
 	# extra_debhelper_pkg_install is used for debhelper.mk only.
 	# when you want to install extra packages, use extra_pkg_install.
 	$(call xx,extra_debhelper_pkg_install)
@@ -75,7 +82,7 @@ ifeq ($(filter nostrip,$(DEB_BUILD_OPTIONS)),)
 
 	if test "$(NOSTRIP_$(curpass))" != 1; then			\
 	  chmod a+x debian/wrapper/objcopy;				\
-	  export PATH=$(shell pwd)/debian/wrapper:$$PATH;		\
+	  export PATH=$(CURDIR)/debian/wrapper:$$PATH;			\
 	  dh_strip -p$(curpass) -Xlibpthread --dbg-package=$(libc)-dbg; \
 	  (cd debian/$(curpass);					\
 	   find . -name libpthread-\*.so -exec				\
@@ -109,6 +116,11 @@ endif
 		install -d -m 755 -o root -g root debian/$(curpass)/usr/share/lintian/overrides/ ; \
 		install -m 644 -o root -g root debian/$(curpass).lintian \
 			debian/$(curpass)/usr/share/lintian/overrides/$(curpass) ; \
+	fi
+
+	if [ -f debian/$(curpass).triggers ] ; then \
+		install -m 644 -o root -g root debian/$(curpass).triggers \
+			debian/$(curpass)/DEBIAN/triggers ; \
 	fi
 
 	dh_installdeb -p$(curpass)
@@ -158,6 +170,7 @@ $(stamp)debhelper:
 	  z=`echo $$y | sed -e 's#/libc#/$(libc)#'`; \
 	  cp $$x $$z; \
 	  sed -e "s#BUILD-TREE#$(build-tree)#" -i $$z; \
+	  sed -e "s#DEB_SRCDIR#.#" -i $$z; \
 	  sed -e "/KERNEL_VERSION_CHECK/r debian/script.in/kernelcheck.sh" -i $$z; \
 	  sed -e "/NSS_CHECK/r debian/script.in/nsscheck.sh" -i $$z; \
 	  sed -e "/NOHWCAP/r debian/script.in/nohwcap.sh" -i $$z; \
@@ -250,5 +263,6 @@ debhelper-clean:
 	rm -f debian/*.linda
 	rm -f debian/*.NEWS
 	rm -f debian/*.README.Debian
+	rm -f debian/*.triggers
 
 	rm -f $(stamp)binaryinst*

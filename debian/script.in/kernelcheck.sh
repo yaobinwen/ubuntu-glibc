@@ -49,11 +49,14 @@ exit_check () {
         realarch=`uname -m`
         kernel_ver=`uname -r`
 
-        # convert "armv4l" and similar to just "arm", and "mips64" and similar
-        # to just "mips"
+        # convert "armv4l" and similar to just "arm", "mips64" and similar
+        # to just "mips", "ppc64" and similar to just "powerpc", and
+        # "sparc64" and similar to just "sparc"
         case $realarch in
           arm*) realarch="arm";;
           mips*) realarch="mips";;
+          powerpc*|ppc*) realarch="powerpc";;
+          sparc*) realarch="sparc";;
         esac
 
 
@@ -70,13 +73,13 @@ exit_check () {
             exit_check
         fi
 
-        # The GNU libc requires a >= 2.6.18 kernel (except on m68k)
+        # The GNU libc requires a >= 2.6.15 kernel
         if [ "$realarch" != m68k ]
         then
-            if linux_compare_versions "$kernel_ver" lt 2.6.18
+            if linux_compare_versions "$kernel_ver" lt 2.6.15
             then
                 echo WARNING: this version of the GNU libc requires kernel version
-                echo 2.6.18 or later.  Please upgrade your kernel before installing
+                echo 2.6.15 or later.  Please upgrade your kernel before installing
                 echo glibc.
                 kernel26_help
                 exit_check
