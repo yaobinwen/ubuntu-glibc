@@ -1,3 +1,63 @@
+glibc (2.9-4ubuntu1) jaunty; urgency=low
+
+  * Test build, explicitely fail after running the tests.
+
+  * Merge with Debian (r3320, trunk); remaining changes:
+    - Packaging:
+      + External tzdata
+      + Addition of Niagara and Niagara2 optimised libraries
+      + GFDL Documentation added back in, build glibc-doc from this source.
+      + Transition from /usr/include/ppc64-linux-gnu to powerpc64-linux-gnu
+      + Use dpkg triggers for ldconfig
+      + Do not die if extra libc libraries or symlinks found
+      + Do not do a test run of nscd when starting
+      + Only apply patches we actually use in Ubuntu
+      + Use /lib and /usr/lib for amd64
+      + amd64 biarch is i686, not i486.
+      + Non-optimised i386 glibc is Xen-friendly.
+      + Support sparcv9v, v9v2, 64b, 64v, 64v2
+      + Add support for lpia.
+      + Use <triplet>.conf for files in /etc/ld.so.conf.d.
+    - Patches:
+      + Applied any/local-ipv6-lookup.
+      + Not applied any/local-sysctl.
+      + Applied debian/patches/all/fedora-nss_dns-gethostbyname4-disable.diff.
+      + Updated arm/local-no-hwcap.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 26 Feb 2009 15:38:06 +0100
+
+glibc (2.9-4) unstable; urgency=low
+
+  * testsuite-checking/expected-results-ia64-linux-gnu-libc: ignore 
+    result of tst-oddstacklimit.out, it is known to fail with old
+    kernels, just like in glibc 2.7.
+  * debian/debhelper.in/libc{-alt,-otherbuild,}.lintian: remove outdated
+    overrides.
+  * debhelper.in/libc.postinst: restart NSS services on upgrades from 
+    versions prior to 2.9-1.
+  * testsuite-checking/expected-results-arm-linux-gnueabi-libc: ignore 
+    result of test-fenv.out and test-fpucw.out, as they were already
+    failing with glibc 2.7.
+  * patches/any/submitted-futex_lock_pi.diff: new patch to correctly
+    define when PI futexes have been introduced in the kernel, on a 
+    per architecture basis.
+  * testsuite-checking/expected-results-{alpha,ia64}-linux-gnu-libc:
+    remove PI futexes failures.
+  * patches/all/submitted-readme-version.diff: fix the upstream version
+    number in upstream README.  Closes: bug#516908.
+  * debian/rules.d/build.mk: disable the testsuite on ball/mayr/mayer/rem
+    build daemons.
+  * debian/rules.d/info.mk: new file to dump useful info in the build log.
+  * debian/rules: always define and export SHELL as "/bin/bash -e".  
+    Closes: bug#517077.
+  * patches/any/cvs-bz7058-nss_nss-nis.diff: new patch to fix crash when
+    doing host lookup with nss-nis.  Closes: bug#517094.
+  * Add debian/libc6-mips{n32,64}.symbols.mips{el,} symbol files.
+  * debian/debhelper.in/glibc-source.install, debian/rules.d/build.mk:
+    switch the format of glibc-source to lzma, sparing 6MB.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 26 Feb 2009 11:37:53 +0100
+
 glibc (2.9-3) unstable; urgency=low
 
   * debhelper.in/nscd.init: fix the for loop.  Closes: bug#516509.
@@ -30,10 +90,123 @@ glibc (2.9-2) unstable; urgency=low
 
 glibc (2.9-1) unstable; urgency=low
 
+  Removed the changelog entries for earlier merges from the glibc-2.9 branch.
+
   [ Aurelien Jarno ]
-  * New upstream release.
-    - This version has been tagged in the CVS, update debian/rules and 
-      debian/rules.d/tarball.mk accordingly.
+  * debian/rules.d/build.mk: enable stackguard randomization.  Closes: 
+    bug#511811.
+  * expected-results-i486-linux-gnu-libc, expected-results-i686-linux-i686:
+    Add tests that fail on a Xen machine. Sigh.
+  * any/local-linuxthreads-thread_self.diff: new patch to fix a warning on
+    linuxthreads builds.
+  * rules.d/build.mk: unset LANG to make sure testsuite errors are not
+    localized.
+  * debian/rules: remove *.mo file in the clean target.
+  * sysdeps/alpha.mk, control.in/main: use gcc-4.3 on alpha.
+  * debhelper.in/locales.postinst: make sure /etc/default/locale is always
+    created.  Closes: bug#515099.
+  * debian/wrapper/objcopy: apply special strip to libraries only.  Closes: 
+    bug#513882.
+  * debian/localedata/locale-fr_FR.diff: revert change of week of day and
+    month abbreviations in fr_FR locale.  Closes: bug#509191.
+
+  [ Clint Adams ]
+  * patches/localedata/submitted-bz9835-en_GB-first_day.diff: new patch to
+    fix first_weekday and first_workday for en_GB.  closes: #512343.
+
+  [ Petr Salinger ]
+  * kfreebsd/local-sysdeps.diff: update to revision 2352 (from glibc-bsd).
+  * add kfreebsd/local-linuxthreads29.diff: 
+    update to fix build on kfreebsd architectures.
+
+  [ Samuel Thibault ]
+  * hurd-i386/cvs-resource-prio.diff: new patch to fix detection of PRIO_*
+    values in some packages
+  * hurd-i386/cvs-hurdsig-fix.diff: new patch to fix hurd signal FD locking.
+  * hurd-i386/cvs-report-wait-fix.diff: patch from CVS instead of 
+    hurd-i386/submitted-report-wait.diff.
+  * hurd-i386/submitted-critical-sections.diff: new patch to fix some missing
+    critical sections.
+  * hurd-i386/submitted-dup2-fix.diff: new patch to fix dup2 FD locking.
+  * hurd-i386/local-net-headers.diff: new patch to install net/*.h headers.
+  * hurd-i386/local-tls-dtv-offset.diff: new patch to fix DTV_OFFSET macro.
+  * hurd-i386/local-pthread_posix-option.diff: put back to series.
+  * hurd-i386/local-check_native.diff: new patch to provide a dummy
+    __check_native() function.
+  * hurd-i386/cvs-get_pc_thunk.diff: new patch to fix missing
+    __i686.get_pc_thunk.bx reference.
+  * hurd-i386/submitted-dl-sysdep.diff: new patch to fix static linking.
+  * hurd-i386/submitted-stat.diff: clean up patch.
+  * hurd-i386/submitted-itimer-lock.diff: new patch fixing itimer unlocking.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 17 Feb 2009 22:49:15 +0100
+
+glibc (2.9-0ubuntu12) jaunty; urgency=low
+
+  * debian/patches/all/fedora-nss_dns-gethostbyname4-disable.diff: Patch
+    from Fedora 2.9-3 to temporarily disable _nss_dns_gethostbyname4_r,
+    which caused problems for systems with broken IPv6 connectivity
+    (LP: #313218, https://bugzilla.redhat.com/show_bug.cgi?id=459756).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Sat, 21 Feb 2009 07:40:16 +0000
+
+glibc (2.9-0ubuntu11) jaunty; urgency=low
+
+  * Update patch arm/local-no-hwcap to flag HWCAP_ARM_VFP as an important
+    hwcap; this adds /lib/vfp, /usr/lib/vfp etc. to the ldconfig and ld.so
+    search path.
+  * Update patch arm/local-no-hwcap to drop HWCAP_ARM_FAST_MULT from important
+    hwcaps as fastmult is even present on StrongARM according to Wookey;
+    suggested by Riku Voipio.
+
+ -- Loic Minier <lool@dooz.org>  Mon, 16 Feb 2009 13:32:55 +0100
+
+glibc (2.9-0ubuntu10) jaunty; urgency=low
+
+  * Move locale generation programs back to libc6, belocs-locales-bin
+    is dead upstream, and more and more incapable of building current
+    locale definitions:
+    - debhelper.in/libc.install: Install localedef, locale,
+      update-locale, and validlocale again. (locale-def will be
+      shipped in langpack-locales, since it is closely related to it).
+    - debhelper.in/libc.manpages: Install manpages for above programs.
+    - sysdeps/depflags.pl: Conflicts/Replaces: belocs-locales-bin.
+   * Merged current fixes from Debian's glibc-2.9 branch (r3269).
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Fri, 13 Feb 2009 18:31:04 +0100
+
+glibc (2.9-0ubuntu9) jaunty; urgency=low
+
+  * Merge with Debian, glibc-2.9 branch, r3244.
+    - Fix testsuite failure in locale test.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 19 Jan 2009 21:42:02 +0100
+
+glibc (2.9-0ubuntu8) jaunty; urgency=low
+
+  * Merge with Debian, glibc-2.9 branch, r3241.
+  * Apply localedata patches. LP: #318507.
+  * Remove progressions from expected test results.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 19 Jan 2009 18:26:53 +0100
+
+glibc (2.9-0ubuntu7) jaunty; urgency=low
+
+  [ Matthias Klose ]
+  * Merge with Debian, glibc-2.9 branch, r3226.
+
+  [ Kees Cook ]
+  * Added debian/patches/any/cvs-bz-9720-resource.diff: upstream
+    fixes for resource.h mis-compile (LP: #302087).
+
+ -- Kees Cook <kees@ubuntu.com>  Thu, 08 Jan 2009 13:27:48 -0800
+
+glibc (2.9-0exp1) UNRELEASED; urgency=low
+
+   [ Aurelien Jarno ]
+   * New upstream release.
+     - This version has been tagged in the CVS, update debian/rules and 
+       debian/rules.d/tarball.mk accordingly.
     - shs_CA locale is enabled.  Closes: #504663.
     - fix snprintf with low-memory.  Closes: #481543.
     - fix mtrace warning message.  Closes: #507488.
@@ -87,23 +260,7 @@ glibc (2.9-1) unstable; urgency=low
   * arm/submitted-setjmp.diff: new patch to fix build on arm.
   * debian/rules: set BUILD_CC (host compiler) to gcc, and set CC (target
     compiler) to gcc-4.3. The later can be override on a per target basis.
-  * debian/rules.d/build.mk: enable stackguard randomization.  Closes: 
-    bug#511811.
-  * expected-results-i486-linux-gnu-libc, expected-results-i686-linux-i686:
-    Add tests that fail on a Xen machine. Sigh.
-  * any/local-linuxthreads-thread_self.diff: new patch to fix a warning on
-    linuxthreads builds.
-  * rules.d/build.mk: unset LANG to make sure testsuite errors are not
-    localized.
-  * debian/rules: remove *.mo file in the clean target.
-  * sysdeps/alpha.mk, control.in/main: use gcc-4.3 on alpha.
-  * debhelper.in/locales.postinst: make sure /etc/default/locale is always
-    created.  Closes: bug#515099.
-  * debian/wrapper/objcopy: apply special strip to libraries only.  Closes: 
-    bug#513882.
-  * debian/localedata/locale-fr_FR.diff: revert change of week of day and
-    month abbreviations in fr_FR locale.  Closes: bug#509191.
-
+ 
   [ Clint Adams ]
   * patches/any/cvs-bz697-posix-regexec.diff: regex fix from Paolo Bonzini.
   * patches/any/cvs-bz9697-posix-regcomp.diff: regex fix from Paolo Bonzini,
@@ -118,41 +275,187 @@ glibc (2.9-1) unstable; urgency=low
     patches/localedata/submitted-bz9731-el_CY_euro.diff.
   * Rename patches/localedata/dz_BT-collation.diff to
     patches/localedata/submitted-bz9732-dz_BT-collation.diff.
-  * patches/localedata/submitted-bz9835-en_GB-first_day.diff: new patch to
-    fix first_weekday and first_workday for en_GB.  closes: #512343.
 
-  [ Arthur Loiret ]
-  * patches/any/local-nss-overflow.diff: new patch to ignore uids and gids 
-    greater than UINT_MAX.  Closes: #483645.
+  [ Arthur Loiret ]
+  * patches/any/local-nss-overflow.diff: new patch to ignore uids greater
+    than UINT_MAX.  Closes: #483645.
   * patches/hppa/submitted-tsd.diff: new patch from to fix build on hppa.
-    Closes: #511430.
+    Closes: bug#511430.
 
-  [ Petr Salinger ]
-  * kfreebsd/local-sysdeps.diff: update to revision 2352 (from glibc-bsd).
-  * add kfreebsd/local-linuxthreads29.diff: 
-    update to fix build on kfreebsd architectures.
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 18 Jan 2009 23:25:16 +0100
 
-  [ Samuel Thibault ]
-  * hurd-i386/cvs-resource-prio.diff: new patch to fix detection of PRIO_*
-    values in some packages
-  * hurd-i386/cvs-hurdsig-fix.diff: new patch to fix hurd signal FD locking.
-  * hurd-i386/cvs-report-wait-fix.diff: patch from CVS instead of 
-    hurd-i386/submitted-report-wait.diff.
-  * hurd-i386/submitted-critical-sections.diff: new patch to fix some missing
-    critical sections.
-  * hurd-i386/submitted-dup2-fix.diff: new patch to fix dup2 FD locking.
-  * hurd-i386/local-net-headers.diff: new patch to install net/*.h headers.
-  * hurd-i386/local-tls-dtv-offset.diff: new patch to fix DTV_OFFSET macro.
-  * hurd-i386/local-pthread_posix-option.diff: put back to series.
-  * hurd-i386/local-check_native.diff: new patch to provide a dummy
-    __check_native() function.
-  * hurd-i386/cvs-get_pc_thunk.diff: new patch to fix missing
-    __i686.get_pc_thunk.bx reference.
-  * hurd-i386/submitted-dl-sysdep.diff: new patch to fix static linking.
-  * hurd-i386/submitted-stat.diff: clean up patch.
-  * hurd-i386/submitted-itimer-lock.diff: new patch fixing itimer unlocking.
+glibc (2.9-0ubuntu6) jaunty; urgency=low
 
- -- Aurelien Jarno <aurel32@debian.org>  Tue, 17 Feb 2009 22:49:15 +0100
+  [ Matthias Klose ]
+  * Merge with Debian, glibc-2.9 branch, r3200.
+
+  [ Kees Cook ]
+  * Add debian/patches/ubuntu/no-sprintf-pre-truncate.diff: do not
+    pre-clear target buffers on sprintf to retain backward compatibility
+    (LP: #305901).
+
+ -- Kees Cook <kees@ubuntu.com>  Thu, 01 Jan 2009 13:28:59 -0800
+
+glibc (2.9-0ubuntu5) jaunty; urgency=low
+
+  * Mark tst-pselect.out as failing on armel.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 03 Dec 2008 23:16:24 +0100
+
+glibc (2.9-0ubuntu4) jaunty; urgency=low
+
+  * Mark tst-mqueue5.out as failing on sparcv9b.
+  * Mark tst-cpuclock2.out as failing on sparc.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 03 Dec 2008 01:33:20 +0100
+
+glibc (2.9-0ubuntu3) jaunty; urgency=low
+
+  * Update expected testsuite results for powerpc64. Fixes build failure
+    on powerpc.
+  * Build with gcc-4.3 on sparc again (still fails on the buildd, builds
+    on a T1000).
+  * debian/testsuite-checking/compare.sh: Robustify.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 30 Nov 2008 12:45:05 +0100
+
+glibc (2.9-0ubuntu2) jaunty; urgency=low
+
+  * Drop the build dependency on gcc-4.2-multilib on sparc for an initial build.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 29 Nov 2008 16:01:59 +0100
+
+glibc (2.9-0ubuntu1) jaunty; urgency=low
+
+  * New upstream, release, taken from the glibc-2_9-base tag.
+    - Remove patches applied upstream: any/cvs-bug-iconv6_tst-iconv7.diff,
+      sparc/cvs-context.diff, any/cvs-getaddrinfo.diff,
+      any/cvs-iconv-braces.diff, any/cvs-nscd-getservbyport.diff,
+      any/cvs-nscd-getservbyport.diff, any/cvs-tst-regex.diff,
+      any/cvs-regex_anchor.diff, hppa/submitted-atomic_h.diff,
+      hppa/submitted-fesetenv.diff, any/submitted-rpcgen-makefile.diff,
+      any/regexp_h___REPB_PREFIX.diff.
+    - Update patches: any/local-bashisms.diff, any/local-ipv6-lookup.diff.
+    - any/submitted-user_h.diff: Remove, replaced with #error stub.
+    - Use barriers and SMP-safe operations on ARM NPTL. LP: #303188.
+  * debian/symbols.wildcards: Update for 2.9.
+  * Add tst-tls6.out to expected test failures on sparc64.
+  * Merge with Debian, r3198.
+  * patches/arm/local-memset.diff: Performance improve on ARM memset.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 29 Nov 2008 15:25:22 +0100
+
+glibc (2.8+20081027-0ubuntu10) jaunty; urgency=low
+
+  * Mark tst-cancel7.out, tst-cancelx7.out, tst-cleanup0.out and tst-fmon.out
+    as failing on armel as well.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 15 Nov 2008 13:56:40 +0100
+
+glibc (2.8+20081027-0ubuntu9) jaunty; urgency=low
+
+  * debian/testsuite-checking/compare.sh: Output the contents of the failure
+    logs to the build log for non-regressions as well.
+    Report progressions as well.
+  * Mark test failures on armel as expected for a first build.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 15 Nov 2008 09:34:14 +0100
+
+glibc (2.8+20081027-0ubuntu8) jaunty; urgency=low
+
+  * debian/testsuite-checking/compare.sh: if there are regressions in
+    the test suite, output the contents of the failure logs to the build
+    log. (wanted for debugging current armel build failure)
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Sat, 15 Nov 2008 00:44:59 +0000
+
+glibc (2.8+20081027-0ubuntu7) jaunty; urgency=low
+
+  * debian/sysdeps/ia64.mk, debian/sysdeps/sparc.mk,
+    debian/sysdeps/powerpc.mk, debian/sysdeps/linux.mk, 
+    debian/script.in/kernelcheck.sh: make 2.6.15 the minimum kernel
+    version across all archs, because there are no major differences
+    between 2.6.15 and 2.6.18 for any architectures and this lets us run
+    jaunty chroots on kernels from Ubuntu 6.06 LTS.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Fri, 14 Nov 2008 19:22:19 +0000
+
+glibc (2.8+20081027-0ubuntu6) jaunty; urgency=low
+
+  * debian/script.in/kernelcheck.sh: Treat `uname -m` == powerpc* or ppc* as
+    powerpc. (Argh.)
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 04 Nov 2008 01:48:57 +0000
+
+glibc (2.8+20081027-0ubuntu5) jaunty; urgency=low
+
+  * debian/script.in/kernelcheck.sh: Treat `uname -m` == sparc64 as sparc.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Mon, 03 Nov 2008 12:39:47 +0000
+
+glibc (2.8+20081027-0ubuntu4) jaunty; urgency=low
+
+  * debian/testsuite-checking/expected-results-ia64-linux-gnu-libc,
+    debian/testsuite-checking/expected-results-powerpc-linux-gnu-libc,
+    debian/testsuite-checking/expected-results-powerpc64-linux-ppc64,
+    debian/testsuite-checking/expected-results-sparc-linux-gnu-libc,
+    debian/testsuite-checking/expected-results-sparc64-linux-sparc64,
+    debian/testsuite-checking/expected-results-sparcv9b-linux-sparcv9b: Add
+    tst-pselect, since the Ubuntu buildds for these architectures are still
+    running 2.6.15 and pselect is racy there.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Mon, 03 Nov 2008 11:50:33 +0000
+
+glibc (2.8+20081027-0ubuntu3) jaunty; urgency=low
+
+  * debian/sysdeps/ia64.mk, debian/sysdeps/sparc.mk,
+    script.in/kernelcheck.sh: Set the minimal kernel version to 2.6.15 for
+    ia64 and sparc, whose Ubuntu buildds are also still running 2.6.15.
+  * debian/patches/ubuntu/stack-guard-quick-randomization.diff: Add test
+    changes from Fedora patch by Jakub Jelinek:
+    - elf/tst-stackguard1.c (do_test): Don't fail if the poor man's
+      randomization doesn't work well enough.
+  * debian/testsuite-checking/expected-results-powerpc-linux-gnu-libc:
+    Expect failure from test-fenv, since it's been failing at least back to
+    Ubuntu 8.04 and this is probably due to use of an old kernel on the
+    Ubuntu powerpc buildds (LP: #292360).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Sun, 02 Nov 2008 11:28:16 +0000
+
+glibc (2.8+20081027-0ubuntu2) jaunty; urgency=low
+
+  * Reapply changes from 2.8~20080505-0ubuntu7.
+  * debian/sysdeps/powerpc.mk, script.in/kernelcheck.sh: Set the
+    minimal kernel version to 2.6.15 for powerpc.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 01 Nov 2008 07:41:22 +0100
+
+glibc (2.8+20081027-0ubuntu1) jaunty; urgency=low
+
+  * Merge with Debian; remaining changes:
+    - Packaging:
+      + External tzdata
+      + Use external locale information
+      + Addition of Niagara and Niagara2 optimised libraries
+      + GFDL Documentation added back in, build glibc-doc from this source.
+      + Transition from /usr/include/ppc64-linux-gnu to powerpc64-linux-gnu
+      + Use dpkg triggers for ldconfig
+      + Do not die if extra libc libraries or symlinks found
+      + Do not do a test run of nscd when starting
+      + Only apply patches we actually use in Ubuntu
+      + Use /lib and /usr/lib for amd64
+      + amd64 biarch is i686, not i486.
+      + Non-optimised i386 glibc is Xen-friendly.
+      + Support sparcv9v, v9v2, 64b, 64v, 64v2
+      + Add support for lpia.
+      + Use <triplet>.conf for files in /etc/ld.so.conf.d.
+    - Patches:
+      + Applied any/local-ipv6-lookup.
+      + Not applied any/local-sysctl.
+  * testsuite-checking: Use Debian's testsuite checking, sort expected and
+    current test results before comparing.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 31 Oct 2008 19:05:39 +0100
 
 glibc (2.8+20080809-3) experimental; urgency=low
 
@@ -296,10 +599,126 @@ glibc (2.8+20080809-3) experimental; urgency=low
   * add any/local-linuxthreads-ptw.diff. Closes: #494908.
   * add kfreebsd/local-sysdeps28.diff, glibc 2.8 specific kfreebsd sysdeps.
 
-  [ Samuel Thibault ]
-  * Add hurd-i386/submitted-report-wait.diff.
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 13 Oct 2008 18:28:11 +0200
 
- -- Aurelien Jarno <aurel32@debian.org>  Sat, 25 Oct 2008 21:22:39 +0200
+glibc (2.8~20080505-0ubuntu7) intrepid; urgency=low
+
+  * Add debian/patches/ubuntu/stack-guard-quick-randomization.diff: do
+    light-weight randomization of the stack guard value instead of using
+    a static sentinel (LP: #275493).
+
+ -- Kees Cook <kees@ubuntu.com>  Sun, 28 Sep 2008 09:30:01 -0700
+
+glibc (2.8~20080505-0ubuntu6) intrepid; urgency=low
+
+  [ Matthias Klose ]
+  * Add debian/patches/any/regexp_h___REPB_PREFIX.diff patch (LP: #234056):
+    fix xview FTBFS error (Devid Filoni). LP: #234056.
+  
+  [ Michael Vogt ]
+  * sysdeps/depflags.pl:
+    - really add "findutils (>= 4.4.0-2ubuntu2)" to the libc6 depends,
+      this needs to be done in sysdeps/depflags.pl the regular 
+      depend lines in debian/control.in/libc are just ignored
+      (LP: #234345)
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Fri, 20 Jun 2008 17:28:24 +0200
+
+glibc (2.8~20080505-0ubuntu5) intrepid; urgency=low
+
+  * Do not run the testsuite on hppa ("threading on hppa is kinda goofy,
+    so the thread-stressing testsuite breaks").
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 10 Jun 2008 14:37:08 +0200
+
+glibc (2.8~20080505-0ubuntu4) intrepid; urgency=low 	
+
+  [ Michael Vogt ]
+  * debian/control:
+    - add a depends on findutils (>= 4.4.0-2ubuntu2) to libc6 to ensure
+      that xargs is unpacked before the new libc6 is unpacked. The xargs
+      from hardy crashes with the libc6 from intrepid (LP: #234345)
+
+  [ Matthias Klose ]
+  * Merge Debian 2.7-12:
+
+  [ Aurelien Jarno ]
+  * patches/alpha/submitted-procfs_h.diff: don't include elf/asm.h on alpha,
+    as it has been removed from linux-libc-dev.
+  * patch/arm/cvs-ioperm.diff: don't include asm/page.h as it has been removed
+    from linux-libc-dev.  Closes: #480892.
+  * patches/hppa/cvs-atomic.diff: don't remove "memory" asm constraint. Fixes
+    FTBFS on hppa.
+  * Update Swedish debconf translation, by Martin Bagge.  Closes: #482467.
+  * sysdeps/amd64.mk, sysdeps/i386.mk, control.in/main: bump g++-4.3 build-depends
+    to (>= 4.3.0-2) to make sure the cld fix is applied. Use gcc-4.3 on amd64
+    and i386.
+  * patches/any/cvs-iconv-braces.diff: new patch from upstream to fix various
+    iconv bugs.
+  * local/manpages/nscd.conf.5: update nscd.conf manpage.  Closes: #482505.
+
+  [ Clint Adams ]
+  * Add any/cvs-regex_anchor.diff to fix performance anomaly with ^$.
+    closes: #475474.
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/cvs-termios.diff: update patch, fixes compilation of jove.
+  * patches/hurd-i386/local-pthread-unsupported-stubs.diff: new patch to
+    declare the unsupported function stubs, fixes compilation of pike.  Also
+    bump the dependency on hurd-dev to get <gnu/stubs-pthread.h>.
+  * patches/hurd-i386/local-unlockpt-chroot.diff: new patch to fix ptys in
+    chroots.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 03 Jun 2008 16:07:12 +0200
+
+glibc (2.8~20080505-0ubuntu3) intrepid; urgency=low
+
+  * Merge from Debian:
+    - patches/any/local-no-pagesize.diff: don't include asm/page.h from 
+      sys/user.h on alpha.  Closes: #480295.
+    - patches/any/submitted-user_h.diff: don't include linux/user.h from 
+      sys/user.h.  Closes: #480093.
+    - patches/hppa/submitted-fesetenv.diff: fix fesetenv() on hppa with 
+      gcc-4.3.
+    - sysdeps/arm.mk, sysdeps/hppa.mk, sysdeps/s390.mk, control.in/main: use
+      gcc-4.3 on arm, hppa and s390.
+    - debian/shlibs-add-udebs: new script from Frans Pop to correctly compute
+      the udev dependencies.  Closes: #474293.
+    - rules.d/debhelper.mk: remove linda overrides installation.
+    - debhelper.in/*lintian: update.
+    - control.in/main: relax a few dependencies.
+    - rules.d/debhelper.mk: avoid creating empty directories when building
+      libc6-dbg.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 11 May 2008 13:09:59 +0200
+
+glibc (2.8~20080505-0ubuntu2) intrepid; urgency=low
+
+  * Don't build-depend on g++-multilib on lpia.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 09 May 2008 20:20:05 +0200
+
+glibc (2.8~20080505-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version, built from a prerelease tarball.
+    - Remove patches applied upstream: amd64/cvs-vdso_clock_gettime.diff,
+      hppa/cvs-atomic.diff, hppa/hppalll.diff, sparc/submitted-v9v2.diff,
+      all/cvs-gai_conf.diff, any/cvs-epoll_h.diff, any/cvs-ether_line.diff,
+      any/cvs-ethertype.diff, any/cvs-fchmodat.diff, any/cvs-gcc-4.3.diff,
+      any/cvs-iconv-iso2022jp-loop-bug.diff, any/cvs-rfc3484.diff,
+      any/cvs-sched_h.diff, any/cvs-strtod.diff, any/cvs-tzfile.diff,
+      any/cvs-vfscanf.diff, any/cvs-wchar_h.diff,
+      any/cvs-sunrpc_rpc_thread.diff, any/cvs-strerror_r.diff,
+      any/cvs-short-for-fnstsw.diff, any/local-strfry.diff,
+      any/submitted-ieee754_h.diff, any/submitted-link-local_resolver.diff.
+    - Update patches: i386/submitted-i686-timing.diff.
+  * debian/*.symbols*:
+    - Add new symbols.
+    - Remove GLIBC_PRIVATE symbols not found anymore in 2.8:
+      _dl_tls_get_addr_soft@GLIBC_PRIVATE, __nss_services_lookup@GLIBC_PRIVATE.
+  * debhelper.in/libc.install: Relax file location for snapshot builds.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 09 May 2008 14:22:01 +0200
 
 glibc (2.7-18) unstable; urgency=low
 
@@ -446,6 +865,39 @@ glibc (2.7-12) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 02 Jun 2008 19:14:35 +0200
 
+glibc (2.7-11ubuntu1) intrepid; urgency=low
+
+  * Merge with Debian (r2892:2919).
+    - Packaging:
+      + External tzdata
+      + Use external locale information
+      + Addition of Niagara and Niagara2 optimised libraries
+      + GFDL Documentation added back in, build glibc-doc from this source.
+      + Transition from /usr/include/ppc64-linux-gnu to powerpc64-linux-gnu
+      + Use dpkg triggers for ldconfig
+      + Do not die if extra libc libraries or symlinks found
+      + Do not do a test run of nscd when starting
+      + Only apply patches we actually use in Ubuntu
+      + Use /lib and /usr/lib for amd64
+      + amd64 biarch is i686, not i486.
+      + Non-optimised i386 glibc is Xen-friendly.
+      + Support sparcv9v, v9v2, 64b, 64v, 64v2
+      + Add support for lpia.
+      + Call `sync' before building the tarball of supported locales.
+      + Downgrade priority of debconf questions for RELEASE_UPGRADE_MODE=desktop.
+      + Use the package settings for *FLAGS, not the settings from the env.
+      + Fail the build when regressions are detected in the testsuite.
+      + Build with GCC-4.3 on amd64 and i386.
+    - Patches:
+      + sparc/submitted-v9v2
+      + hppa/hppalll
+      + Applied any/local-ipv6-lookup.
+      + Not applied any/local-sysctl.
+  * any/cvs-short-for-fnstsw.diff: Backport from the trunk, fix build failure
+    with binutils from trunk.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 08 May 2008 12:06:01 +0200
+
 glibc (2.7-11) unstable; urgency=low
 
   [ Aurelien Jarno ]
@@ -469,23 +921,8 @@ glibc (2.7-11) unstable; urgency=low
   * kfreebsd/local-sysdeps.diff: update to revision 2163 (from glibc-bsd).
   * patches/s390/submitted-nexttowardf.diff: fix IEEE exceptions raising in
     nexttowardf() on s390 with gcc-4.3.
-  * patches/i386/cvs-short-for-fnstsw.diff: patch for upstream to fix build
-    with latest binutils.
-  * patches/any/local-no-pagesize.diff: don't include asm/page.h from 
-    sys/user.h on alpha.  Closes: #480295.
-  * patches/any/submitted-user_h.diff: don't include linux/user.h from 
-    sys/user.h.  Closes: #480093.
-  * patches/hppa/submitted-fesetenv.diff: fix fesetenv() on hppa with 
-    gcc-4.3.
-  * sysdeps/arm.mk, sysdeps/hppa.mk, sysdeps/s390.mk, control.in/main: use
-    gcc-4.3 on arm, hppa and s390.
-  * debian/shlibs-add-udebs: new script from Frans Pop to correctly compute
-    the udev dependencies.  Closes: #474293.
-  * rules.d/debhelper.mk: remove linda overrides installation.
-  * debhelper.in/*lintian: update.
-  * control.in/main: relax a few dependencies.
-  * rules.d/debhelper.mk: avoid creating empty directories when building
-    libc6-dbg.
+  * sysdeps/arm.mk, sysdeps/s390.mk, control.in/main: use gcc-4.3 on arm
+    and s390.
 
   [ Pierre Habouzit ]
   * Add any/cvs-strerror_r.diff to make strerror_r actually thread safe.
@@ -495,7 +932,49 @@ glibc (2.7-11) unstable; urgency=low
   * patches/hurd-i386/cvs-termios.diff: new patch to revamp ioctls/termios
   bits.
 
- -- Aurelien Jarno <aurel32@debian.org>  Sun, 11 May 2008 12:13:59 +0200
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 05 May 2008 22:24:48 +0200
+
+glibc (2.7-10ubuntu3) hardy; urgency=low
+
+  * Probably built on the good buildds last time; pessimize expected
+    test results on ia64, i386.
+  * debian/expected_test_summary: Fix typos in expected sparc results.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 05 Apr 2008 00:03:19 +0200
+
+glibc (2.7-10ubuntu2) hardy; urgency=low
+
+  * Adjust debian/expected_test_summary:
+    - Fix typo for i386 xen.
+    - crypt/sha512c fails on i386 (log-test-i486-linux-gnu-libc), but not on
+      the PPA build.
+    - Add current results for ia64, powerpc, sparc. 
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 04 Apr 2008 09:09:37 +0200
+
+glibc (2.7-10ubuntu1) hardy; urgency=low
+
+  * Merge remaining changes from 2.7-10 (r2869:2892).
+  * If RELEASE_UPGRADE_MODE is set to `desktop', make the glibc/restart-services,
+    glibc/restart-failed and glibc/upgrade questions of medium priority (and
+    restarting the services automatically).  LP: #174002.
+    Works as well around the upgrade errors mentioned in LP #205079 in a KDE
+    environment, when the upgrade is done using the update-manager.
+  * debian/rules: Always use the package settings for *FLAGS, not the settings
+    from the environment.
+  * Fail the build if regressions are found running the testsuite compared to
+    expected results from debian/expected_test_summary. Take initial values
+    from a PPA build predating this upload.
+  * Merge from Debian trunk:
+    - local/manpages/ld.so.8: fix libraries search order.  Closes: #473458.
+    - Update Finish debconf translation, by Esko Arajärvi.  Closes: #473802.
+    - Add any/cvs-strerror_r.diff to make strerror_r actually thread safe.
+      Closes: #456531.
+  * debian/rules.d/build.mk: Call `sync' before building the tarball of
+    supported locales. Our buildds trigger http://lkml.org/lkml/2007/8/1/337
+    on every build.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 03 Apr 2008 21:50:42 +0200
 
 glibc (2.7-10) unstable; urgency=low
 
@@ -558,6 +1037,75 @@ glibc (2.7-10) unstable; urgency=low
     hurd-i386.
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 27 Mar 2008 23:09:00 +0100
+
+glibc (2.7-9ubuntu2) hardy; urgency=low
+
+  * Clear out LDFLAGS when building; glibc isn't happy building with
+    -Wl,-Bsymbolic-functions. LP: #201673
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Thu, 13 Mar 2008 08:34:28 +0000
+
+glibc (2.7-9ubuntu1) hardy; urgency=low
+
+  * Merge with Debian (r2869); remaining changes:
+    - Packaging:
+      + External tzdata
+      + Use external locale information
+      + Addition of Niagara and Niagara2 optimised libraries
+      + GFDL Documentation added back in, build glibc-doc from this source.
+      + Transition from /usr/include/ppc64-linux-gnu to powerpc64-linux-gnu
+      + Use dpkg triggers for ldconfig
+      + Do not die if extra libc libraries or symlinks found
+      + Do not do a test run of nscd when starting
+      + Only apply patches we actually use in Ubuntu
+      + Use /lib and /usr/lib for amd64
+      + amd64 biarch is i686, not i486.
+      + Non-optimised i386 glibc is Xen-friendly.
+      + Support sparcv9v, v9v2, 64b, 64v, 64v2
+      + Add support for lpia.
+    - Patches:
+      + sparc/submitted-v9v2
+      + hppa/hppalll
+      + Applied any/local-ipv6-lookup.
+      + Not applied any/local-sysctl.
+  * debian/sysdeps/*.mk: Still build main flavours with -O3 (using gcc-4.2).
+  * Use <triplet>.conf for files in /etc/ld.so.conf.d. LP: #70315
+
+  * patches/any/local-ipv6-lookup.diff: Update (Tollef van Heen).
+
+  [changes from Debian svn after -9]
+  * Update Chinese debconf translation, by LI Daobing.
+  * Update Dutch debconf translation, by Bart Cornelis.  Closes: #468300.
+  * Update Polish debcon translation, by Emilian Nowak.
+  * Update Vietnamese debconf translation, by Clytie Siddall.  Closes: #468453.
+  * Update Basque debconf translation, by Piarres Beobide.  Closes: #468463.
+  * Update Romanian debconf translation, by Stan Ioan-Eugen.  Closes: #468671.
+  * Update Czech debconf translation, by Miroslav Kure.  Closes: #468910.
+  * Update Russian debconf translation, by Sergey Alyoshin.  Closes: #469037.
+  * Update Korean debconf translation, by Sunjae Park.  Closes: #469097.
+  * Update French debconf translation, by Christian Perrier.  Closes: #469249.
+  * patches/localedata/locale-es_CR.diff: chane AM/PM format to "a.m./p.m." 
+    from "A.M/P.M.".
+  * Remove uk_UA from patches/localedata/first_weekday.diff: merged upstream
+    in a different way.  Closes: bug#469439.
+  * patches/any/cvs-rfc3484.diff: update from CVS to allow the definition of
+    IPv4 scopes in /etc/gai.conf.    
+  * patches/all/cvs-gai_conf.diff: update gai.conf from CVS to also mention
+    Teredo tunnels and scopev4 defaults.
+  * sysdeps/mips.mk, sysdeps/mipsel.mk: define TIMEOUTFACTOR.
+  * patches/any/cvs-strtod.diff: new patch from CVS to fix strtod().  Closes:
+    #465769.
+  * Update Italian debconf translation, by Lica Monducci.  Closes: #469985.
+  * control.in/main, sysdeps/*.mk, rules: build with gcc-4.3 by default,
+    except on alpha, arm, armel, hppa, s390 and hurd-i386.
+  * rules, rules.d/build.mk: fix parallel build.
+  * control.in/main: build-depends on gcc-4.3 (>= 4.3.0-2) to make sure a cld
+    instruction is emitted in the prologue of functions using stringops.
+    Closes: #469568.
+  * debian/rules.d/build.mk: disable testsuite on ARM machines running a
+    2.6.21 to 2.6.24 kernel.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 12 Mar 2008 22:08:00 +0100
 
 glibc (2.7-9) unstable; urgency=low
 
@@ -691,6 +1239,47 @@ glibc (2.7-6) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Sat, 12 Jan 2008 15:33:10 +0100
 
+glibc (2.7-5ubuntu2) hardy; urgency=low
+
+  * Really stop setting MAKEINFO to :, so that the info documentation is
+    built.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 01 Jan 2008 12:10:28 +0000
+
+glibc (2.7-5ubuntu1) hardy; urgency=low
+
+  * Resynchronise with Debian. Remaining changes:
+    - Packaging:
+      + External tzdata
+      + Use external locale information
+      + Addition of Niagara and Niagara2 optimised libraries
+      + GFDL Documentation added back in.
+      + Transition from /usr/include/ppc64-linux-gnu to powerpc64-linux-gnu
+      + Use dpkg triggers for ldconfig
+      + Do not die if extra libc libraries or symlinks found
+      + Do not do a test run of nscd when starting
+      + Only apply patches we actually use in Ubuntu
+      + Use /lib and /usr/lib for amd64
+      + amd64 biarch is i686, not i486.
+      + Non-optimised i386 glibc is Xen-friendly.
+      + Support sparcv9v, v9v2, 64b, 64v, 64v2
+      + Add support for lpia.
+    - Patches:
+      + any/local-ipv6-sanity
+      + i386/local-clone
+      + amd64/local-clone
+      + sparc/submitted-v9v2
+      + hppa/hppalll
+  * Debian any/cvs-vfscanf patch fixes LP: #178045. Actually add it to
+    debian/patches/series (forgotten in Debian).
+  * Stop setting MAKEINFO to :, which prevented the info documentation being
+    built. See also 2.5-0ubuntu3.
+  * any/submitted-rfc3484-sortv4: Return to disabling RFC3484 s6 rule 9 by
+    default. As requested by Ubuntu sysadmins, we want this regardless of
+    the Debian technical committee's decision.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Mon, 24 Dec 2007 09:55:32 +0000
+
 glibc (2.7-5) unstable; urgency=low
 
   [ Aurelien Jarno ]
@@ -722,6 +1311,12 @@ glibc (2.7-5) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 19 Dec 2007 01:22:06 +0100
 
+glibc (2.7-4ubuntu1) hardy; urgency=low
+
+  * Merge with Debian; remaining changes (see 2.7-1ubuntu1)
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 10 Dec 2007 10:34:38 +0100
+
 glibc (2.7-4) unstable; urgency=low
 
   [ Aurelien Jarno ]
@@ -740,6 +1335,18 @@ glibc (2.7-4) unstable; urgency=low
     re-enabled.  Closes: #453480.
 
  -- Aurelien Jarno <aurel32@debian.org>  Fri, 07 Dec 2007 00:49:02 +0100
+
+glibc (2.7-3ubuntu1) hardy; urgency=low
+
+  [ Matthias Klose ]
+  * Merge with Debian; remaining changes (see 2.7-1ubuntu1)
+  * debian/rules.d/control.mk: Re-add support for lpia.
+  * debian/sysdeps/amd64.mk: Restore i386_includedir.
+
+  [ Jeff Bailey ]
+  * debian/patches/hppa/hppalll.diff: Fix build failure on hppa.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 07 Dec 2007 23:21:12 +0100
 
 glibc (2.7-3) unstable; urgency=low
 
@@ -789,6 +1396,32 @@ glibc (2.7-2) unstable; urgency=low
     about no_NO locale.
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 26 Nov 2007 19:03:17 +0100
+
+glibc (2.7-1ubuntu1) UNRELEASED; urgency=low
+
+  * Merge changes from Debian.
+    Remaining changes:
+      * Packaging:
+      *   External tzdata
+      *   Use external locale information
+      *   Addition of Niagara and Niagara2 optimised libraries
+      *   GFDL Documentation added back in.
+      *   Transition from /usr/include/ppc64-linux-gnu to powerpc64-linux-gnu
+      *   Use dpkg triggers for ldconfig
+      *   Do not die if extra libc libraries or symlinks found
+      *   Do not do a test run of nscd when starting
+      *   Only apply patches we actually use in Ubuntu
+      *   Use /lib and /usr/lib for amd64
+      *   amd64 biarch is i686, not i486.
+      *   Non-optimised i386 glibc is Xen-friendly.
+      *   Support sparcv9v, v9v2, 64b, 64v, 64v2
+      * Patches:
+      *   any/local-ipv6-sanity
+      *   i386/local-clone
+      *   amd64/local-clone
+      *   sparc/submitted-v9v2
+
+ -- Jeff Bailey <jeffbailey@google.com>  Sun, 25 Nov 2007 17:44:13 -0800
 
 glibc (2.7-1) unstable; urgency=low
 
@@ -946,6 +1579,43 @@ glibc (2.7-1) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Fri, 23 Nov 2007 10:46:24 +0100
 
+glibc (2.6.1-6ubuntu2) hardy; urgency=low
+
+  * Reapply any/local-ipv6-sanity.diff, lost when merging 2.6. LP: #156720.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 24 Oct 2007 18:15:43 +0200
+
+glibc (2.6.1-6ubuntu1) hardy; urgency=low
+
+  [Fabio M. Di Nitto]
+  * debian/patches/sparc/submitted-v9v2.diff: Add Niagara 2 optimized
+    memcpy support.
+    Code, patch and test done by David S. Miller.
+  * debian/patches/series: update.
+  * debian/sysdeps/sparc.mk: Add v9v2 32 and 64 bit targets.
+  * debian/control.in/opt: Add sparc64v2 and sparcv9v2 packages.
+  * debian/control: update.
+  * debian/script.in/nohwcap.sh:
+    memcpy support.
+    Code, patch and test done by David S. Miller.
+  * debian/patches/series: update.
+  * debian/sysdeps/sparc.mk: Add v9v2 32 and 64 bit targets.
+  * debian/control.in/opt: Add sparc64v2 and sparcv9v2 packages.
+  * debian/control: update.
+  * debian/script.in/nohwcap.sh:
+    - fix list of sparc optimized libc6.
+    - add v9v2 optimized packages.
+
+  [Matthias Klose]
+  * Merge with Debian; remaining changes:
+    - Upstream tarball including GFDL'd documentation.
+    - Don't apply patches for architectures not found in Ubuntu.
+    - Build optimized sparc packages.
+    - Support lpia.
+    - No support for linuxthreads.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 19 Oct 2007 15:25:11 +0200
+
 glibc (2.6.1-6) unstable; urgency=low
 
   [ Aurelien Jarno ]
@@ -1071,6 +1741,77 @@ glibc (2.6.1-2) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon,  3 Sep 2007 18:15:37 +0200
 
+glibc (2.6.1-1ubuntu9) gutsy; urgency=low
+
+  * Rebuild using g++-4.2 (>= 4.2.1-5ubuntu4).
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 01 Oct 2007 00:04:19 +0200
+
+glibc (2.6.1-1ubuntu8) gutsy; urgency=low
+
+  * hppa/local-private-futex-lamont.diff: fix hppa FTBFS.
+
+ -- LaMont Jones <lamont@ubuntu.com>  Thu, 27 Sep 2007 18:51:24 +0000
+
+glibc (2.6.1-1ubuntu7) gutsy; urgency=low
+
+  * any/submitted-rfc3484-sortv4.diff: new patch to allow bypassing RFC3484
+    rule 9 for IPv4 adresses.  Closes: bug#438179.
+    [ by Aurelien Jarno; imported from glibc 2.6.1-2 into Ubuntu by iwj ]
+  * any/submitted-rfc3484-sortv4.diff: disable RFC3484 s6 rule 9 by
+    default as requested by Ubuntu sysadmins and in anticipation of
+    that change in Debian (which looks likely).
+
+ -- Ian Jackson <iwj@ubuntu.com>  Thu, 20 Sep 2007 14:49:50 +0100
+
+glibc (2.6.1-1ubuntu6) gutsy; urgency=low
+
+  * Do not print "ldconfig: wrapper deferring update (trigger activated)"
+    message (unless LDCONFIG_TRIGGER_DEBUG is set).
+
+ -- Ian Jackson <iwj@ubuntu.com>  Thu, 20 Sep 2007 14:20:30 +0100
+
+glibc (2.6.1-1ubuntu5) gutsy; urgency=low
+
+  * Do not install the ppu symlinks in the powerpc packages.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 19 Sep 2007 00:27:46 +0200
+
+glibc (2.6.1-1ubuntu4) gutsy; urgency=low
+
+  * sysdeps/amd64.mk: uses x86_64 headers also for the i486 flavour now
+    that they are compatible. don't provide include symlink for bi-arch,
+    but only an empty directory.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 09 Sep 2007 21:09:21 +0200
+
+glibc (2.6.1-1ubuntu3) gutsy; urgency=low
+
+  * Actually exec ldconfig.real.  (LP #137129.)
+
+ -- Ian Jackson <iwj@ubuntu.com>  Mon, 03 Sep 2007 20:47:11 +0100
+
+glibc (2.6.1-1ubuntu2) gutsy; urgency=low
+
+  * Use dpkg-trigger to avoid multiple calls to ldconfig.
+
+ -- Ian Jackson <iwj@ubuntu.com>  Mon, 03 Sep 2007 14:48:39 +0100
+
+glibc (2.6.1-1ubuntu1) gutsy; urgency=low
+
+  * Merge with Debian (outstanding changes for the final 2.6.1-1 package).
+    Remaining changes:
+    - Upstream tarball including GFDL'd documentation.
+    - Don't apply patches for architectures not found in Ubuntu.
+    - Build optimized sparc packages.
+    - Support lpia.
+    - No support for linuxthreads.
+
+  * debian/patches/sparc/sparc-sparcv9.diff: sparc-sparcv9 directory fix
+    (David Miller).
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 28 Aug 2007 13:04:00 +0200
+
 glibc (2.6.1-1) unstable; urgency=low
 
   * New upstream version:
@@ -1099,6 +1840,34 @@ glibc (2.6.1-1) unstable; urgency=low
   * hurd-i386/local-gscope.diff: resync, mostly merged upstream.
 
  -- Aurelien Jarno <aurel32@debian.org>  Tue, 07 Aug 2007 13:34:26 +0200
+
+glibc (2.6.1-0ubuntu1) gutsy; urgency=low
+
+  * New upstream version 2.6.1, including glibc-ports-2.6.1.
+    - Remove applied patches: patches/any/cvs-ports-glibc-2_6-branch.diff,
+      patches/arm/cvs-gscope_flag.diff, patches/mips/cvs-gscope_flag.diff,
+      patches/hppa/submitted-gscope_flag.diff.
+  * debian/wrapper/objcopy: Revert the workaround.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 06 Aug 2007 22:38:54 +0200
+
+glibc (2.6.1~pre-0ubuntu1) gutsy; urgency=low
+
+  * New upstream version 2.6.1, glibc-ports is still version 2.6.
+  * Remove patches applied upstream.
+  * Merge from the Debian repository.
+  * debian/wrapper/objcopy: Remove -R .debug_aranges, fixing broken
+    debug symbols.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 03 Aug 2007 12:22:19 +0200
+
+glibc (2.6-5ubuntu1) gutsy; urgency=low
+
+  * Merge with Debian.
+    -  cvs-printf_fp.c.diff: new patch to  print the wrong number of
+       digits with %#g. LP: #128355.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 29 Jul 2007 20:39:57 +0200
 
 glibc (2.6-5) unstable; urgency=low
 
@@ -1134,6 +1903,40 @@ glibc (2.6-5) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 29 Jul 2007 17:25:52 +0200
 
+glibc (2.6-4ubuntu3) gutsy; urgency=low
+
+  * patches/lpia/local-i686-redefine.diff: Redefine __i686, which gets
+    clobbered to "1" by the compiler, causing the assembler to have a fit
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sat, 28 Jul 2007 05:30:06 +1000
+
+glibc (2.6-4ubuntu2) gutsy; urgency=low
+
+  * Fix gij memory hog on amd64, thanks to Aurelien Jarno.
+  * sparc/submitted-gscope_flag.diff: update from upstream.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 26 Jul 2007 23:28:49 +0200
+
+glibc (2.6-4ubuntu1) gutsy; urgency=low
+
+  * Merge with Debian; remaining changes:
+    - Upstream tarball including GFDL'd documentation.
+    - Don't apply patches for architectures not found in Ubuntu.
+    - Build optimized sparc packages.
+    - Support lpia.
+    - Minor differences to be cleaned up.
+  * glibc-doc: Install the documentation in info format. Closes: LP: #60607.
+
+  * Merge changes from Debian:
+    * mips/cvs-gscope_flag.diff: new patch to fix build on mips/mipsel.
+    * arm/cvs-gscope_flag.diff: new patch to fix build on arm/armel.
+    * any/cvs-initfini.diff: new patch from upstream to fix crti.o on 
+      ppc64.  Closes: #434626.
+    * debian/sysdeps/powerpc.mk: build libc6-ppc64 with gcc-4.2.
+    * debian/control: Remove build-depend on gcc-4.1 on powerpc.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 26 Jul 2007 16:22:15 +0200
+
 glibc (2.6-4) unstable; urgency=low
 
   [ Samuel Thibault ]
@@ -1159,6 +1962,36 @@ glibc (2.6-4) unstable; urgency=low
   * sparc/submitted-gscope_flag.diff: new patch to fix build on sparc.
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 26 Jul 2007 08:57:48 +0200
+
+glibc (2.6-3ubuntu3) gutsy; urgency=low
+
+  * patches/sparc/submitted-gscope_flag.diff: New patch to fix build
+    on sparc (Aurelien Jarno).
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 26 Jul 2007 00:56:49 +0200
+
+glibc (2.6-3ubuntu2) gutsy; urgency=low
+
+  * Build the 64bit powerpc library with gcc-4.1.
+  * Update to the glibc-2_6-branch 20070725.
+    - patches/any/cvs-libc-glibc-2_6-branch.diff: New.
+    - patches/any/cvs-ports-glibc-2_6-branch.diff: New.
+    - patches/any/cvs-ld-integer-overflow.diff: Remove.
+    - patches/any/cvs-malloc.diff: Remove.
+    - patches/any/cvs-nis-nss-default.diff: Remove.
+    - patches/any/cvs-nscd-short-replies.diff: Remove.
+    - patches/any/cvs-vfscanf.diff: Remove.
+  * Build-depend on g++-4.1-multilib/g++-4.2-multilib.
+  * debian/sysdeps/hppa.mk: Don't explicitely use gcc-4.2.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 25 Jul 2007 15:34:26 +0200
+
+glibc (2.6-3ubuntu1) gutsy; urgency=low
+
+  * Merge with Debian.
+  * debian/sysdeps/lpia.mk: Build using -march=i686 -mtune=i586 -g -O3.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 23 Jul 2007 15:02:03 +0200
 
 glibc (2.6-3) unstable; urgency=low
 
@@ -1216,6 +2049,20 @@ glibc (2.6-3) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 23 Jul 2007 08:01:26 +0200
 
+glibc (2.6-2ubuntu2) gutsy; urgency=low
+
+  * debian/rules.d/control.mk: Add lpia to threads_archs and to libc6 list
+  * debian/sysdeps/lpia.mk: Add gcc-4.2 usage, but comment it out for now,
+    while we bootstrap with gcc-4.1 (because we're FTBFS with gcc-4.2)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 12 Jul 2007 13:36:23 +0100
+
+glibc (2.6-2ubuntu1) gutsy; urgency=low
+
+  * Merge Debian changes 2.6-1 -> 2.6-2.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 10 Jul 2007 14:18:22 +0200
+
 glibc (2.6-2) unstable; urgency=low
 
   [ Clint Adams ]
@@ -1232,7 +2079,30 @@ glibc (2.6-2) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Tue, 10 Jul 2007 09:17:49 +0200
 
-glibc (2.6-1) unstable; urgency=low
+glibc (2.6-1ubuntu1) gutsy; urgency=low
+
+  [Jeff Bailey]
+  * debian/sysdeps/hppa.mk: Use gcc-4.2
+  * debian/control.in/main: Build-dep on gcc-4.2 [hppa]
+  * debian/control: Regenerate
+
+  [Matthias Klose]
+  * Merge Debian changes 2.6-0exp3 -> 2.6-1.
+  * debian/sysdeps/lpia: New.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon,  9 Jul 2007 12:20:28 +0200
+
+glibc (2.6-0ubuntu1) gutsy; urgency=low
+
+  * New upstream release.
+  * Merge with Debian; remaining changes:
+    - Include unmodified glibc-2.6 upstream tarball.
+    - Don't build locale* packages.
+    - TODO: list remaining changes.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon,  2 Jul 2007 13:29:33 +0200
+
+glibc (2.6-0exp3) experimental; urgency=low
 
   [ Pierre Habouzit ]
   [ Clint Adams]
@@ -1346,6 +2216,13 @@ glibc (2.6-1) unstable; urgency=low
 
  -- Clint Adams <schizo@debian.org>  Sat, 07 Jul 2007 09:43:02 -0400
 
+glibc (2.5-11ubuntu1) gutsy; urgency=low
+
+  * Merge Debian changes (2.5-10 - 2.5-11).
+  * Add ppu symlinks on powerpc.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 13 Jun 2007 17:20:14 +0200
+
 glibc (2.5-11) unstable; urgency=low
 
   [ Aurelien Jarno ]
@@ -1359,6 +2236,18 @@ glibc (2.5-11) unstable; urgency=low
     shlibs.  Closes: #427637.
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 11 Jun 2007 15:06:21 +0200
+
+glibc (2.5-10ubuntu2) gutsy; urgency=low
+
+  * libc6-dev-ppc64: Install gnu-stubs-64.h in /usr/include/gnu.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 08 Jun 2007 12:01:55 +0000
+
+glibc (2.5-10ubuntu1) gutsy; urgency=low
+
+  * Merge Debian changes (2.5-9 - 2.5-10).
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon,  4 Jun 2007 23:31:10 +0200
 
 glibc (2.5-10) unstable; urgency=low
 
@@ -1400,6 +2289,13 @@ glibc (2.5-9) unstable; urgency=low
 
  -- Aurelien Jarno <aurel32@debian.org>  Tue, 22 May 2007 17:03:23 +0200
 
+glibc (2.5-8ubuntu1) gutsy; urgency=low
+
+  * Merge Debian changes (2.5-7 - 2.5-8).
+  * Fix installation location of sparc64 headers.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 20 May 2007 15:01:08 +0200
+
 glibc (2.5-8) unstable; urgency=low
 
   [ Aurelien Jarno ]
@@ -1422,6 +2318,12 @@ glibc (2.5-8) unstable; urgency=low
   * debian/control.in/main: unify the gcc-4.1 depends to (>= 4.1.2-6).
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 20 May 2007 03:43:09 +0200
+
+glibc (2.5-7ubuntu1) gutsy; urgency=low
+
+  * Merge Debian changes (2.5-5 - 2.5-7).
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 15 May 2007 17:31:45 +0200
 
 glibc (2.5-7) unstable; urgency=low
 
@@ -1468,6 +2370,12 @@ glibc (2.5-6) unstable; urgency=low
     hppa.
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 07 May 2007 03:27:10 +0200
+
+glibc (2.5-5ubuntu1) gutsy; urgency=low
+
+  * Merge Debian changes (2.5-2 - 2.5-5).
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 02 May 2007 09:04:02 +0200
 
 glibc (2.5-5) unstable; urgency=low
 
@@ -1612,6 +2520,29 @@ glibc (2.5-3) unstable; urgency=low
     and *_DK. Closes: #379100.
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 19 Apr 2007 07:55:58 +0200
+
+glibc (2.5-2ubuntu1) gutsy; urgency=low
+
+  * Merge Debian changes (2.5-0exp6 - 2.5-2).
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 18 Apr 2007 22:14:32 +0200
+
+glibc (2.5-0ubuntu21.2) toolchain-test; urgency=low
+
+  * libc6-dev-sparc64: Copy headers into /usr/include/sparc64-linux-gnu.
+    A symlink to /usr/include works for libc6-dev-sparc64, but not for
+    other packages which install into /usr/include/sparc64-linux-gnu.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri,  6 Apr 2007 13:45:41 +0200
+
+glibc (2.5-0ubuntu21.1) toolchain-test; urgency=low
+
+  * Update to current glibc-2_5-branch.
+    - debian/patches/sparc/local-pthread-shlib.diff: Update.
+    - debian/patches/any/branch-pr3429.diff: Remove.
+  * Merge Debian changes (2.5-0exp3 - 2.5-0exp6).
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 21 Mar 2007 17:22:13 +0100
 
 glibc (2.5-2) unstable; urgency=low
 
@@ -1837,6 +2768,308 @@ glibc (2.5-1) unstable; urgency=low
 
  -- Clint Adams <schizo@debian.org>  Mon, 09 Apr 2007 16:17:20 -0400
 
+glibc (2.5-0ubuntu12) feisty; urgency=low
+
+  * debian/patches/any/branch-pr3429.diff: Fix a race condition in
+    _dl_open with r_debug.r_state consistency check. Ubuntu #72639.
+  * debian/debhelper.in/nscd.init: Invalidate the hosts database as
+    well. Ubuntu #72647.
+  * debian/local/manpages/nscd.conf.5: Fix formatting. Ubuntu #55331.
+  * Fix typo in libc6-i686 package description. Ubuntu #81153.
+  * debian/patches/any/local-iconv-fix-trampoline.diff: Import from
+    Debian; new patch (fix iconvconfig segfault when run under exec-shield,
+    PaX or similar) from hlfs. Ubuntu #63353.
+  * Set Ubuntu maintainer address.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 21 Mar 2007 08:16:00 +0100
+
+glibc (2.5-0ubuntu14) feisty; urgency=low
+
+  * Twiddle the diff a little so it actually applies.
+
+ -- Tollef Fog Heen <tfheen@ubuntu.com>  Tue,  3 Apr 2007 21:34:51 +0200
+
+glibc (2.5-0ubuntu13) feisty; urgency=low
+
+  * debian/patches/any/local-ipv6-sanity.diff: Only do AAAA lookups if we
+    have an interface with better than link-local addresses available.
+
+ -- Tollef Fog Heen <tfheen@ubuntu.com>  Tue,  3 Apr 2007 14:11:26 +0200
+
+glibc (2.5-0ubuntu11) feisty; urgency=low
+
+  * debian/patches/hppa/cvs-missing-cfi_procend.diff: New file to work around
+    FTBFS uncovered by January CVS binutils.
+  * debian/patches/series: Use it.
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Sun, 11 Feb 2007 08:51:24 -0700
+
+glibc (2.5-0ubuntu10) feisty; urgency=low
+
+  [ Colin Watson ]
+  * debian/debhelper.in/libc.postinst: Correct grammar of NSS reboot warning
+    (LP: #70567).
+
+  [ Jeff Bailey ]
+  * debian/patches/hppa/submitted-nptl-carlos2.diff: New patch to add
+    STACK_GROWS_UP case to NPTL.
+  * debian/patches/series: Use it.
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Sat, 10 Feb 2007 12:03:41 -0500
+
+glibc (2.5-0ubuntu9) feisty; urgency=low
+
+  * debian/debhelper.in/libc.preinst: turn libc6 duplication
+    check from an error to a warning and point to the bug when
+    printing the warning.
+  (Closes Ubuntu: #81125)
+
+ -- Fabio M. Di Nitto <fabbione@ubuntu.com>  Sat, 06 Jan 2007 07:06:22 +0100
+
+glibc (2.5-0ubuntu8) feisty;  urgency=low
+
+  * no change upload to rebuild with proper binutils/gcc-4.1
+
+ -- Fabio M. Di Nitto <fabbione@ubuntu.com>  Sat, 06 Jan 2007 06:46:26 +0100
+
+glibc (2.5-0ubuntu7) feisty; urgency=low
+
+  [ Colin Watson ]
+
+  * debian/debhelper.in/glibc-doc.links: Restore
+    /usr/share/doc/glibc-doc/html/index.html symlink.
+
+  [ Fabio M. Di Nitto ]
+
+  * debian/patches/sparc/local-pthread-shlib.diff: New file.
+  * debian/patches/series: Update.
+
+ -- Fabio M. Di Nitto <fabbione@ubuntu.com>  Thu, 04 Jan 2007 17:36:19 +0100
+
+glibc (2.5-0ubuntu6) feisty; urgency=low
+
+  * Rebuild using gcc 4.1.1-21ubuntu3.
+
+ -- Fabio M. Di Nitto <fabbione@ubuntu.com>  Thu, 21 Dec 2006 08:52:45 -0800
+
+glibc (2.5-0ubuntu5) feisty; urgency=low
+
+  * Rebuild using gcc 4.1.1-21ubuntu2.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 14 Dec 2006 14:12:56 +0000
+
+glibc (2.5-0ubuntu4) feisty; urgency=low
+  
+  [ Fabio M. Di Nitto ]
+  * Fix path to patch in ubuntu2 changelog.
+  * debian/sysdeps/sparc.mk: re-enable testsuite on Niagara.
+    It was a kernel bug and fix is on the way upstream.
+  * debian/debhelper.in/libc.postinst: set back NSS version check.
+    It was bumped by mistake.
+    (Closes Ubuntu: #21117)
+
+ -- Fabio M. Di Nitto <fabbione@ubuntu.com>  Wed, 29 Nov 2006 06:26:46 +0100
+
+glibc (2.5-0ubuntu3) feisty; urgency=low
+
+  * debian/rules.d/build.mk: Do not define MAKEINFO to :, this prevented
+    generation of the info documentation, which we are happy to distribute.
+  * debian/control.in:
+    * main:
+      * glibc-doc Provides/Replaces/Conflicts glibc-doc-reference instead of
+        Suggests.  Fix description. 
+  * debian/control: Regenerate.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 24 Nov 2006 14:05:17 +0000
+
+glibc (2.5-0ubuntu2) feisty; urgency=low
+
+  [ Jeff Bailey ]
+  * debian/patches/hppa/submitted-ustat.diff: New file.
+  * debian/patches/series: Update.
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Wed,  1 Nov 2006 14:53:41 -0500
+
+glibc (2.5-0ubuntu1) feisty; urgency=low
+
+  [ Jeff Bailey ]
+  * debian/rules: Define BUILD_CXX
+  * debian/sysdeps/sparc.mk: Define sparc64v_CXX, sparc64b_CXX, sparc64_CXX
+  * debian/sysdeps/powerpc.mk: Define ppc64_CXX.
+  * debian/sysdeps/i386.mk: Define amd64_CXX.
+  * debian/sysdeps/amd64.mk: Define i386_CXX.
+  * debian/control.in/main: Set minimum b-d version of linux-libc-dev to
+    2.6.19-1.1
+    Add build-dep on lib64c++6 for powerpc and sparc.
+  * debian/control: Regenerate.
+  * debian/patches/any/local-2.6.19-linux-libc-dev.diff: Patch to cope
+    with kernel headers from 2.6.19.
+  * debian/patches/series: Update.
+    Prune localedata, alpha, arm, hppa linuxthreads and kernel version
+    hurd, m68k, and mips patches.
+
+  [ Fabio M. Di Nitto]
+  * use original glibc-2.5.tar.bz2 tarball from ftp.gnu.org:
+    * debian/patches/series: drop all/local-remove-manual.diff.
+  * debian/control.in:
+    * readd libc-dbg.
+    * main:
+      * readd Build-Depends: texinfo (>= 4.0), texi2html.
+      * change Build-Depends: linux-kernel-headers to linux-libc-dev.
+      * drop Build-Depends: lib32ssp0 and lib64ssp0.
+      * drop Conflicts: belocs-locales-bin, belocs-locales-data.
+    * opt:
+      * drop libc6-sparcv9.
+      * readd libc6-sparcv9v.
+      * readd libc6-sparc64b.
+      * readd libc6-sparc64v.
+      * merge descriptions from glibc 2.4 (WARNINGs and NPTL).
+  * Regenerate debian/control.
+  * debian/debhelper.in:
+    * readd glibc-doc.doc-base, glibc-doc.info and glibc-doc.install.
+    * readd libc-alt-dev.postinst.
+    * libc.install: drop usr/bin/locale nad usr/bin/localedef.
+    * libc.manpages: drop locale.1 and localedef.1.
+    * libc.postinst:
+      * fix $preversion quoting.
+      * bump version checking for $preversion to 2.5-0ubuntu1 for some cases.
+      * fix hwcappkgs lists for sparc.
+      * remove kernel version detection at startup.
+    * drop locales-all.*
+  * Merge debian/FAQ.
+  * debian/rules:
+    * drop locales-all and locales packages.
+    * readd CXX for cross-compiling.
+    * force -fno-stack-protector to disable automatic enablement from Ubuntu's
+      glibc.  Glibc itself will enable it as necessary.
+  * debian/rules.d:
+    * build.mk:
+      * readd CXX for cross-compiling.
+      * drop localedir (requires check).
+      * readd manual generation (requires check).
+      * keep using /etc/ld.so.conf.d/$triplet. New debian packages use
+        triplet.conf, and that would require a conffile migration script.
+      * readd nptl bits.
+    * debhelper.mk:
+      * readd nptl bits.
+      * install $(libc)-dev-$$x.postinst from libc-alt-dev.postinst.
+  * debian/script.in/kernelcheck.sh: fix kernel version check on != m68k.
+    (this should be pushed to debian too)
+  * debian/shlibver: bump to 2.5-0ubuntu1.
+  * debian/sysdeps:
+    * amd64.mk:
+      * default to nptl for amd64.
+      * set i386 configure target to i686-linux.
+      * set i386 CC to use $(BUILD_CC).
+      * readd --disable-profile to i386_extra_config_options.
+      * readd i386_MAKEFLAGS to set gconvdir.
+      * set i386_extra_cflags back to -march=i686 -mtune=i686.
+      * drop i386_rtlddir (requires check).
+      * set i386_slibdir and _libdir to use */lib32.
+      * change symlinking for */lib32.
+    * depflags.pl:
+      * change linux-kernel-headers into linux-libc-dev.
+      * readd Recommends: tzdata.
+      * readd Depends: locales (>= 2.3.11). (requires review)
+      * readd hack to cope with */lib64.
+    * hppa.mk: enable nptl.
+    * i386.mk:
+      * readd no-tls-direct-seg-refs to generic libc cflags.
+      * make symlink absolute again. (requires review - might be droppable)
+      * restore nptl_* options.
+      * change i686_slibdir to /lib/tls/i686/cmov.
+      * change xen_slibdir to /lib/tls/i686/nosegneg.
+      * keep using /etc/ld.so.conf.d/xen.conf. New debian packages use
+        libc6-xen.conf, and that would require a conffile migration script.
+      * drop ldconfig from libc6-xen.
+    * linux.mk:
+      * readd comments about nptl.
+      * readd nptl config.
+    * powerpc.mk: revert change to fix bug #391858 that is a gcc bug
+      (already addressed in Ubuntu) and not a glibc one.
+    * sparc.mk:
+      * readd sparc64b pass.
+      * readd sparc64v pass.
+      * disable sparcv9 pass.
+      * readd sparcv9v pass.
+      * fix sparc64 headers install.
+      * dynamically disable testsuite when building on Niagara.
+  * debian/patches:
+    * port forward ubuntu dir from 2.4:
+      * drop local-dynamic-resolvconf.diff. now part of debian.
+      * readd local-altlocaledir.diff.
+      * series: update.
+
+ -- Fabio M. Di Nitto <fabbione@ubuntu.com>  Wed, 01 Nov 2006 12:49:55 +0100
+
+glibc (2.5-0exp2) UNRELEASED; urgency=low
+
+  * New upstream version 2.5.
+
+  [ Aurelien Jarno ]
+  * debian/shlibver: Bump up to 2.5-1.
+  * debian/copyright: update.
+  * Remove locale/cvs-iso3166.diff (merged upstream).
+  * Remove localedata/locale-ro_RO.diff (merged upstream).
+  * Remove arm/cvs-portshead.patch (merged upstream).
+  * Remove hppa/cvs-portshead.patch (merged upstream).
+  * Remove hppa/submitted-drop-utimes.diff (merged upstream).
+  * Remove hurd-i386/cvs-machrules-make.diff (merged upstream).
+  * Remove mips/cvs-fork.diff (merged upstream).
+  * Remove mips/cvs-resource.diff (merged upstream).
+  * Remove powerpc/cvs-procfs.diff (merged upstream).
+  * Remove any/cvs-argp_h.diff (merged upstream).
+  * Remove any/cvs-getcwd_c.diff (merged upstream).
+  * Remove any/cvs-sysctl.diff (merged upstream).
+  * Remove any/cvs-thread_signals.diff (merged upstream).
+  * Remove any/cvs-uio_h.diff (merged upstream).
+  * Remove any/submitted-strfmon.diff (merged upstream).
+  * Remove all/submitted-uninitialized-byte-LC_CTYPE.diff (merged upstream).
+  * Remove any/local-ttyname-devfs.diff (devfs is not supported anymore).
+  * Update arm/local-no-hwcap.diff.
+  * Update any/local-ldso-disable-hwcap.diff.
+  * Update all/submitted-new-brf-encoding.diff.
+  * debhelper.in/libc.docs: remove INTERFACE as it has been removed upstream.
+  * sysdeps/depflags.pl: don't make libc6 depends on tzdata, as this package
+    is of priority required. Should help to debconfize tzdata.
+  * sysdeps/i386.mk: put the static Xen libc flavour in /usr/lib/xen.  Closes:
+    #391372.
+  * sysdeps/powerpc.mk: install 64-bit headers (actually gnu/stubs-64.h)
+    directly into /usr/include and provide /usr/include/powerpc64-linux-gnu as
+    a symlink to /usr/include for compatibility reasons.  Closes: #391858.
+  * sparc/cvs-pause-sigprocmask.diff: new patch (fix sparc64 build) from 
+    upstream CVS.
+  * kfreebsd/local-scripts.diff: update.
+  * kfreebsd/local-sys_queue_h.diff: update.
+  * kfreebsd/local-sysdeps.diff: update to revision 1689 (from glibc-bsd).
+  * kfreebsd/local-sysdeps-2.4.diff: remove.
+  * sysdeps/kfreebsd: enable the ports add-on.
+  * sysdeps/kfreebsd-i386.mk: ditto.
+  * any/local-stubs_h.diff: new patch to fix a warning in stubs.h.  Closes:
+    #394128.
+  * alpha/submitted-sigsuspend.diff: new patch (fix the build on alpha) from
+    the libc-alpha mailing list.
+
+  [ Denis Barbier ]
+  * Remove localedata/locale-en_NZ.diff (merged upstream).
+  * Remove localedata/locale-nr_ZA.diff (merged upstream).
+  * Remove localedata/new-catalan-locales.diff (merged upstream).
+  * Remove localedata/update-ZA.diff (merged upstream).
+  * Remove localedata/locale-te_IN.diff (merged upstream).
+  * Remove locale/iso4217-RON.diff (merged upstream).
+  * Update localedata/locales_CH.diff
+  * Update localedata/supported.diff
+  * Update localedata/locale-hy_AM.diff
+  * Update localedata/locale-csb_PL.diff
+  * Update localedata/dz_BT-collation.diff
+  * Update localedata/locale-ia.diff
+  * Update localedata/locales-sr.diff
+  * Update localedata/tailor-iso14651_t1.diff
+  * Update localedata/fix-lang.diff
+  * Update localedata/first_weekday.diff
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 11 Oct 2006 16:27:42 +0200
+
 glibc (2.4-1) UNRELEASED; urgency=low
 
   * New upstream version 2.4:
@@ -1991,16 +3224,7 @@ glibc (2.4-1) UNRELEASED; urgency=low
 
  -- Clint Adams <schizo@debian.org>  Sun, 28 May 2006 03:28:14 +0200
 
-glibc (2.3.6.ds1-13) unstable; urgency=low
-
-  * debhelper.in/libc.postinst: try to add /etc/ld.so.conf.d support for
-    versions lower then 2.3.6.ds1-11 instead of 2.3.6-16, because new 
-    installations done with version from 2.3.6-16 to 2.3.6.ds1-10 are
-    broken.  Closes: #411542.
-    
- -- Aurelien Jarno <aurel32@debian.org>  Wed, 21 Feb 2007 11:07:13 +0100
-
-glibc (2.3.6.ds1-12) unstable; urgency=low
+glibc (2.3.6.ds1-12) UNRELEASED; urgency=low
 
   [ Pierre Habouzit ]
   * patches/any/cvs-sunrpc-xdrmem_setpos.diff: fix a pointer-to-cast problem
@@ -2013,7 +3237,7 @@ glibc (2.3.6.ds1-12) unstable; urgency=low
   [ Aurelien Jarno ]
   * debian/control.in/opt: fix a typo: Ezla -> Ezra.  Closes: #410839.
 
- -- Pierre Habouzit <madcoder@debian.org>  Thu, 15 Feb 2007 18:41:06 +0100
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 13 Feb 2007 23:43:39 +0100
 
 glibc (2.3.6.ds1-11) unstable; urgency=low
 

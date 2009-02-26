@@ -71,7 +71,6 @@ $(stamp)configure_%: $(stamp)mkbuilddir_%
 		CC="$(call xx,CC)" \
 		CXX="$(call xx,CXX)" \
 		AUTOCONF=false \
-		MAKEINFO=: \
 		$(CURDIR)/configure \
 		--host=$(call xx,configure_target) \
 		--build=$$configure_build --prefix=/usr --without-cvs \
@@ -91,6 +90,7 @@ $(stamp)build_%: $(stamp)configure_%
 	  $(MAKE) -C $(DEB_BUILDDIR) $(NJOBS) \
 	    objdir=$(DEB_BUILDDIR) install_root=$(CURDIR)/build-tree/locales-all \
 	    localedata/install-locales; \
+	  sync; \
 	  tar --use-compress-program /usr/bin/lzma --owner root --group root -cf $(CURDIR)/build-tree/locales-all/supported.tar.lzma -C $(CURDIR)/build-tree/locales-all/usr/lib/locale .; \
 	fi
 	touch $@
@@ -105,6 +105,8 @@ $(stamp)check_%: $(stamp)build_%
 	  echo "Flavour cross-compiled, tests have been skipped." | tee $(log_results) ; \
 	elif ! $(call kernel_check,$(call xx,MIN_KERNEL_SUPPORTED)); then \
 	  echo "Kernel too old, tests have been skipped." | tee $(log_results) ; \
+	elif hostname | grep -q -E 'ball|mayr|mayer|rem' ; then \
+	  echo "Buggy build daemon detected, tests have been skipped." | tee $(log_results) ; \
 	elif [ $(call xx,RUN_TESTSUITE) != "yes" ]; then \
 	  echo "Testsuite disabled for $(curpass), skipping tests."; \
 	  echo "Tests have been disabled." > $(log_results) ; \
@@ -125,6 +127,10 @@ $(stamp)check_%: $(stamp)build_%
 	    echo "*** WARNING ***" ; \
 	  fi ; \
 	fi
+	@n=$$(grep '^make.* Error' $(log_test) | wc -l || true); \
+	  echo "TEST SUMMARY $(log_test) ($$n matching lines)"; \
+	  grep '^make.* Error' $(log_test) || true; \
+	  echo "END TEST SUMMARY $(log_test)"
 	touch $@
 
 $(patsubst %,install_%,$(GLIBC_PASSES)) :: install_% : $(stamp)install_%
@@ -138,6 +144,7 @@ $(stamp)install_%: $(stamp)check_%
 	if [ $(curpass) = libc ]; then \
 	  $(MAKE) -f debian/generate-supported.mk IN=localedata/SUPPORTED \
 	    OUT=debian/tmp-$(curpass)/usr/share/i18n/SUPPORTED; \
+	  (cd $(DEB_SRCDIR)/manual && texi2html -split_chapter libc.texinfo); \
 	fi
 
 	# Create the multidir directories, and the configuration file in /etc/ld.so.conf.d
@@ -168,8 +175,8 @@ $(stamp)doc: $(stamp)patch
 	touch $@
 
 $(stamp)source: $(stamp)patch
-	tar -c --bzip2 -C .. \
-		-f $(build-tree)/glibc-$(GLIBC_VERSION).tar.bz2 \
+	tar -c --lzma -C .. \
+		-f $(build-tree)/glibc-$(GLIBC_VERSION).tar.lzma \
 		$(GLIBC_SOURCES)
 	touch $@
 
