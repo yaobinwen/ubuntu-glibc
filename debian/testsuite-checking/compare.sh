@@ -8,17 +8,34 @@ fi;
 
 expected=$(tempfile)
 results=$(tempfile)
-grep -v '^#.*' $1 | sort > $expected
-grep -v '^#.*' $2 | sort > $results
+sort $1 | grep -Ev '^ *$|^#' > $expected
+sort $2 | grep -Ev '^ *$|^#' > $results
 
-REGRESSIONS=$(diff -wB $expected $results | sed -e '/^>/!d;s/^> //g')
-rm -f $expected $results
+REGRESSIONS=$(diff -wBI '^#.*' $expected $results | sed -e '/^>/!d;s/^> //g')
+PROGRESSIONS=$(diff -wBI '^#.*' $expected $results | sed -e '/^</!d;s/^< //g')
 if [ -n "$REGRESSIONS" ] ; then
   echo "Encountered regressions that don't match expected failures:"
   echo "$REGRESSIONS"
-  exit 1
+  for test in $(echo "$REGRESSIONS" | sed -e's/, Error.*//')
+  do
+    echo TEST $test:
+    find . -name "$test" | xargs -r cat
+  done
+  rv=1
 else
   echo "Passed regression testing. No new failures, no changed error values."
-  exit 0
+  for test in $(sed -n '/^[^#]/s/, Error.*//p' $results)
+  do
+    echo TEST $test:
+    find . -name "$test" | xargs -r cat
+  done
+  rv=0
 fi
 
+if [ -n "$PROGRESSIONS" ] ; then
+  echo "Encountered progressions that don't match expected failures:"
+  echo "$PROGRESSIONS"
+fi
+
+rm -f $expected $results
+exit $rv
