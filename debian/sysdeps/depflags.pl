@@ -49,6 +49,10 @@ push @{$libc_dev_c{'Suggests'}}, "manpages-dev";
 # nss-db is now seperate
 push @{$libc_c{'Recommends'}}, 'libnss-db';
 
+# tzdata is now separate
+# In Ubuntu, it's a recommends.
+push @{$libc_c{'Recommends'}}, 'tzdata';
+
 # 2.1.94 required a patch, applied in gcc -15, so c++ compiles will work again
 push @{$libc_dev_c{'Conflicts'}}, 'libstdc++2.10-dev (<< 1:2.95.2-15)';
 
@@ -60,6 +64,12 @@ if ($DEB_HOST_ARCH =~ m/^i386$/) {
     push @{$libc_c{'Suggests'}}, 'libc6-i686';
 } else {
     push @{$libc_dev_c{'Conflicts'}}, 'gcc-2.95 (<< 1:2.95.3-8)';
+}
+
+# Ubuntu hack to cope with the fact that we shipped /lib64 and /usr/lib64
+# in base-files for a while, and now they're in libc6, same as Debian
+if ($DEB_HOST_GNU_TYPE eq "x86_64-linux-gnu") {
+    push @{$libc_c{'Replaces'}}, 'base-files (<< 3.1.9ubuntu8)';
 }
 
 ## Conflict versions of binutils version that does not support DT_GNU_HASH
@@ -81,6 +91,11 @@ push @{$libc_c{'Conflicts'}}, 'tzdata (<< 2007k-1), tzdata-etch';
 # Conflict with older versions of nscd
 push @{$libc_c{'Conflicts'}}, 'nscd (<< 2.9)';
 
+# belocs-locales-bin is dead upstream; Ubuntu previously used it, now libc6
+# ships the programs itself again
+push @{$libc_c{'Conflicts'}}, 'belocs-locales-bin';
+push @{$libc_c{'Replaces'}}, 'belocs-locales-bin';
+
 # Depends on libgcc1/libgcc2/libgcc4
 if ($DEB_HOST_ARCH =~ m/^hppa$/) {
     push @{$libc_c{'Depends'}}, 'libgcc4';
@@ -89,6 +104,11 @@ if ($DEB_HOST_ARCH =~ m/^hppa$/) {
 } else {
     push @{$libc_c{'Depends'}}, 'libgcc1';
 }
+
+# mvo: this is needed to work arounda a upgrade issue from 
+#      hardy to intrepid (see launchpad #234345)
+push @{$libc_c{'Depends'}}, 'findutils (>= 4.4.0-2ubuntu2)';
+
 
 if ($type eq "libc") {
     %pkg = %libc_c;
