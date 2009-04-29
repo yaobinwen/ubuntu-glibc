@@ -10,6 +10,9 @@
         alpha)
             hwcappkgs="libc6-alphaev67"
             ;;
+        armel)
+            hwcappkgs="libc6-vfp"
+            ;;
         i386)
             hwcappkgs="libc6-i686 libc6-xen"
             ;;
@@ -17,7 +20,7 @@
             hwcappkgs="libc0.1-i686"
             ;;
         sparc)
-            hwcappkgs="libc6-sparcv9 libc6-sparcv9b"
+            hwcappkgs="libc6-sparcv9 libc6-sparcv9b libc6-sparcv9v libc6-sparcv9v2 libc6-sparc64b libc6-sparc64v libc6-sparc64v2"
             ;;
     esac
  

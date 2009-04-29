@@ -61,6 +61,7 @@ DEB_SOURCE_PACKAGE := $(strip $(shell egrep '^Source: ' debian/control | cut -f 
 DEB_VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' ')
 GLIBC_VERSION = $(shell echo $(DEB_VERSION) | sed -e 's/-.*//')
 
+DEB_SRCDIR ?= $(CURDIR)
 DEB_BUILDDIR ?= $(build-tree)/$(DEB_HOST_ARCH)-$(curpass)
 
 GLIBC_SOURCES = $(addprefix $(shell basename $(CURDIR))/, \
@@ -74,6 +75,24 @@ KERNEL_HOST_CPU := $(subst powerpc,ppc,$(DEB_HOST_GNU_CPU))
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 NJOBS := -j $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 endif
+
+ifeq ($(DEB_HOST_ARCH),lpia)
+  export DEB_BUILD_OPTIMIZING_SIZE=0
+endif
+
+ifeq ($(DEB_HOST_ARCH),hppa)
+  ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
+    DEB_BUILD_OPTIONS += nocheck
+    export DEB_BUILD_OPTIONS
+  endif
+endif
+
+# use the package settings, not the settings from the environment
+define unsetenv
+  unexport $(1)
+  $(1) =
+endef
+$(foreach v, CPPFLAGS CFLAGS CXXFLAGS LDFLAGS, $(if $(filter environment,$(origin $(v))),$(eval $(call unsetenv, $(v)))))
 
 # Default setup
 GLIBC_PASSES ?= libc
@@ -90,8 +109,8 @@ docdir=$(prefix)/share/doc
 mandir=$(prefix)/share/man
 sbindir=$(prefix)/sbin
 
-BUILD_CC = gcc
-BUILD_CXX = g++
+BUILD_CC = gcc-4.3 -fno-stack-protector -U_FORTIFY_SOURCE
+BUILD_CXX = g++-4.3 -fno-stack-protector -U_FORTIFY_SOURCE
 
 RUN_TESTSUITE = yes
 
@@ -100,8 +119,8 @@ ifneq ($(DEB_HOST_ARCH),$(DEB_BUILD_ARCH))
 CC     = $(DEB_HOST_GNU_TYPE)-gcc
 CXX    = $(DEB_HOST_GNU_TYPE)-g++
 else
-CC     = gcc-4.3
-CXX    = gcc-4.3
+CC     = $(BUILD_CC)
+CXX    = $(BUILD_CXX)
 endif
 
 BUILD_CFLAGS = -O2 -g
@@ -123,8 +142,8 @@ log_expected = debian/testsuite-checking/expected-results-$(call xx,configure_ta
 # Which build pass are we on?
 curpass = $(filter-out %_,$(subst _,_ ,$@))
 
-DEB_ARCH_REGULAR_PACKAGES = $(libc) $(libc)-dev $(libc)-dbg $(libc)-prof $(libc)-pic locales-all
-DEB_INDEP_REGULAR_PACKAGES = glibc-doc glibc-source locales
+DEB_ARCH_REGULAR_PACKAGES = $(libc) $(libc)-dev $(libc)-dbg $(libc)-prof $(libc)-pic
+DEB_INDEP_REGULAR_PACKAGES = glibc-doc glibc-source
 DEB_UDEB_PACKAGES = $(libc)-udeb libnss-dns-udeb libnss-files-udeb
 
 # Generic kernel version check
@@ -161,6 +180,8 @@ clean:: unpatch debhelper-clean
 	rm -rf $(build-tree)
 	rm -rf $(stamp)
 	rm -rf debian/include
+	rm -f manual/stamp-*
+	rm -f po/*.mo
 
 # Required Debian targets
 binary-indep: build testroot debian/control $(build-tree) \

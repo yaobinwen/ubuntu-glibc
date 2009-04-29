@@ -5,6 +5,15 @@ export LC_ALL=C
 type=$1
 preversion=$2
 
+if [ "x$type" = xtriggered ]
+then
+	LDCONFIG_NOTRIGGER=y
+	export LDCONFIG_NOTRIGGER
+	echo ldconfig deferred processing now taking place
+	ldconfig
+	exit 0
+fi
+
 package_name()
 {
     echo LIBC
@@ -157,7 +166,11 @@ then
 		    db_version 2.0
 		    db_reset glibc/restart-services
 		    db_set glibc/restart-services "$services"
-		    db_input critical glibc/restart-services || true
+		    if [ "$RELEASE_UPGRADE_MODE" = desktop ]; then
+			db_input medium glibc/restart-services || true
+		    else
+			db_input critical glibc/restart-services || true
+		    fi
 		    db_go || true
 		    db_get glibc/restart-services
 		    if [ "x$RET" != "x" ]
@@ -223,7 +236,11 @@ then
 	        	if [ -f /usr/share/debconf/confmodule ] ; then
 		    	    db_fset glibc/restart-failed seen false
 			    db_subst glibc/restart-failed services "$failed"
-			    db_input critical glibc/restart-failed || true
+			    if [ "$RELEASE_UPGRADE_MODE" = desktop ]; then
+				db_input medium glibc/restart-failed || true
+			    else
+				db_input critical glibc/restart-failed || true
+			    fi
 			    db_go || true
 			else
 			    echo "The following services failed to start: $failed"
@@ -256,13 +273,9 @@ then
     # Generate cache file /usr/lib/gconv/gconv-modules.cache
     iconvconfig || true
 
-#   # DO NOT FOLLOW THIS EXAMPLE IN OTHER PACKAGES
-    updatercd glibc.sh start 01 S .
-    if [ -x /usr/sbin/invoke-rc.d ]; then
-	invoke-rc.d glibc.sh start
-    else
-	/etc/init.d/glibc.sh 2>/dev/null || true
-    fi
+    # Ubuntu change.  Do not do kernel version detection at startup.
+    update-rc.d -f glibc.sh remove >/dev/null 2>&1
+
 fi
 
 if [ "`uname -s`" = Linux ]; then
