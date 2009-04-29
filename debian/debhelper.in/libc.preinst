@@ -49,7 +49,11 @@ then
 	            db_version 2.0
 		    db_reset glibc/upgrade
 		    db_subst glibc/upgrade services $services
-		    db_input critical glibc/upgrade || true
+		    if [ "$RELEASE_UPGRADE_MODE" = desktop ]; then
+			db_input medium glibc/upgrade || true
+		    else
+			db_input critical glibc/upgrade || true
+		    fi
 		    db_go || true
 		    db_get glibc/upgrade
 		    answer=$RET
@@ -159,7 +163,7 @@ then
     echo "A copy of glibc was found in an unexpected directory."
     echo "It is not safe to upgrade the C library in this situation;"
     echo "please remove that copy of the C library and try again."
-    exit 1
+    echo "Please check: https://launchpad.net/bugs/81125"
   fi
 
   if test -n "$LD_LIBRARY_PATH"; then
@@ -169,7 +173,7 @@ then
       echo "Another copy of the C library was found via LD_LIBRARY_PATH."
       echo "It is not safe to upgrade the C library in this situation;"
       echo "please remove the directory from LD_LIBRARY_PATH and try again."
-      exit 1
+      echo "Please check: https://launchpad.net/bugs/81125"
     fi
   fi
   if test -e /etc/ld.so.conf; then
@@ -179,7 +183,7 @@ then
       echo "Another copy of the C library was found via /etc/ld.so.conf."
       echo "It is not safe to upgrade the C library in this situation;"
       echo "please remove the directory from /etc/ld.so.conf and try again."
-      exit 1
+      echo "Please check: https://launchpad.net/bugs/81125"
     fi
   fi
   for i in ld-2.3.2.so libc-2.3.2.so ld-2.3.6.so libc-2.3.6.so ; do

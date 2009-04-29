@@ -7,7 +7,6 @@ get-orig-source: $(DEB_ORIG)
 $(DEB_ORIG):
 	cvs -z 9 -d $(GLIBC_PSERVER) export -d $(GLIBC_DIR) -r $(GLIBC_TAG) libc ; \
 	cd $(GLIBC_DIR) ; \
-	rm -fr manual/ ; \
 	cvs -z 9 -d $(GLIBC_PSERVER) export -d ports -r $(GLIBC_TAG) ports ; \
 	cvs -z 9 -d $(GLIBC_PSERVER) export -d linuxthreads -r HEAD linuxthreads/linuxthreads ; \
 	cvs -z 9 -d $(GLIBC_PSERVER) export -d linuxthreads_db -r HEAD linuxthreads/linuxthreads_db ; \

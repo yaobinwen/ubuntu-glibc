@@ -44,15 +44,6 @@ localedata/locale-fr_FR.diff
 localedata/submitted-bz9912-locale-ru_UA.diff
 localedata/cvs-el_CY-el_GR-frac_digits.diff
 
-alpha/local-gcc4.1.diff
-alpha/submitted-creat64.diff
-alpha/submitted-dl-procinfo.diff
-alpha/submitted-dl-support.diff
-alpha/submitted-fdatasync.diff
-alpha/submitted-fpu-round.diff
-alpha/submitted-PTR_MANGLE.diff
-alpha/submitted-procfs_h.diff
-
 amd64/local-biarch.diff
 amd64/local-clone.diff
 amd64/local-linuxthreads-gscope.diff
@@ -63,6 +54,8 @@ arm/local-lowlevellock.diff
 arm/local-no-hwcap.diff
 arm/submitted-setjmp.diff
 arm/submitted-fpu_control_h.diff
+arm/local-memset.diff
+arm/local-hwcap-updates.diff
 
 hppa/local-inlining.diff
 hppa/local-linuxthreads.diff
@@ -74,78 +67,29 @@ hppa/submitted-pie.diff
 hppa/cvs-tsd.diff
 hppa/local-nptl-compat.diff
 
-hurd-i386/local-dl-dynamic-weak.diff
-hurd-i386/local-enable-ldconfig.diff
-hurd-i386/local-mlock.diff
-hurd-i386/local-tls.diff
-hurd-i386/local-tls-support.diff
-hurd-i386/local-gcc-4.1-init-first.diff
-hurd-i386/submitted-ioctl-decode-argument.diff
-hurd-i386/submitted-libc_once.diff
-hurd-i386/submitted-ptr-mangle.diff
-hurd-i386/submitted-stat.diff
-hurd-i386/submitted-strtoul.diff
-hurd-i386/submitted-sysvshm.diff
-hurd-i386/submitted-ioctl-unsigned-size_t.diff
-hurd-i386/submitted-ECANCELED.diff
-hurd-i386/submitted-IPV6_PKTINFO.diff
-hurd-i386/submitted-extern_inline.diff
-hurd-i386/cvs-resource-prio.diff
-hurd-i386/cvs-hurdsig-fix.diff
-hurd-i386/cvs-report-wait-fix.diff
-hurd-i386/submitted-critical-sections.diff
-hurd-i386/submitted-dup2-fix.diff
-hurd-i386/cvs-net-headers.diff
-hurd-i386/local-pthread_posix-option.diff
-hurd-i386/local-check_native.diff
-hurd-i386/cvs-get_pc_thunk.diff
-hurd-i386/submitted-dl-sysdep.diff
-hurd-i386/submitted-itimer-lock.diff
-hurd-i386/local-pthread_types.diff
-hurd-i386/cvs-strerror_l.diff
-hurd-i386/cvs-rtld.diff
-
 i386/local-biarch.diff
 i386/local-clone.diff
 i386/local-cmov.diff
 i386/local-linuxthreads-gscope.diff
 i386/submitted-i686-timing.diff
 
-m68k/local-compat.diff
-m68k/local-dwarf2-buildfix.diff
-m68k/local-fpic.diff
-# m68k/local-mathinline_h.diff
-m68k/local-reloc.diff
-m68k/local-pthread_lock.diff
-m68k/submitted-gcc34-seccomment.diff
-
-mips/local-lazy-eval.diff
-mips/local-r10k.diff
-mips/cvs-context.diff
+lpia/local-i686-redefine.diff -p0
 
 powerpc/local-sysconf.diff
-
-s390/submitted-nexttowardf.diff
-
-sh4/local-fpscr_values.diff
 
 sparc/local-fork.diff
 sparc/local-sparcv9-target.diff
 sparc/submitted-timing.diff
 
-all/local-alias-UTF-8.diff
-all/local-alias-et_EE.diff
-all/local-pthread-manpages.diff
-all/local-remove-manual.diff
-all/local-ru_RU.diff
 all/submitted-readme-version.diff
+all/fedora-nss_dns-gethostbyname4-disable.diff
 
 any/local-asserth-decls.diff
 any/local-bindresvport_blacklist.diff
 any/local-allocalim-header.diff
 any/local-fhs-linux-paths.diff
 any/local-fhs-nscd.diff
-# any/local-ipv6-lookup.diff -p1               # has issues
+any/local-ipv6-lookup.diff -p0
 any/local-ld-multiarch.diff
 any/local-ldd.diff
 any/local-ldso-disable-hwcap.diff
@@ -189,6 +133,7 @@ any/local-missing-linux_types.h.diff
 any/cvs-bz697-posix-regexec.diff
 any/cvs-bz9697-posix-regcomp.diff
 any/cvs-bz9706-nss_nss-files_files-parse.diff
+any/cvs-bz-9720-resource.diff
 any/local-nss-overflow.diff
 any/submitted-popen.diff
 any/local-linuxthreads-thread_self.diff
@@ -203,3 +148,10 @@ any/cvs-iconv-utf16.diff
 any/local-getaddrinfo-interface.diff
 any/cvs-broken-dns.diff
 any/cvs-binutils_2.20.diff
+
+# Ubuntu-specific patches.  These are things that we don't expect to wind up
+# in Debian.
+ubuntu/local-altlocaledir.diff -p1
+ubuntu/stack-guard-quick-randomization.diff
+ubuntu/no-sprintf-pre-truncate.diff
+ubuntu/local-fwrite-no-attr-unused.diff
