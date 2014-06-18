@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,1996,1997,1998,2002,2003 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <string.h>
@@ -48,7 +47,12 @@ tcsetattr (fd, optional_actions, termios_p)
      const struct termios *termios_p;
 {
   struct __kernel_termios k_termios;
+  struct __kernel_termios k_termios_old;
   unsigned long int cmd;
+  int retval, old_retval;
+
+  /* Preserve the previous termios state if we can. */
+  old_retval = INLINE_SYSCALL (ioctl, 3, fd, TCGETS, &k_termios_old);
 
   switch (optional_actions)
     {
@@ -80,6 +84,54 @@ tcsetattr (fd, optional_actions, termios_p)
   memcpy (&k_termios.c_cc[0], &termios_p->c_cc[0],
 	  __KERNEL_NCCS * sizeof (cc_t));
 
-  return INLINE_SYSCALL (ioctl, 3, fd, cmd, &k_termios);
+  retval = INLINE_SYSCALL (ioctl, 3, fd, cmd, &k_termios);
+
+  /* The Linux kernel silently ignores the invalid c_cflag on pty.
+     We have to check it here, and return an error.  But if some other
+     setting was successfully changed, POSIX requires us to report
+     success. */
+  if ((retval == 0) && (old_retval == 0))
+    {
+      int save = errno;
+      retval = INLINE_SYSCALL (ioctl, 3, fd, TCGETS, &k_termios);
+      if (retval)
+	{
+	  /* We cannot verify if the setting is ok. We don't return
+	     an error (?). */
+	  __set_errno (save);
+	  retval = 0;
+	}
+      else if ((k_termios_old.c_oflag != k_termios.c_oflag) ||
+	       (k_termios_old.c_lflag != k_termios.c_lflag) ||
+	       (k_termios_old.c_line != k_termios.c_line) ||
+	       ((k_termios_old.c_iflag | IBAUD0) != (k_termios.c_iflag | IBAUD0)))
+	{
+	  /* Some other setting was successfully changed, which
+	     means we should not return an error. */
+	  __set_errno (save);
+	  retval = 0;
+	}
+      else if ((k_termios_old.c_cflag | (PARENB & CREAD & CSIZE)) !=
+	       (k_termios.c_cflag | (PARENB & CREAD & CSIZE)))
+	{
+	  /* Some other c_cflag setting was successfully changed, which
+	     means we should not return an error. */
+	  __set_errno (save);
+	  retval = 0;
+	}
+      else if ((termios_p->c_cflag & (PARENB | CREAD))
+			!= (k_termios.c_cflag & (PARENB | CREAD))
+	       || ((termios_p->c_cflag & CSIZE)
+		   && (termios_p->c_cflag & CSIZE)
+			!= (k_termios.c_cflag & CSIZE)))
+	{
+	  /* It looks like the Linux kernel silently changed the
+	     PARENB/CREAD/CSIZE bits in c_cflag. Report it as an
+	     error. */
+	  __set_errno (EINVAL);
+	  retval = -1;
+	}
+    }
+   return retval;
 }
 libc_hidden_def (tcsetattr)

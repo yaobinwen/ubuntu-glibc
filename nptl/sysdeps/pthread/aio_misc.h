@@ -1,4 +1,4 @@
-/* Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+/* Copyright (C) 2006-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 /* We define a special synchronization primitive for AIO.  POSIX
    conditional variables would be ideal but the pthread_cond_*wait
@@ -51,7 +50,7 @@
 	  {								      \
 	    status = lll_futex_timed_wait (futexaddr, oldval, timeout,	      \
 					   LLL_PRIVATE);		      \
-	    if (status != -EWOULDBLOCK)					      \
+	    if (status != -EWOULDBLOCK && status != -EAGAIN)		      \
 	      break;							      \
 									      \
 	    oldval = *futexaddr;					      \
@@ -66,7 +65,7 @@
 	else if (status == -ETIMEDOUT)					      \
 	  result = EAGAIN;						      \
 	else								      \
-	  assert (status == 0 || status == -EWOULDBLOCK);		      \
+	  assert (status == 0 || status == -EWOULDBLOCK || status == -EAGAIN);\
 									      \
 	pthread_mutex_lock (&__aio_requests_mutex);			      \
       }									      \

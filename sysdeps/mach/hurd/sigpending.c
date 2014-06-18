@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1993, 1994, 1995, 1997 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <stddef.h>
@@ -38,9 +37,9 @@ sigpending (set)
     }
 
   ss = _hurd_self_sigstate ();
-  __spin_lock (&ss->lock);
-  pending = ss->pending;
-  __spin_unlock (&ss->lock);
+  _hurd_sigstate_lock (ss);
+  pending = _hurd_sigstate_pending (ss);
+  _hurd_sigstate_unlock (ss);
 
   *set = pending;
   return 0;

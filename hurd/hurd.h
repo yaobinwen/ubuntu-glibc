@@ -1,5 +1,4 @@
-/* Copyright (C) 1993,94,95,96,97,98,99,2001,2002,2007
-   Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef	_HURD_H
 
@@ -48,6 +46,9 @@
 #define _HURD_H_EXTERN_INLINE __extern_inline
 #endif
 
+int __hurd_fail (error_t err);
+
+#ifdef __USE_EXTERN_INLINES
 _HURD_H_EXTERN_INLINE int
 __hurd_fail (error_t err)
 {
@@ -77,6 +78,7 @@ __hurd_fail (error_t err)
   errno = err;
   return -1;
 }
+#endif
 
 /* Basic ports and info, initialized by startup.  */
 
@@ -243,12 +245,20 @@ extern FILE *fopenport (io_t port, const char *mode);
 extern FILE *__fopenport (io_t port, const char *mode);
 
 
-/* Execute a file, replacing TASK's current program image.  */
+/* Deprecated: use _hurd_exec_file_name instead.  */
 
 extern error_t _hurd_exec (task_t task,
 			   file_t file,
 			   char *const argv[],
-			   char *const envp[]);
+			   char *const envp[]) __attribute_deprecated__;
+
+/* Execute a file, replacing TASK's current program image.  */
+
+extern error_t _hurd_exec_file_name (task_t task,
+				     file_t file,
+				     const char *filename,
+				     char *const argv[],
+				     char *const envp[]);
 
 
 /* Inform the proc server we have exited with STATUS, and kill the

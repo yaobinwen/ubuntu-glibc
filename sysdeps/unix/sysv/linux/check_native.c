@@ -1,5 +1,5 @@
 /* Determine whether interfaces use native transport.  Linux version.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <assert.h>
 #include <errno.h>
@@ -23,6 +22,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 #include <net/if.h>
@@ -77,13 +77,7 @@ __check_native (uint32_t a1_index, int *a1_native,
   memset (&nladdr, '\0', sizeof (nladdr));
   nladdr.nl_family = AF_NETLINK;
 
-#ifdef PAGE_SIZE
-  /* Help the compiler optimize out the malloc call if PAGE_SIZE
-     is constant and smaller or equal to PTHREAD_STACK_MIN/4.  */
-  const size_t buf_size = PAGE_SIZE;
-#else
   const size_t buf_size = __getpagesize ();
-#endif
   bool use_malloc = false;
   char *buf;
 

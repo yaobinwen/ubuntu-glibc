@@ -1,5 +1,4 @@
-/* Copyright (C) 1994,1995,1996,1997,1999,2001,2002,2004,2005,2006
-	Free Software Foundation, Inc.
+/* Copyright (C) 1994-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,14 +12,14 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <unistd.h>
 #include <hurd.h>
 #include <hurd/signal.h>
+#include <hurd/threadvar.h>
 #include <setjmp.h>
 #include <thread_state.h>
 #include <sysdep.h>		/* For stack growth direction.  */
@@ -35,6 +34,11 @@
 /* Things that want to be locked while forking.  */
 symbol_set_declare (_hurd_fork_locks)
 
+
+/* Application callbacks registered through pthread_atfork.  */
+DEFINE_HOOK (_hurd_atfork_prepare_hook, (void));
+DEFINE_HOOK (_hurd_atfork_child_hook, (void));
+DEFINE_HOOK (_hurd_atfork_parent_hook, (void));
 
 /* Things that want to be called before we fork, to prepare the parent for
    task_create, when the new child task will inherit our address space.  */
@@ -63,6 +67,8 @@ __fork (void)
   size_t i;
   error_t err;
   struct hurd_sigstate *volatile ss;
+
+  RUN_HOOK (_hurd_atfork_prepare_hook, ());
 
   ss = _hurd_self_sigstate ();
   __spin_lock (&ss->critical_section_lock);
@@ -313,7 +319,7 @@ __fork (void)
 	    {
 	      /* This is a send right or a dead name.
 		 Give the child as many references for it as we have.  */
-	      mach_port_urefs_t refs, *record_refs = NULL;
+	      mach_port_urefs_t refs = 0, *record_refs = NULL;
 	      mach_port_t insert;
 	      mach_msg_type_name_t insert_type = MACH_MSG_TYPE_COPY_SEND;
 	      if (portnames[i] == newtask || portnames[i] == newproc)
@@ -455,14 +461,10 @@ __fork (void)
 	  (err = __mach_port_insert_right (newtask, ss->thread,
 					   thread, MACH_MSG_TYPE_COPY_SEND)))
 	LOSE;
-      /* We have one extra user reference created at the beginning of this
-	 function, accounted for by mach_port_names (and which will thus be
-	 accounted for in the child below).  This extra right gets consumed
-	 in the child by the store into _hurd_sigthread in the child fork.  */
       if (thread_refs > 1 &&
 	  (err = __mach_port_mod_refs (newtask, ss->thread,
 				       MACH_PORT_RIGHT_SEND,
-				       thread_refs)))
+				       thread_refs - 1)))
 	LOSE;
       if ((_hurd_msgport_thread != MACH_PORT_NULL) /* Let user have none.  */
 	  && ((err = __mach_port_deallocate (newtask, _hurd_msgport_thread)) ||
@@ -499,19 +501,17 @@ __fork (void)
 				    (natural_t *) &state, &statecount))
 	LOSE;
 #if STACK_GROWTH_UP
-#define THREADVAR_SPACE (__hurd_threadvar_max \
-			 * sizeof *__hurd_sightread_variables)
       if (__hurd_sigthread_stack_base == 0)
 	{
 	  state.SP &= __hurd_threadvar_stack_mask;
-	  state.SP += __hurd_threadvar_stack_offset + THREADVAR_SPACE;
+	  state.SP += __hurd_threadvar_stack_offset;
 	}
       else
 	state.SP = __hurd_sigthread_stack_base;
 #else
       if (__hurd_sigthread_stack_end == 0)
 	{
-	  /* The signal thread has a normal stack assigned by cthreads.
+	  /* The signal thread has a stack assigned by cthreads.
 	     The threadvar_stack variables conveniently tell us how
 	     to get to the highest address in the stack, just below
 	     the per-thread variables.  */
@@ -523,6 +523,11 @@ __fork (void)
 #endif
       MACHINE_THREAD_STATE_SET_PC (&state,
 				   (unsigned long int) _hurd_msgport_receive);
+
+      /* Do special thread setup for TLS if needed.  */
+      if (err = _hurd_tls_fork (sigthread, _hurd_msgport_thread, &state))
+	LOSE;
+
       if (err = __thread_set_state (sigthread, MACHINE_THREAD_STATE_FLAVOR,
 				    (natural_t *) &state, statecount))
 	LOSE;
@@ -533,7 +538,7 @@ __fork (void)
       _hurd_longjmp_thread_state (&state, env, 1);
 
       /* Do special thread setup for TLS if needed.  */
-      if (err = _hurd_tls_fork (thread, &state))
+      if (err = _hurd_tls_fork (thread, ss->thread, &state))
 	LOSE;
 
       if (err = __thread_set_state (thread, MACHINE_THREAD_STATE_FLAVOR,
@@ -616,10 +621,6 @@ __fork (void)
       for (i = 0; i < _hurd_nports; ++i)
 	__spin_unlock (&_hurd_ports[i].lock);
 
-      /* We are one of the (exactly) two threads in this new task, we
-	 will take the task-global signals.  */
-      _hurd_sigthread = ss->thread;
-
       /* Claim our sigstate structure and unchain the rest: the
 	 threads existed in the parent task but don't exist in this
 	 task (the child process).  Delay freeing them until later
@@ -639,6 +640,25 @@ __fork (void)
       ss->next = NULL;
       _hurd_sigstates = ss;
       __mutex_unlock (&_hurd_siglock);
+      /* Earlier on, the global sigstate may have been tainted and now needs to
+         be reinitialized.  Nobody is interested in its present state anymore:
+         we're not, the signal thread will be restarted, and there are no other
+         threads.
+
+         We can't simply allocate a fresh global sigstate here, as
+         _hurd_thread_sigstate will call malloc and that will deadlock trying
+         to determine the current thread's sigstate.  */
+#if 0
+      _hurd_thread_sigstate_init (_hurd_global_sigstate, MACH_PORT_NULL);
+#else
+      /* Only reinitialize the lock -- otherwise we might have to do additional
+         setup as done in hurdsig.c:_hurdsig_init.  */
+      __spin_lock_init (&_hurd_global_sigstate->lock);
+#endif
+
+      /* We are one of the (exactly) two threads in this new task, we
+	 will take the task-global signals.  */
+      _hurd_sigstate_set_global_rcv (ss);
 
       /* Fetch our new process IDs from the proc server.  No need to
 	 refetch our pgrp; it is always inherited from the parent (so
@@ -647,8 +667,10 @@ __fork (void)
       err = __USEPORT (PROC, __proc_getpids (port, &_hurd_pid, &_hurd_ppid,
 					     &_hurd_orphaned));
 
-      /* Forking clears the trace flag.  */
+      /* Forking clears the trace flag and pending masks.  */
       __sigemptyset (&_hurdsig_traced);
+      __sigemptyset (&_hurd_global_sigstate->pending);
+      __sigemptyset (&ss->pending);
 
       /* Run things that want to run in the child task to set up.  */
       RUN_HOOK (_hurd_fork_child_hook, ());
@@ -696,6 +718,14 @@ __fork (void)
   }
 
   _hurd_critical_section_unlock (ss);
+
+  if (!err)
+    {
+      if (pid != 0)
+	RUN_HOOK (_hurd_atfork_parent_hook, ());
+      else
+	RUN_HOOK (_hurd_atfork_child_hook, ());
+    }
 
   return err ? __hurd_fail (err) : pid;
 }

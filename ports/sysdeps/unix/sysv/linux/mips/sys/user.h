@@ -1,4 +1,4 @@
-/* Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,14 +12,14 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library.  If not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _SYS_USER_H
 #define _SYS_USER_H	1
 
 #include <sgidefs.h>
+#include <unistd.h>
 
 /* The whole purpose of this file is for GDB and GDB only.  Don't read
    too much into it.  Don't use it for anything other than GDB unless
@@ -207,8 +207,7 @@ struct user {
 
 #endif
 
-#define PAGE_SHIFT		12
-#define PAGE_SIZE		(1UL << PAGE_SHIFT)
+#define PAGE_SIZE		(sysconf(_SC_PAGESIZE))
 #define PAGE_MASK		(~(PAGE_SIZE-1))
 #define NBPG			PAGE_SIZE
 #define UPAGES			1

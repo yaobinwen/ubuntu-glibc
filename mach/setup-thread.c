@@ -1,4 +1,4 @@
-/* Copyright (C) 1991,94,1995,1997,2002,2005 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,14 +12,14 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <mach.h>
 #include <thread_state.h>
 #include <string.h>
 #include <mach/machine/vm_param.h>
+#include <ldsodefs.h>
 #include "sysdep.h"		/* Defines stack direction.  */
 
 #define	STACK_SIZE	(16 * 1024 * 1024) /* 16MB, arbitrary.  */
@@ -73,8 +73,35 @@ __mach_setup_thread (task_t task, thread_t thread, void *pc,
   if (error = __vm_protect (task, stack, __vm_page_size, 0, VM_PROT_NONE))
     return error;
 
-  return __thread_set_state (thread, MACHINE_THREAD_STATE_FLAVOR,
+  return __thread_set_state (thread, MACHINE_NEW_THREAD_STATE_FLAVOR,
 			     (natural_t *) &ts, tssize);
 }
 
 weak_alias (__mach_setup_thread, mach_setup_thread)
+
+/* Give THREAD a TLS area.  */
+kern_return_t
+__mach_setup_tls (thread_t thread)
+{
+  kern_return_t error;
+  struct machine_thread_state ts;
+  mach_msg_type_number_t tssize = MACHINE_THREAD_STATE_COUNT;
+  tcbhead_t *tcb;
+
+  if (error = __thread_get_state (thread, MACHINE_THREAD_STATE_FLAVOR,
+			     (natural_t *) &ts, &tssize))
+    return error;
+  assert (tssize == MACHINE_THREAD_STATE_COUNT);
+
+  tcb = _dl_allocate_tls(NULL);
+  if (!tcb)
+    return KERN_RESOURCE_SHORTAGE;
+
+  _hurd_tls_new(thread, &ts, tcb);
+
+  error = __thread_set_state (thread, MACHINE_THREAD_STATE_FLAVOR,
+			     (natural_t *) &ts, tssize);
+  return error;
+}
+
+weak_alias (__mach_setup_tls, mach_setup_tls)

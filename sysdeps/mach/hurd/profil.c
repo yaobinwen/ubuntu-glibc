@@ -1,5 +1,5 @@
 /* Low-level statistical profiling support function.  Mach/Hurd version.
-   Copyright (C) 1995, 1996, 1997, 2000, 2002, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -69,6 +68,8 @@ update_waiter (u_short *sample_buffer, size_t size, size_t offset, u_int scale)
       if (! err)
 	err = __mach_setup_thread (__mach_task_self (), profile_thread,
 				   &profile_waiter, NULL, NULL);
+      if (! err)
+	err = __mach_setup_tls(profile_thread);
     }
   else
     err = 0;
@@ -138,7 +139,7 @@ __profil (u_short *sample_buffer, size_t size, size_t offset, u_int scale)
 weak_alias (__profil, profil)
 
 /* Fetch PC samples.  This function must be very careful not to depend
-   on Hurd threadvar variables.  We arrange that by using a special
+   on Hurd TLS variables.  We arrange that by using a special
    stub arranged for at the end of this file. */
 static void
 fetch_samples (void)
@@ -174,7 +175,7 @@ fetch_samples (void)
 }
 
 
-/* This function must be very careful not to depend on Hurd threadvar
+/* This function must be very careful not to depend on Hurd TLS
    variables.  We arrange that by using special stubs arranged for at the
    end of this file. */
 static void
@@ -217,7 +218,7 @@ fork_profil_parent (void)
 }
 text_set_element (_hurd_fork_parent_hook, fork_profil_parent);
 
-/* In the childs, unlock the interlock, and start a profiling thread up
+/* In the child, unlock the interlock, and start a profiling thread up
    if necessary. */
 static void
 fork_profil_child (void)
@@ -266,7 +267,7 @@ text_set_element (_hurd_fork_child_hook, fork_profil_child);
    are fatal in profile_waiter anyhow. */
 #define __mig_put_reply_port(foo)
 
-/* Use our static variable instead of the usual threadvar mechanism for
+/* Use our static variable instead of the usual TLS mechanism for
    this. */
 #define __mig_get_reply_port() profil_reply_port
 

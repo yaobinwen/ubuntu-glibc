@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -13,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <assert.h>
 #include "pthreadP.h"
@@ -33,7 +32,11 @@ __pthread_attr_getstack (attr, stackaddr, stacksize)
   iattr = (struct pthread_attr *) attr;
 
   /* Store the result.  */
+#ifdef _STACK_GROWS_DOWN
   *stackaddr = (char *) iattr->stackaddr - iattr->stacksize;
+#else
+  *stackaddr = (char *) iattr->stackaddr;
+#endif
   *stacksize = iattr->stacksize;
 
   return 0;

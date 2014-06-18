@@ -42,7 +42,7 @@ category  "nb_NO:2000";LC_PAPER
 category  "nb_NO:2000";LC_NAME
 category  "nb_NO:2000";LC_ADDRESS
 category  "nb_NO:2000";LC_TELEPHONE
-
+category  "nb_NO:2000";LC_MEASUREMENT
 END LC_IDENTIFICATION
 
 LC_COLLATE
@@ -127,6 +127,21 @@ copy "i18n"
 
 translit_start
 include  "translit_combining";""
+
+% Norwegian transliteration
+% LATIN CAPITAL LETTER A WITH RING ABOVE -> "Aa"
+<U00C5> "<U0041><U030A>";"<U0041><U0061>"
+% LATIN SMALL LETTER A WITH RING ABOVE -> "aa"
+<U00E5> "<U0061><U030A>";"<U0061><U0061>"
+% LATIN CAPITAL LETTER O WITH STROKE -> "Oe"
+<U00D8> "<U004F><U0338>";"<U004F><U0065>"
+% LATIN SMALL LETTER O WITH STROKE -> "oe"
+<U00F8> "<U006F><U0338>";"<U006F><U0065>"
+% LATIN CAPITAL LETTER AE -> "Ae"
+<U00C6> "<U0041><U0065>"
+% LATIN SMALL LETTER AE -> "ae"
+<U00E6> "<U0061><U0065>"
+
 translit_end
 END LC_CTYPE
 
@@ -201,9 +216,9 @@ date_fmt       "<U0025><U0061><U0020><U0025><U0064><U002E><U0020><U0025>/
 <U0062><U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053>/
 <U0020><U0025><U007A><U0020><U0025><U0059>"
 
-week    7;19971201;4
-first_weekday 1
-first_workday 1
+week    7;19971130;4
+first_weekday 2
+first_workday 2
 END LC_TIME
 
 LC_MESSAGES
@@ -224,7 +239,8 @@ int_prefix     "<U0034><U0037>"
 END LC_TELEPHONE
 
 LC_MEASUREMENT
-measurement    1
+% metric
+measurement 1
 END LC_MEASUREMENT
 
 LC_NAME
@@ -241,4 +257,14 @@ postal_fmt    "<U0025><U0066><U0025><U004E><U0025><U0061><U0025><U004E>/
 country_ab2 "<U004E><U004F>"
 country_ab3 "<U004E><U004F><U0052>"
 country_num 578
+% N
+country_car    "<U004E>"
+% Bokmål
+lang_name    "<U0042><U006F><U006B><U006D><U00E5><U006C>"
+% nb
+lang_ab      "<U006E><U0062>"
+% nob
+lang_term    "<U006E><U006F><U0062>"
+% nob
+lang_lib    "<U006E><U006F><U0062>"
 END LC_ADDRESS

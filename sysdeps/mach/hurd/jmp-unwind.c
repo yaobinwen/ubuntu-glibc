@@ -1,5 +1,5 @@
 /* _longjmp_unwind -- Clean up stack frames unwound by longjmp.  Hurd version.
-   Copyright (C) 1995,1996,2005,2006 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <jmpbuf-unwind.h>
 #include <hurd/userlink.h>
@@ -51,7 +50,6 @@ _longjmp_unwind (jmp_buf env, int val)
   /* All access to SS->active_resources must take place inside a critical
      section where signal handlers cannot run.  */
   __spin_lock (&ss->lock);
-  assert (! __spin_lock_locked (&ss->critical_section_lock));
   __spin_lock (&ss->critical_section_lock);
 
   /* Remove local signal preemptors being unwound past.  */

@@ -2,6 +2,7 @@ libc {
   GLIBC_2.2 {
     # functions used in other libraries
     __xstat64; __fxstat64; __lxstat64;
+    __fpscr_values;
 
     # a*
     alphasort64;
@@ -23,5 +24,11 @@ libc {
   }
   GLIBC_2.3.3 {
     posix_fadvise64; posix_fallocate64;
+  }
+  GLIBC_2.11 {
+    fallocate64;
+  }
+  GLIBC_2.16 {
+    fanotify_mark;
   }
 }

@@ -1,4 +1,4 @@
-/* Copyright (C) 1992, 1994, 1995, 1996, 1997 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <hurd.h>
 #include <hurd/msg_server.h>
@@ -122,17 +121,9 @@ get_int (int which, int *value)
     case INIT_UMASK:
       *value = _hurd_umask;
       return 0;
-    case INIT_SIGMASK:
-      {
-	struct hurd_sigstate *ss = _hurd_thread_sigstate (_hurd_sigthread);
-	__spin_lock (&ss->lock);
-	*value = ss->blocked;
-	__spin_unlock (&ss->lock);
-	return 0;
-      }
     case INIT_SIGPENDING:
       {
-	struct hurd_sigstate *ss = _hurd_thread_sigstate (_hurd_sigthread);
+	struct hurd_sigstate *ss = _hurd_global_sigstate;
 	__spin_lock (&ss->lock);
 	*value = ss->pending;
 	__spin_unlock (&ss->lock);
@@ -140,7 +131,7 @@ get_int (int which, int *value)
       }
     case INIT_SIGIGN:
       {
-	struct hurd_sigstate *ss = _hurd_thread_sigstate (_hurd_sigthread);
+	struct hurd_sigstate *ss = _hurd_global_sigstate;
 	sigset_t ign;
 	int sig;
 	__spin_lock (&ss->lock);
@@ -208,17 +199,9 @@ set_int (int which, int value)
       return 0;
 
       /* These are pretty odd things to do.  But you asked for it.  */
-    case INIT_SIGMASK:
-      {
-	struct hurd_sigstate *ss = _hurd_thread_sigstate (_hurd_sigthread);
-	__spin_lock (&ss->lock);
-	ss->blocked = value;
-	__spin_unlock (&ss->lock);
-	return 0;
-      }
     case INIT_SIGPENDING:
       {
-	struct hurd_sigstate *ss = _hurd_thread_sigstate (_hurd_sigthread);
+	struct hurd_sigstate *ss = _hurd_global_sigstate;
 	__spin_lock (&ss->lock);
 	ss->pending = value;
 	__spin_unlock (&ss->lock);
@@ -226,7 +209,7 @@ set_int (int which, int value)
       }
     case INIT_SIGIGN:
       {
-	struct hurd_sigstate *ss = _hurd_thread_sigstate (_hurd_sigthread);
+	struct hurd_sigstate *ss = _hurd_global_sigstate;
 	int sig;
 	const sigset_t ign = value;
 	__spin_lock (&ss->lock);
@@ -325,7 +308,7 @@ _S_msg_get_env_variable (mach_port_t msgport,
   valuelen = strlen (value);
   if (valuelen > *datalen)
     {
-      if (err = __vm_allocate (__mach_task_self (), 
+      if (err = __vm_allocate (__mach_task_self (),
 			       (vm_address_t *) data, valuelen, 1))
 	return err;
     }

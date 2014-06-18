@@ -1,6 +1,5 @@
 /* O_*, F_*, FD_* bit values for GNU.
-   Copyright (C) 1993,1994,1996,1997,1998,1999,2000,2001,2004,2007
-	Free Software Foundation, Inc.
+   Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -14,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _FCNTL_H
 # error "Never use <bits/fcntl.h> directly; include <fcntl.h> instead."
@@ -55,7 +53,9 @@
 #ifdef __USE_GNU
 # define O_NOLINK	0x0040	/* No name mappings on final component.  */
 # define O_NOTRANS	0x0080	/* No translator on final component. */
+#endif
 
+#ifdef __USE_XOPEN2K8
 # define O_NOFOLLOW	0x00100000 /* Produce ENOENT if file is a symlink.  */
 # define O_DIRECTORY	0x00200000 /* Produce ENOTDIR if not a directory.  */
 #endif
@@ -119,7 +119,7 @@
    once the file has been opened.  */
 
 #define	O_TRUNC		0x00010000 /* Truncate file to zero length.  */
-#ifdef __USE_GNU
+#ifdef __USE_XOPEN2K8
 # define O_CLOEXEC	0x00400000 /* Set FD_CLOEXEC.  */
 #endif
 
@@ -159,7 +159,7 @@
 #define	F_SETFD		2	/* Set file descriptor flags.  */
 #define	F_GETFL		3	/* Get file status flags.  */
 #define	F_SETFL		4	/* Set file status flags.  */
-#if defined __USE_BSD || defined __USE_UNIX98
+#if defined __USE_BSD || defined __USE_UNIX98 || defined __USE_XOPEN2K8
 # define F_GETOWN	5	/* Get owner (receiver of SIGIO).  */
 # define F_SETOWN	6	/* Set owner (receiver of SIGIO).  */
 #endif
@@ -167,7 +167,7 @@
 #define	F_SETLK		8	/* Set record locking info (non-blocking).  */
 #define	F_SETLKW	9	/* Set record locking info (blocking).  */
 
-#ifdef __USE_GNU
+#ifdef __USE_XOPEN2K8
 # define F_DUPFD_CLOEXEC 1030	/* Duplicate, set FD_CLOEXEC on new one.  */
 #endif
 
@@ -218,4 +218,22 @@ struct flock64
 # define POSIX_FADV_WILLNEED	3 /* Will need these pages.  */
 # define POSIX_FADV_DONTNEED	4 /* Don't need these pages.  */
 # define POSIX_FADV_NOREUSE	5 /* Data will be accessed once.  */
+#endif
+
+/* Values for `*at' functions.  */
+#ifdef __USE_ATFILE
+# define AT_FDCWD		-100	/* Special value used to indicate
+					   the *at functions should use the
+					   current working directory. */
+# define AT_SYMLINK_NOFOLLOW	0x100	/* Do not follow symbolic links.  */
+# define AT_REMOVEDIR		0x200	/* Remove directory instead of
+					   unlinking file.  */
+# define AT_SYMLINK_FOLLOW	0x400	/* Follow symbolic links.  */
+# ifdef __USE_GNU
+#  define AT_NO_AUTOMOUNT	0x800	/* Suppress terminal automount
+					   traversal.  */
+#  define AT_EMPTY_PATH		0x1000	/* Allow empty relative pathname.  */
+# endif
+# define AT_EACCESS		0x200	/* Test access permitted for
+					   effective IDs, not real IDs.  */
 #endif

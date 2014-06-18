@@ -1,5 +1,5 @@
 /* Definitions for thread-local data handling.  Hurd/i386 version.
-   Copyright (C) 2003, 2004, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,23 +13,57 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _I386_TLS_H
 #define _I386_TLS_H
 
-#if defined HAVE_TLS_SUPPORT
 
 /* Some things really need not be machine-dependent.  */
-# include <sysdeps/mach/hurd/tls.h>
+#include <sysdeps/mach/hurd/tls.h>
+
+
+#ifndef __ASSEMBLER__
+/* Type for the dtv.  */
+typedef union dtv
+{
+  size_t counter;
+  struct
+  {
+    void *val;
+    bool is_static;
+  } pointer;
+} dtv_t;
+
+
+/* Type of the TCB.  */
+typedef struct
+{
+  void *tcb;			/* Points to this structure.  */
+  dtv_t *dtv;			/* Vector of pointers to TLS data.  */
+  thread_t self;		/* This thread's control port.  */
+  int multiple_threads;
+  uintptr_t sysinfo;
+  uintptr_t stack_guard;
+  uintptr_t pointer_guard;
+  int gscope_flag;
+  int private_futex;
+  /* Reservation of some values for the TM ABI.  */
+  void *__private_tm[4];
+  /* GCC split stack support.  */
+  void *__private_ss;
+  mach_port_t reply_port;      /* This thread's reply port.  */
+  struct hurd_sigstate *_hurd_sigstate;
+} tcbhead_t;
+#endif
+
 
 /* The TCB can have any size and the memory following the address the
    thread pointer points to is unspecified.  Allocate the TCB there.  */
-# define TLS_TCB_AT_TP	1
+#define TLS_TCB_AT_TP	1
 
-# ifndef __ASSEMBLER__
+#ifndef __ASSEMBLER__
 
 /* Use i386-specific RPCs to arrange that %gs segment register prefix
    addresses the TCB in each thread.  */
@@ -42,7 +76,7 @@
 # include <errno.h>
 # include <assert.h>
 
-#define HURD_TLS_DESC_DECL(desc, tcb)					      \
+# define HURD_TLS_DESC_DECL(desc, tcb)					      \
   struct descriptor desc =						      \
     {				/* low word: */				      \
       0xffff			/* limit 0..15 */			      \
@@ -55,11 +89,24 @@
       | (((unsigned int) (tcb)) & 0xff000000) /* base 24..31 */		      \
     }
 
+# define HURD_DESC_TLS(desc)						      \
+  ({									      \
+   (tcbhead_t *) (   (desc->low_word >> 16)				      \
+                  | ((desc->high_word & 0xff) << 16)			      \
+                  |  (desc->high_word & 0xff000000)			      \
+     );})
+
+#define __LIBC_NO_TLS()							      \
+  ({ unsigned short ds, gs;						      \
+     asm ("movw %%ds,%w0; movw %%gs,%w1" : "=q" (ds), "=q" (gs));	      \
+     ds == gs; })
 
 static inline const char * __attribute__ ((unused))
 _hurd_tls_init (tcbhead_t *tcb, int secondcall)
 {
   HURD_TLS_DESC_DECL (desc, tcb);
+  thread_t self = __mach_thread_self ();
+  const char *msg = NULL;
 
   if (!secondcall)
     {
@@ -67,25 +114,26 @@ _hurd_tls_init (tcbhead_t *tcb, int secondcall)
 	 from the TLS point of view.  */
       tcb->tcb = tcb;
 
-      /* Cache our thread port.  */
-      tcb->self = __mach_thread_self ();
-
       /* Get the first available selector.  */
       int sel = -1;
-      error_t err = __i386_set_gdt (tcb->self, &sel, desc);
+      kern_return_t err = __i386_set_gdt (self, &sel, desc);
       if (err == MIG_BAD_ID)
 	{
 	  /* Old kernel, use a per-thread LDT.  */
 	  sel = 0x27;
-	  err = __i386_set_ldt (tcb->self, sel, &desc, 1);
+	  err = __i386_set_ldt (self, sel, &desc, 1);
 	  assert_perror (err);
 	  if (err)
-	    return "i386_set_ldt failed";
+	    {
+	      msg = "i386_set_ldt failed";
+	      goto out;
+	    }
 	}
       else if (err)
 	{
 	  assert_perror (err); /* Separate from above with different line #. */
-	  return "i386_set_gdt failed";
+	  msg = "i386_set_gdt failed";
+	  goto out;
 	}
 
       /* Now install the new selector.  */
@@ -96,23 +144,31 @@ _hurd_tls_init (tcbhead_t *tcb, int secondcall)
       /* Fetch the selector set by the first call.  */
       int sel;
       asm ("mov %%gs, %w0" : "=q" (sel) : "0" (0));
-      if (__builtin_expect (sel, 0x50) & 4) /* LDT selector */
+      if (__builtin_expect (sel, 0x48) & 4) /* LDT selector */
 	{
-	  error_t err = __i386_set_ldt (tcb->self, sel, &desc, 1);
+	  kern_return_t err = __i386_set_ldt (self, sel, &desc, 1);
 	  assert_perror (err);
 	  if (err)
-	    return "i386_set_ldt failed";
+	    {
+	      msg = "i386_set_ldt failed";
+	      goto out;
+	    }
 	}
       else
 	{
-	  error_t err = __i386_set_gdt (tcb->self, &sel, desc);
+	  kern_return_t err = __i386_set_gdt (self, &sel, desc);
 	  assert_perror (err);
 	  if (err)
-	    return "i386_set_gdt failed";
+	    {
+	      msg = "i386_set_gdt failed";
+	      goto out;
+	    }
 	}
     }
 
-  return 0;
+out:
+  __mach_port_deallocate (__mach_task_self (), self);
+  return msg;
 }
 
 /* Code to initially initialize the thread pointer.  This might need
@@ -120,14 +176,27 @@ _hurd_tls_init (tcbhead_t *tcb, int secondcall)
    operation can cause a failure 'errno' must not be touched.  */
 # define TLS_INIT_TP(descr, secondcall) \
     _hurd_tls_init ((tcbhead_t *) (descr), (secondcall))
-# define TLS_INIT_TP_EXPENSIVE 1
 
 /* Return the TCB address of the current thread.  */
-# define THREAD_SELF 							      \
+# define THREAD_SELF							      \
   ({ tcbhead_t *__tcb;							      \
      __asm__ ("movl %%gs:%c1,%0" : "=r" (__tcb)				      \
 	      : "i" (offsetof (tcbhead_t, tcb)));			      \
      __tcb;})
+
+/* Return the TCB address of a thread given its state.  */
+# define THREAD_TCB(thread, thread_state)				      \
+  ({ int __sel = (thread_state)->basic.gs;				      \
+     struct descriptor __desc, *___desc = &__desc;			      \
+     unsigned int __count = 1;						      \
+     kern_return_t __err;						      \
+     if (__builtin_expect (__sel, 0x48) & 4) /* LDT selector */		      \
+       __err = __i386_get_ldt ((thread), __sel, 1, &___desc, &__count);	      \
+     else								      \
+       __err = __i386_get_gdt ((thread), __sel, &__desc);		      \
+     assert_perror (__err);						      \
+     assert (__count == 1);						      \
+     HURD_DESC_TLS(___desc);})
 
 /* Install new dtv for current thread.  */
 # define INSTALL_NEW_DTV(dtvp)						      \
@@ -135,16 +204,16 @@ _hurd_tls_init (tcbhead_t *tcb, int secondcall)
 		   : : "ir" (dtvp), "i" (offsetof (tcbhead_t, dtv))); })
 
 /* Return the address of the dtv for the current thread.  */
-# define THREAD_DTV() 							      \
+# define THREAD_DTV()							      \
   ({ dtv_t *_dtv;							      \
      asm ("movl %%gs:%P1,%0" : "=q" (_dtv) : "i" (offsetof (tcbhead_t, dtv)));\
      _dtv; })
 
-#include <mach/machine/thread_status.h>
+# include <mach/machine/thread_status.h>
 
-/* Set up TLS in the new thread of a fork child, copying from our own.  */
-static inline error_t __attribute__ ((unused))
-_hurd_tls_fork (thread_t child, struct i386_thread_state *state)
+/* Set up TLS in the new thread of a fork child, copying from the original.  */
+static inline kern_return_t __attribute__ ((unused))
+_hurd_tls_fork (thread_t child, thread_t orig, struct i386_thread_state *state)
 {
   /* Fetch the selector set by _hurd_tls_init.  */
   int sel;
@@ -152,11 +221,20 @@ _hurd_tls_fork (thread_t child, struct i386_thread_state *state)
   if (sel == state->ds)		/* _hurd_tls_init was never called.  */
     return 0;
 
-  tcbhead_t *const tcb = THREAD_SELF;
-  HURD_TLS_DESC_DECL (desc, tcb);
-  error_t err;
+  struct descriptor desc, *_desc = &desc;
+  int err;
+  unsigned int count = 1;
 
-  if (__builtin_expect (sel, 0x50) & 4) /* LDT selector */
+  if (__builtin_expect (sel, 0x48) & 4) /* LDT selector */
+    err = __i386_get_ldt (orig, sel, 1, &_desc, &count);
+  else
+    err = __i386_get_gdt (orig, sel, &desc);
+
+  assert_perror (err);
+  if (err)
+    return err;
+
+  if (__builtin_expect (sel, 0x48) & 4) /* LDT selector */
     err = __i386_set_ldt (child, sel, &desc, 1);
   else
     err = __i386_set_gdt (child, &sel, desc);
@@ -165,7 +243,30 @@ _hurd_tls_fork (thread_t child, struct i386_thread_state *state)
   return err;
 }
 
-# endif	/* !__ASSEMBLER__ */
-#endif /* HAVE_TLS_SUPPORT */
+static inline kern_return_t __attribute__ ((unused))
+_hurd_tls_new (thread_t child, struct i386_thread_state *state, tcbhead_t *tcb)
+{
+  /* Fetch the selector set by _hurd_tls_init.  */
+  int sel;
+  asm ("mov %%gs, %w0" : "=q" (sel) : "0" (0));
+  if (sel == state->ds)		/* _hurd_tls_init was never called.  */
+    return 0;
+
+  HURD_TLS_DESC_DECL (desc, tcb);
+  kern_return_t err;
+
+  tcb->tcb = tcb;
+  tcb->self = child;
+
+  if (__builtin_expect (sel, 0x48) & 4) /* LDT selector */
+    err = __i386_set_ldt (child, sel, &desc, 1);
+  else
+    err = __i386_set_gdt (child, &sel, desc);
+
+  state->gs = sel;
+  return err;
+}
+
+#endif	/* !__ASSEMBLER__ */
 
 #endif	/* i386/tls.h */

@@ -1,7 +1,10 @@
 /* Test program from Paul Eggert and Tony Leneis.  */
+
+#include <limits.h>
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <limits.h>
 
 static time_t time_t_max;
 static time_t time_t_min;

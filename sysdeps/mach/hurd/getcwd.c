@@ -1,4 +1,4 @@
-/* Copyright (C) 1991,92,93,94,95,96,97,98,2002,04 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <sys/types.h>
@@ -46,7 +45,7 @@ _hurd_canonicalize_directory_name_internal (file_t thisdir,
   mach_port_t rootid, thisid, rootdevid, thisdevid;
   ino64_t rootino, thisino;
   char *file_name;
-  register char *file_namep;
+  char *file_namep;
   file_t parent;
   char *dirbuf = NULL;
   unsigned int dirbufsize = 0;
@@ -60,7 +59,6 @@ _hurd_canonicalize_directory_name_internal (file_t thisdir,
       __mach_port_deallocate (__mach_task_self (), thisid);
       __mach_port_deallocate (__mach_task_self (), thisdevid);
       __mach_port_deallocate (__mach_task_self (), rootid);
-      __mach_port_deallocate (__mach_task_self (), rootdevid);
 
       if (dirbuf != NULL)
 	__vm_deallocate (__mach_task_self (),
@@ -268,11 +266,6 @@ _hurd_canonicalize_directory_name_internal (file_t thisdir,
        So the root is our current directory.  */
     *--file_namep = '/';
 
-  if (thisid != rootid)
-    /* We did not get to our root directory. The returned name should
-       not begin with a slash.  */
-    ++file_namep;
-
   memmove (file_name, file_namep, file_name + size - file_namep);
   cleanup ();
   return file_name;
@@ -312,13 +305,6 @@ __getcwd (char *buf, size_t size)
     __USEPORT (CWDIR,
 	       _hurd_canonicalize_directory_name_internal (port,
 							   buf, size));
-  if (cwd && cwd[0] != '/')
-    {
-      /* `cwd' is an unknown root directory.  */
-      if (buf == NULL)
-	  free (cwd);
-      return __hurd_fail (EGRATUITOUS), NULL;
-    }
   return cwd;
 }
 weak_alias (__getcwd, getcwd)

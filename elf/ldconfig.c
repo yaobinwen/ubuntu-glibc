@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2007, 2008 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Andreas Jaeger <aj@suse.de>, 1999.
 
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 #define PROCINFO_CLASS static
 #include <alloca.h>
@@ -32,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -58,6 +58,21 @@
 #include <version.h>
 
 #define PACKAGE _libc_intl_domainname
+
+#ifndef PATH_MAX
+#define PATH_MAX 1024
+#endif
+
+/* Get the generated information about the trusted/standard directories.  */
+#include "trusted-dirs.h"
+
+static const char system_dirs[] = SYSTEM_DIRS;
+static const size_t system_dirs_len[] =
+{
+  SYSTEM_DIRS_LEN
+};
+#define nsystem_dirs_len \
+  (sizeof (system_dirs_len) / sizeof (system_dirs_len[0]))
 
 static const struct
 {
@@ -132,6 +147,9 @@ static void print_version (FILE *stream, struct argp_state *state);
 void (*argp_program_version_hook) (FILE *, struct argp_state *)
      = print_version;
 
+/* Function to print some extra text in the help message.  */
+static char *more_help (int key, const char *text, void *input);
+
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
@@ -161,7 +179,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state);
 /* Data structure to communicate with argp functions.  */
 static struct argp argp =
 {
-  options, parse_opt, NULL, doc, NULL, NULL, NULL
+  options, parse_opt, NULL, doc, NULL, more_help, NULL
 };
 
 /* Check if string corresponds to an important hardware capability or
@@ -171,13 +189,17 @@ is_hwcap_platform (const char *name)
 {
   int hwcap_idx = _dl_string_hwcap (name);
 
+  /* Is this a normal hwcap for the machine like "fpu?"  */
   if (hwcap_idx != -1 && ((1 << hwcap_idx) & hwcap_mask))
     return 1;
 
+  /* Is this a platform pseudo-hwcap like "i686?"  */
   hwcap_idx = _dl_string_platform (name);
   if (hwcap_idx != -1)
     return 1;
 
+  /* Is this one of the extra pseudo-hwcaps that we map beyond
+     _DL_FIRST_EXTRA like "tls", or "nosegneg?"  */
   for (hwcap_idx = _DL_FIRST_EXTRA; hwcap_idx < 64; ++hwcap_idx)
     if (hwcap_extra[hwcap_idx - _DL_FIRST_EXTRA] != NULL
 	&& !strcmp (name, hwcap_extra[hwcap_idx - _DL_FIRST_EXTRA]))
@@ -288,16 +310,36 @@ parse_opt (int key, char *arg, struct argp_state *state)
   return 0;
 }
 
+/* Print bug-reporting information in the help message.  */
+static char *
+more_help (int key, const char *text, void *input)
+{
+  char *tp = NULL;
+  switch (key)
+    {
+    case ARGP_KEY_HELP_EXTRA:
+      /* We print some extra information.  */
+      if (asprintf (&tp, gettext ("\
+For bug reporting instructions, please see:\n\
+%s.\n"), REPORT_BUGS_TO) < 0)
+	return NULL;
+      return tp;
+    default:
+      break;
+    }
+  return (char *) text;
+}
+
 /* Print the version information.  */
 static void
 print_version (FILE *stream, struct argp_state *state)
 {
-  fprintf (stream, "ldconfig (GNU %s) %s\n", PACKAGE, VERSION);
+  fprintf (stream, "ldconfig %s%s\n", PKGVERSION, VERSION);
   fprintf (stream, gettext ("\
 Copyright (C) %s Free Software Foundation, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2008");
+"), "2014");
   fprintf (stream, gettext ("Written by %s.\n"),
 	   "Andreas Jaeger");
 }
@@ -364,14 +406,17 @@ add_dir (const char *line)
     }
 
   /* Canonify path: for now only remove leading and trailing
-     whitespace and the trailing slashes slashes.  */
-  i = strlen (entry->path) - 1;
+     whitespace and the trailing slashes.  */
+  i = strlen (entry->path);
 
-  while (isspace (entry->path[i]) && i > 0)
-    entry->path[i--] = '\0';
+  while (i > 0 && isspace (entry->path[i - 1]))
+    entry->path[--i] = '\0';
 
-  while (entry->path[i] == '/' && i > 0)
-    entry->path[i--] = '\0';
+  while (i > 0 && entry->path[i - 1] == '/')
+    entry->path[--i] = '\0';
+
+  if (i == 0)
+    return;
 
   char *path = entry->path;
   if (opt_chroot)
@@ -420,6 +465,23 @@ chroot_stat (const char *real_path, const char *path, struct stat64 *st)
   return ret;
 }
 
+static const char * const ld_sonames[] =
+{
+  "ld-kfreebsd-x86-64.so.1",
+  "ld-linux-aarch64.so.1",
+  "ld-linux-aarch64_be.so.1",
+  "ld-linux-armhf.so.3",
+  "ld-linux-ia64.so.2",
+  "ld-linux-mipsn8.so.1",
+  "ld-linux-x32.so.2",
+  "ld-linux-x86-64.so.2",
+  "ld-linux.so.2",
+  "ld-linux.so.3",
+  "ld.so.1",
+  "ld64.so.1",
+  "ld64.so.2",
+};
+
 /* Create a symbolic link from soname to libname in directory path.  */
 static void
 create_links (const char *real_path, const char *path, const char *libname,
@@ -430,6 +492,7 @@ create_links (const char *real_path, const char *path, const char *libname,
   struct stat64 stat_lib, stat_so, lstat_so;
   int do_link = 1;
   int do_remove = 1;
+  int i;
   /* XXX: The logics in this function should be simplified.  */
 
   /* Get complete path.  */
@@ -458,6 +521,18 @@ create_links (const char *real_path, const char *path, const char *libname,
 	  error (0, 0, _("Can't stat %s\n"), full_libname);
 	  return;
 	}
+
+      /* Do not change the symlink pointer to the dynamic linker except for
+	 non-existing symlinks, as it might break multiarch systems.  */
+      for (i = 0; i < sizeof (ld_sonames) / sizeof (ld_sonames[0]); i++)
+	if (__glibc_unlikely(!strcmp(soname, ld_sonames[i])))
+	  {
+	    if (opt_verbose)
+	      error (0, 0, _("%s is the dynamic linker, ignoring\n"),
+			     full_libname);
+	    do_link = 0;
+	  }
+
       if (stat_lib.st_dev == stat_so.st_dev
 	  && stat_lib.st_ino == stat_so.st_ino)
 	/* Link is already correct.  */
@@ -753,7 +828,18 @@ search_dir (const struct dir_entry *entry)
 	{
 	  /* In case of symlink, we check if the symlink refers to
 	     a directory. */
-	  if (__builtin_expect (stat64 (real_file_name, &stat_buf), 0))
+	  char *target_name = real_file_name;
+	  if (opt_chroot)
+	    {
+	      target_name = chroot_canon (opt_chroot, file_name);
+	      if (target_name == NULL)
+		{
+		  if (strstr (file_name, ".so") == NULL)
+		    error (0, 0, _("Input file %s not found.\n"), file_name);
+		  continue;
+		}
+	    }
+	  if (__builtin_expect (stat64 (target_name, &stat_buf), 0))
 	    {
 	      if (opt_verbose)
 		error (0, errno, _("Cannot stat %s"), file_name);
@@ -1028,7 +1114,10 @@ parse_conf (const char *filename, bool do_chroot)
 
   if (file == NULL)
     {
-      error (0, errno, _("Can't open configuration file %s"), canon);
+      if (strcmp(canon, LD_SO_CONF) != 0 || opt_verbose)
+       error (0, errno, _("\
+Warning: ignoring configuration file that cannot be opened: %s"),
+	      canon);
       if (canon != filename)
 	free ((char *) canon);
       return;
@@ -1154,7 +1243,9 @@ parse_conf_include (const char *config_file, unsigned int lineno,
   if (do_chroot && opt_chroot)
     {
       char *canon = chroot_canon (opt_chroot, pattern);
-      result = glob64 (canon ?: pattern, 0, NULL, &gl);
+      if (canon == NULL)
+	return;
+      result = glob64 (canon, 0, NULL, &gl);
       free (canon);
     }
   else
@@ -1225,6 +1316,10 @@ main (int argc, char **argv)
 	  add_dir (argv[i]);
     }
 
+  /* The last entry in hwcap_extra is reserved for the "tls" pseudo-hwcap which
+     indicates support for TLS.  This pseudo-hwcap is only used by old versions
+     under which TLS support was optional.  The entry is no longer needed, but
+     must remain for compatibility.  */
   hwcap_extra[63 - _DL_FIRST_EXTRA] = "tls";
 
   set_hwcap ();
@@ -1285,11 +1380,9 @@ main (int argc, char **argv)
 				  p ? (*p = '\0', cache_file) : "/");
 
       if (canon == NULL)
-	{
-	  error (EXIT_FAILURE, errno,
-		 _("Can't open cache file directory %s\n"),
-		 p ? cache_file : "/");
-	}
+	error (EXIT_FAILURE, errno,
+	       _("Can't open cache file directory %s\n"),
+	       p ? cache_file : "/");
 
       if (p)
 	++p;
@@ -1318,16 +1411,27 @@ main (int argc, char **argv)
 
   if (!opt_only_cline)
     {
+      const char *strp = system_dirs;
+      size_t idx = 0;
+
       parse_conf (config_file, true);
 
       /* Always add the standard search paths.  */
-      add_system_dir (SLIBDIR);
-      if (strcmp (SLIBDIR, LIBDIR))
-	add_system_dir (LIBDIR);
+      do
+        {
+          add_system_dir (strp);
+          strp += system_dirs_len[idx] + 1;
+          idx++;
+        }
+      while (idx < nsystem_dirs_len);
     }
 
-  if (! opt_ignore_aux_cache)
-    load_aux_cache (_PATH_LDCONFIG_AUX_CACHE);
+  const char *aux_cache_file = _PATH_LDCONFIG_AUX_CACHE;
+  if (opt_chroot)
+    aux_cache_file = chroot_canon (opt_chroot, aux_cache_file);
+
+  if (! opt_ignore_aux_cache && aux_cache_file)
+    load_aux_cache (aux_cache_file);
   else
     init_aux_cache ();
 
@@ -1336,7 +1440,8 @@ main (int argc, char **argv)
   if (opt_build_cache)
     {
       save_cache (cache_file);
-      save_aux_cache (_PATH_LDCONFIG_AUX_CACHE);
+      if (aux_cache_file)
+	save_aux_cache (aux_cache_file);
     }
 
   return 0;

@@ -1,6 +1,5 @@
 /* Operating system support for run-time dynamic linker.  Hurd version.
-   Copyright (C) 1995,1996,1997,1998,1999,2000,2001,2002,2003,2004
-	Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -14,9 +13,12 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+
+/* In the static library, this is all handled by dl-support.c
+   or by the vanilla definitions in the rest of the C library.  */
+#ifdef SHARED
 
 #include <hurd.h>
 #include <link.h>
@@ -52,34 +54,17 @@ int __libc_enable_secure = 0;
 INTVARDEF(__libc_enable_secure)
 int __libc_multiple_libcs = 0;	/* Defining this here avoids the inclusion
 				   of init-first.  */
-/* This variable containts the lowest stack address ever used.  */
+/* This variable contains the lowest stack address ever used.  */
 void *__libc_stack_end;
 
 #if HP_TIMING_AVAIL
 hp_timing_t _dl_cpuclock_offset;
 #endif
 
+/* TODO: this is never properly initialized in here.  */
+void *_dl_random attribute_relro = NULL;
 
 struct hurd_startup_data *_dl_hurd_data;
-
-/* This is used only within ld.so, via dl-minimal.c's __errno_location.  */
-#undef errno
-int errno attribute_hidden;
-
-/* Defining these variables here avoids the inclusion of hurdsig.c.  */
-unsigned long int __hurd_sigthread_stack_base;
-unsigned long int __hurd_sigthread_stack_end;
-unsigned long int *__hurd_sigthread_variables;
-
-/* Defining these variables here avoids the inclusion of init-first.c.
-   We need to provide temporary storage for the per-thread variables
-   of the main user thread here, since it is used for storing the
-   `errno' variable.  Note that this information is lost once we
-   relocate the dynamic linker.  */
-static unsigned long int threadvars[_HURD_THREADVAR_MAX];
-unsigned long int __hurd_threadvar_stack_offset
-  = (unsigned long int) &threadvars;
-unsigned long int __hurd_threadvar_stack_mask;
 
 #define FMH defined(__i386__)
 #if ! FMH
@@ -102,12 +87,28 @@ static void fmh(void) {
 	max=a; break;}
       fmha=a+=fmhs;}
     if (err) assert(err==KERN_NO_SPACE);
-    if (!fmha)fmhs=0;else{
-    fmhs=max-fmha;
-    err = __vm_map (__mach_task_self (),
-		    &fmha, fmhs, 0, 0, MACH_PORT_NULL, 0, 1,
-		    VM_PROT_NONE, VM_PROT_NONE, VM_INHERIT_COPY);
-    assert_perror(err);}
+    if (!fmha)
+      fmhs=0;
+    else
+      while (1) {
+	fmhs=max-fmha;
+	if (fmhs == 0)
+	  break;
+	err = __vm_map (__mach_task_self (),
+			&fmha, fmhs, 0, 0, MACH_PORT_NULL, 0, 1,
+			VM_PROT_NONE, VM_PROT_NONE, VM_INHERIT_COPY);
+	if (!err)
+	  break;
+	if (err != KERN_INVALID_ADDRESS && err != KERN_NO_SPACE)
+	  assert_perror(err);
+	vm_address_t new_max = (max - 1) & 0xf0000000U;
+	if (new_max >= max) {
+	  fmhs = 0;
+	  fmha = 0;
+	  break;
+	}
+	max = new_max;
+      }
   }
 /* XXX loser kludge for vm_map kernel bug */
 #endif
@@ -116,11 +117,11 @@ static void fmh(void) {
 ElfW(Addr)
 _dl_sysdep_start (void **start_argptr,
 		  void (*dl_main) (const ElfW(Phdr) *phdr, ElfW(Word) phent,
-				   ElfW(Addr) *user_entry))
+				   ElfW(Addr) *user_entry,
+				   ElfW(auxv_t) *auxv))
 {
   void go (intptr_t *argdata)
     {
-      extern unsigned int _dl_skip_args; /* rtld.c */
       char **p;
 
       /* Cache the information in various global variables.  */
@@ -197,7 +198,7 @@ unfmh();			/* XXX */
 	 up and leave us to transfer control to USER_ENTRY.  */
       (*dl_main) ((const ElfW(Phdr) *) _dl_hurd_data->phdr,
 		  _dl_hurd_data->phdrsz / sizeof (ElfW(Phdr)),
-		  &_dl_hurd_data->user_entry);
+		  &_dl_hurd_data->user_entry, NULL);
 
       /* The call above might screw a few things up.
 
@@ -315,7 +316,7 @@ open_file (const char *file_name, int flags,
       return MACH_PORT_NULL;
     }
 
-  assert (!(flags & ~O_READ));
+  assert (!(flags & ~(O_READ | O_CLOEXEC)));
 
   startdir = _dl_hurd_data->portarray[file_name[0] == '/' ?
 				      INIT_PORT_CRDIR : INIT_PORT_CWDIR];
@@ -551,7 +552,7 @@ __access (const char *file, int type)
 }
 
 pid_t weak_function
-__getpid ()
+__getpid (void)
 {
   pid_t pid, ppid;
   int orphaned;
@@ -643,28 +644,10 @@ _dl_show_auxv (void)
 }
 
 
-/* Return an array of useful/necessary hardware capability names.  */
-const struct r_strlenpair *
-internal_function
-_dl_important_hwcaps (const char *platform, size_t platform_len, size_t *sz,
-		      size_t *max_capstrlen)
-{
-  struct r_strlenpair *result;
-
-  /* Return an empty array.  Hurd has no hardware capabilities.  */
-  result = (struct r_strlenpair *) malloc (sizeof (*result));
-  if (result == NULL)
-    _dl_signal_error (ENOMEM, NULL, NULL, "cannot create capability list");
-
-  result[0].str = (char *) result;	/* Does not really matter.  */
-  result[0].len = 0;
-
-  *sz = 1;
-  return result;
-}
-
 void weak_function
 _dl_init_first (int argc, ...)
 {
   /* This no-op definition only gets used if libc is not linked in.  */
 }
+
+#endif /* SHARED */

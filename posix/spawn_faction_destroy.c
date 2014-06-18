@@ -1,4 +1,4 @@
-/* Copyright (C) 2000 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,18 +12,35 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <spawn.h>
 #include <stdlib.h>
 
-/* Initialize data structure for file attribute for `spawn' call.  */
+#include "spawn_int.h"
+
+/* Deallocate the file actions.  */
 int
 posix_spawn_file_actions_destroy (posix_spawn_file_actions_t *file_actions)
 {
-  /* Free the memory allocated.  */
+  /* Free the paths in the open actions.  */
+  for (int i = 0; i < file_actions->__used; ++i)
+    {
+      struct __spawn_action *sa = &file_actions->__actions[i];
+      switch (sa->tag)
+	{
+	case spawn_do_open:
+	  free (sa->action.open_action.path);
+	  break;
+	case spawn_do_close:
+	case spawn_do_dup2:
+	  /* No cleanup required.  */
+	  break;
+	}
+    }
+
+  /* Free the array of actions.  */
   free (file_actions->__actions);
   return 0;
 }

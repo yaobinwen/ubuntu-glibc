@@ -1,5 +1,5 @@
 /* Machine-specific definition for spin locks.  Stub version.
-   Copyright (C) 1994, 1997, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1994-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _MACHINE_LOCK_H
 #define	_MACHINE_LOCK_H
@@ -35,14 +34,21 @@ typedef volatile int __spin_lock_t;
 
 /* Unlock LOCK.  */
 
+void __spin_unlock (__spin_lock_t *__lock);
+
+#ifdef __USE_EXTERN_INLINES
 _EXTERN_INLINE void
 __spin_unlock (__spin_lock_t *__lock)
 {
   *__lock = 0;
 }
+#endif
 
 /* Try to lock LOCK; return nonzero if we locked it, zero if another has.  */
 
+int __spin_try_lock (__spin_lock_t *__lock);
+
+#ifdef __USE_EXTERN_INLINES
 _EXTERN_INLINE int
 __spin_try_lock (__spin_lock_t *__lock)
 {
@@ -51,14 +57,19 @@ __spin_try_lock (__spin_lock_t *__lock)
   *__lock = 1;
   return 1;
 }
+#endif
 
 /* Return nonzero if LOCK is locked.  */
 
+int __spin_lock_locked (__spin_lock_t *__lock);
+
+#ifdef __USE_EXTERN_INLINES
 _EXTERN_INLINE int
 __spin_lock_locked (__spin_lock_t *__lock)
 {
   return *__lock != 0;
 }
+#endif
 
 
 #endif /* machine-lock.h */

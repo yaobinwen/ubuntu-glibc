@@ -22,12 +22,13 @@
 #include <arpa/nameser.h>
 #include <resolv.h>
 #include <bits/libc-lock.h>
-
+#include <sys/stat.h>
 
 /* The following bit is copied from res_data.c (where it is #ifdef'ed
    out) since res_init() should go into libc.so but the rest of that
    file should not.  */
 
+__libc_lock_define_initialized (static, lock);
 extern unsigned long long int __res_initstamp attribute_hidden;
 /* We have atomic increment operations on 64-bit platforms.  */
 #if __WORDSIZE == 64
@@ -35,7 +36,6 @@ extern unsigned long long int __res_initstamp attribute_hidden;
 # define atomicincunlock(lock) (void) 0
 # define atomicinc(var) catomic_increment (&(var))
 #else
-__libc_lock_define_initialized (static, lock);
 # define atomicinclock(lock) __libc_lock_lock (lock)
 # define atomicincunlock(lock) __libc_lock_unlock (lock)
 # define atomicinc(var) ++var
@@ -94,12 +94,22 @@ res_init(void) {
 int
 __res_maybe_init (res_state resp, int preinit)
 {
+	static time_t last_mtime;
+	struct stat statbuf;
+	int ret;
+
 	if (resp->options & RES_INIT) {
+		ret = stat (_PATH_RESCONF, &statbuf);
+		__libc_lock_lock (lock);
+		if ((ret == 0) && (last_mtime != statbuf.st_mtime)) {
+			last_mtime = statbuf.st_mtime;
+			atomicinc (__res_initstamp);
+		}
+		__libc_lock_unlock (lock);
 		if (__res_initstamp != resp->_u._ext.initstamp) {
-			if (resp->nscount > 0) {
+			if (resp->nscount > 0)
 				__res_iclose (resp, true);
-				return __res_vinit (resp, 1);
-			}
+			return __res_vinit (resp, 1);
 		}
 		return 0;
 	} else if (preinit) {
@@ -123,20 +133,16 @@ libc_hidden_def (__res_maybe_init)
    This differs from plain `struct __res_state _res;' in that it doesn't
    create a common definition, but a plain symbol that resides in .bss,
    which can have an alias.  */
-struct __res_state _res __attribute__((section (".bss")));
+struct __res_state _res __attribute__ ((nocommon));
 
-#include <tls.h>
-
-#if USE___THREAD
 #undef __resp
 __thread struct __res_state *__resp = &_res;
 extern __thread struct __res_state *__libc_resp
   __attribute__ ((alias ("__resp"))) attribute_hidden;
-#endif
 
 /* We declare this with compat_symbol so that it's not
    visible at link time.  Programs must use the accessor functions.  */
-#if defined HAVE_ELF && defined SHARED && defined DO_VERSIONING
+#ifdef SHARED
 # include <shlib-compat.h>
 compat_symbol (libc, _res, _res, GLIBC_2_0);
 #endif

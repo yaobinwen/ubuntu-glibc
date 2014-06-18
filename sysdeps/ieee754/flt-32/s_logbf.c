@@ -8,33 +8,34 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
-#if defined(LIBM_SCCS) && !defined(lint)
-static char rcsid[] = "$NetBSD: s_logbf.c,v 1.4 1995/05/10 20:47:51 jtc Exp $";
-#endif
+#include <math.h>
+#include <math_private.h>
 
-#include "math.h"
-#include "math_private.h"
-
-#ifdef __STDC__
-	float __logbf(float x)
-#else
-	float __logbf(x)
-	float x;
-#endif
+float
+__logbf (float x)
 {
-	int32_t ix;
-	GET_FLOAT_WORD(ix,x);
-	ix &= 0x7fffffff;			/* high |x| */
-	if(ix==0) return (float)-1.0/fabsf(x);
-	if(ix>=0x7f800000) return x*x;
-	if((ix>>=23)==0) 			/* IEEE 754 logb */
-		return -126.0; 
-	else
-		return (float) (ix-127); 
+  int32_t ix, rix;
+  float ret;
+
+  GET_FLOAT_WORD (ix, x);
+  ix &= 0x7fffffff;		/* high |x| */
+  if (ix == 0)
+    return (float) -1.0 / fabsf (x);
+  if (ix >= 0x7f800000)
+    return x * x;
+  if (__builtin_expect ((rix = ix >> 23) == 0, 0))
+    {
+      /* POSIX specifies that denormal number is treated as
+         though it were normalized.  */
+      rix -= __builtin_clz (ix) - 9;
+    }
+  ret = (float) (rix - 127);
+  /* The test is to avoid logb_downward (0.0) == -0.0.  */
+  return ret == -0.0 ? 0.0 : ret;
 }
 weak_alias (__logbf, logbf)

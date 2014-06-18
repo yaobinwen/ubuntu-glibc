@@ -43,7 +43,7 @@ category  "en_NZ:2000";LC_PAPER
 category  "en_NZ:2000";LC_NAME
 category  "en_NZ:2000";LC_ADDRESS
 category  "en_NZ:2000";LC_TELEPHONE
-
+category  "en_NZ:2000";LC_MEASUREMENT
 END LC_IDENTIFICATION
 
 LC_CTYPE
@@ -117,6 +117,8 @@ t_fmt_ampm  "<U0025><U0049><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
 date_fmt	"<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
 <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
 <U0025><U005A><U0020><U0025><U0059>"
+%  FIXME: found in CLDR
+first_weekday 1
 END LC_TIME
 
 LC_MESSAGES
@@ -138,8 +140,8 @@ int_prefix     "<U0036><U0034>"
 END LC_TELEPHONE
 
 LC_MEASUREMENT
-% FIXME
-measurement    1
+% metric
+measurement 1
 END LC_MEASUREMENT
 
 LC_NAME
@@ -156,4 +158,14 @@ postal_fmt    "<U0025><U0066><U0025><U004E><U0025><U0061><U0025><U004E>/
 country_ab2   "<U004E><U005A>"
 country_ab3   "<U004E><U005A><U004C>"
 country_num   554
+% NZ
+country_car    "<U004E><U005A>"
+% English
+lang_name     "<U0045><U006E><U0067><U006C><U0069><U0073><U0068>"
+% en
+lang_ab      "<U0065><U006E>"
+% eng
+lang_term    "<U0065><U006E><U0067>"
+% eng
+lang_lib    "<U0065><U006E><U0067>"
 END LC_ADDRESS

@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 92, 93, 94, 95, 97 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <unistd.h>
 #include <hurd.h>
@@ -35,7 +34,8 @@ __execve (file_name, argv, envp)
     return -1;
 
   /* Hopefully this will not return.  */
-  err = _hurd_exec (__mach_task_self (), file, argv, envp);
+  err = _hurd_exec_file_name (__mach_task_self (), file,
+			      file_name, argv, envp);
 
   /* Oh well.  Might as well be tidy.  */
   __mach_port_deallocate (__mach_task_self (), file);

@@ -1,4 +1,4 @@
-/* Copyright (C) 2005 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,18 +12,17 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library.  If not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include "pthreadP.h"
 
 int
 pthread_spin_unlock (pthread_spinlock_t *lock)
 {
-  int tmp = 0;
-  /* This should be a memory barrier to newer compilers */
-  __asm__ __volatile__ ("stw,ma %1,0(%0)"
-                        : : "r" (lock), "r" (tmp) : "memory");           
+  /* The LWS-CAS operation on hppa is a synthetic atomic operation
+     that doesn't provide the type of coherency that we need. Therefore
+     we force that coherency by using LWS-CAS again.  */
+  atomic_exchange_rel (lock, 0);
   return 0;
 }

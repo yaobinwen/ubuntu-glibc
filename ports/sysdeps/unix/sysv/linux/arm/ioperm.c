@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 1999, 2003, 2005, 2008 Free Software Foundation, Inc.
+/* Copyright (C) 1998-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Phil Blundell, based on the Alpha version by
    David Mosberger.
@@ -14,9 +14,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library.  If not, see
+   <http://www.gnu.org/licenses/>.  */
 
 /* I/O port access on the ARM is something of a fiction.  What we do is to
    map an appropriate area of /dev/mem into user space so that a program
@@ -95,19 +94,13 @@ static struct platform {
  *    values.
  */
 
-/* The Linux kernel headers renamed this constant between 2.5.26 and
-   2.5.27.  It was backported to 2.4 between 2.4.22 and 2.4.23.  */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,23)
-# define BUS_ISA CTL_BUS_ISA
-#endif
-
 static int
 init_iosys (void)
 {
   char systype[256];
   int i, n;
-  static int iobase_name[] = { CTL_BUS, BUS_ISA, BUS_ISA_PORT_BASE };
-  static int ioshift_name[] = { CTL_BUS, BUS_ISA, BUS_ISA_PORT_SHIFT };
+  static int iobase_name[] = { CTL_BUS, CTL_BUS_ISA, BUS_ISA_PORT_BASE };
+  static int ioshift_name[] = { CTL_BUS, CTL_BUS_ISA, BUS_ISA_PORT_SHIFT };
   size_t len = sizeof(io.base);
 
   if (! __sysctl (iobase_name, 3, &io.io_base, &len, NULL, 0)
@@ -135,7 +128,7 @@ init_iosys (void)
     {
       FILE * fp;
 
-      fp = fopen (PATH_CPUINFO, "r");
+      fp = fopen (PATH_CPUINFO, "rce");
       if (! fp)
 	return -1;
       while ((n = fscanf (fp, "Hardware\t: %256[^\n]\n", systype))

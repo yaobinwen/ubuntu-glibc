@@ -1,5 +1,4 @@
-/* Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 2002, 2007
-     Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -14,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <hurd.h>
@@ -43,7 +41,7 @@ __sigsuspend (set)
 
   ss = _hurd_self_sigstate ();
 
-  __spin_lock (&ss->lock);
+  _hurd_sigstate_lock (ss);
 
   oldmask = ss->blocked;
   if (set != NULL)
@@ -51,11 +49,11 @@ __sigsuspend (set)
     ss->blocked = newmask & ~_SIG_CANT_MASK;
 
   /* Notice if any pending signals just became unblocked.  */
-  pending = ss->pending & ~ss->blocked;
+  pending = _hurd_sigstate_pending (ss) & ~ss->blocked;
 
   /* Tell the signal thread to message us when a signal arrives.  */
   ss->suspended = wait;
-  __spin_unlock (&ss->lock);
+  _hurd_sigstate_unlock (ss);
 
   if (pending)
     /* Tell the signal thread to check for pending signals.  */
@@ -66,10 +64,11 @@ __sigsuspend (set)
 	      MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
   __mach_port_destroy (__mach_task_self (), wait);
 
-  __spin_lock (&ss->lock);
-  ss->blocked = oldmask;	/* Restore the old mask.  */
-  pending = ss->pending & ~ss->blocked;	/* Again check for pending signals.  */
-  __spin_unlock (&ss->lock);
+  /* Restore the old mask and check for pending signals again.  */
+  _hurd_sigstate_lock (ss);
+  ss->blocked = oldmask;
+  pending = _hurd_sigstate_pending(ss) & ~ss->blocked;
+  _hurd_sigstate_unlock (ss);
 
   if (pending)
     /* Tell the signal thread to check for pending signals.  */

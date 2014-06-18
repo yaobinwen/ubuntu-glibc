@@ -1,5 +1,5 @@
 /* Mach thread state definitions for machine-independent code.  i386 version.
-   Copyright (C) 1994, 1997 Free Software Foundation, Inc.
+   Copyright (C) 1994-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,13 +13,16 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+
+#ifndef _MACH_I386_THREAD_STATE_H
+#define _MACH_I386_THREAD_STATE_H 1
 
 #include <mach/machine/thread_status.h>
 
-#define MACHINE_THREAD_STATE_FLAVOR	i386_THREAD_STATE
+#define MACHINE_NEW_THREAD_STATE_FLAVOR	i386_THREAD_STATE
+#define MACHINE_THREAD_STATE_FLAVOR	i386_REGS_SEGS_STATE
 #define MACHINE_THREAD_STATE_COUNT	i386_THREAD_STATE_COUNT
 
 #define machine_thread_state i386_thread_state
@@ -27,6 +30,14 @@
 #define PC eip
 #define SP uesp
 #define SYSRETURN eax
+
+#define MACHINE_THREAD_STATE_FIX_NEW(ts) do { \
+	asm ("mov %%cs, %w0" : "=q" ((ts)->cs)); \
+	asm ("mov %%ds, %w0" : "=q" ((ts)->ds)); \
+	asm ("mov %%es, %w0" : "=q" ((ts)->es)); \
+	asm ("mov %%fs, %w0" : "=q" ((ts)->fs)); \
+	asm ("mov %%gs, %w0" : "=q" ((ts)->gs)); \
+} while(0)
 
 struct machine_thread_all_state
   {
@@ -36,3 +47,5 @@ struct machine_thread_all_state
   };
 
 #include <sysdeps/mach/thread_state.h>
+
+#endif /* mach/i386/thread_state.h */

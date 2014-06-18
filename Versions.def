@@ -26,13 +26,26 @@ libc {
   GLIBC_2.7
   GLIBC_2.8
   GLIBC_2.9
-%ifdef USE_IN_LIBIO
+  GLIBC_2.10
+  GLIBC_2.11
+  GLIBC_2.12
+  GLIBC_2.13
+  GLIBC_2.13_DEBIAN_38
+  GLIBC_2.13_DEBIAN_39
+  GLIBC_2.14
+  GLIBC_2.15
+  GLIBC_2.16
+  GLIBC_2.17
+  GLIBC_2.18
+  GLIBC_2.19
   HURD_CTHREADS_0.3
-%endif
 %ifdef EXPORT_UNWIND_FIND_FDE
   GCC_3.0
 %endif
   GLIBC_PRIVATE
+  GLIBC_2.13_DEBIAN_19
+  GLIBC_2.13_DEBIAN_31
+  GLIBC_2.13_DEBIAN_33
 }
 libcrypt {
   GLIBC_2.0
@@ -48,8 +61,12 @@ libm {
   GLIBC_2.1
   GLIBC_2.2
   GLIBC_2.2.3
+  GLIBC_2.3
   GLIBC_2.3.4
   GLIBC_2.4
+  GLIBC_2.15
+  GLIBC_2.18
+  GLIBC_2.19
 }
 libnsl {
   GLIBC_2.0
@@ -60,6 +77,9 @@ libnss_compat {
   GLIBC_PRIVATE
 }
 libnss_dns {
+  GLIBC_PRIVATE
+}
+libnss_db {
   GLIBC_PRIVATE
 }
 libnss_files {
@@ -82,11 +102,18 @@ libpthread {
   GLIBC_2.2
   GLIBC_2.2.3
   GLIBC_2.2.6
+  GLIBC_2.3
   GLIBC_2.3.2
   GLIBC_2.3.3
   GLIBC_2.3.4
   GLIBC_2.4
   GLIBC_2.6
+  GLIBC_2.11
+  GLIBC_2.12
+  GLIBC_2.13_DEBIAN_38
+  GLIBC_2.13_DEBIAN_39
+  GLIBC_2.18
+  GLIBC_2.19
   GLIBC_PRIVATE
 }
 libresolv {

@@ -1,5 +1,5 @@
 /* Manage function descriptors.  Generic version.
-   Copyright (C) 1999-2004, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1999-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <libintl.h>
 #include <unistd.h>
@@ -56,7 +55,12 @@ static struct local
   }
 local =
   {
+#ifndef SHARED
     .root = &local.boot_table,
+#else
+    /* Address of .boot_table is not known until runtime.  */
+    .root = 0,
+#endif
     .npages = 2,
     .boot_table =
       {
@@ -93,6 +97,17 @@ new_fdesc_table (struct local *l, size_t *size)
   return new_table;
 }
 
+/* Must call _dl_fptr_init before using any other function.  */
+void
+_dl_fptr_init (void)
+{
+  struct local *l;
+
+  ELF_MACHINE_LOAD_ADDRESS (l, local);
+  /* Initialize root once.  */
+  if (__builtin_expect (l->root == 0, 0))
+    l->root = &l->boot_table;
+}
 
 static ElfW(Addr)
 make_fdesc (ElfW(Addr) ip, ElfW(Addr) gp)

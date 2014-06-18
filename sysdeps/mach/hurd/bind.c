@@ -1,4 +1,4 @@
-/* Copyright (C) 1992,94,95,96,97,98,2001,02 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <sys/socket.h>
@@ -26,7 +25,7 @@
 #include <stddef.h>
 #include <hurd/ifsock.h>
 #include <sys/un.h>
-#include <string.h>
+#include "hurd/hurdsocket.h"
 
 /* Give the socket FD the local address ADDR (which is LEN bytes long).  */
 int
@@ -38,13 +37,11 @@ __bind  (int fd, __CONST_SOCKADDR_ARG addrarg, socklen_t len)
 
   if (addr->sun_family == AF_LOCAL)
     {
+      char *name = _hurd_sun_path_dupa (addr, len);
       /* For the local domain, we must create a node in the filesystem
 	 using the ifsock translator and then fetch the address from it.  */
       file_t dir, node;
-      char name[len - offsetof (struct sockaddr_un, sun_path) + 1], *n;
-
-      strncpy (name, addr->sun_path, sizeof name - 1);
-      name[sizeof name - 1] = '\0'; /* Make sure */
+      char *n;
 
       dir = __file_name_split (name, &n);
       if (dir == MACH_PORT_NULL)

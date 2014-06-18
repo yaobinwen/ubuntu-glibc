@@ -1,5 +1,5 @@
 /* Internal macros for atomic operations for GNU C Library.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -14,9 +14,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _ATOMIC_H
 #define _ATOMIC_H	1
@@ -33,7 +32,7 @@
      the multi-thread case.  The interfaces have the prefix
      "catomic_".
 
-   - support functions like barriers.  They also have the preifx
+   - support functions like barriers.  They also have the prefix
      "atomic_".
 
    Architectures must provide a few lowlevel macros (the compare
@@ -95,25 +94,31 @@
 #endif
 
 
-#if !defined catomic_compare_and_exchange_val_acq \
-    && defined __arch_c_compare_and_exchange_val_32_acq
-# define catomic_compare_and_exchange_val_acq(mem, newval, oldval) \
+#ifndef catomic_compare_and_exchange_val_acq
+# ifdef __arch_c_compare_and_exchange_val_32_acq
+#  define catomic_compare_and_exchange_val_acq(mem, newval, oldval) \
   __atomic_val_bysize (__arch_c_compare_and_exchange_val,acq,		      \
 		       mem, newval, oldval)
-#else
-# define catomic_compare_and_exchange_val_acq(mem, newval, oldval) \
+# else
+#  define catomic_compare_and_exchange_val_acq(mem, newval, oldval) \
   atomic_compare_and_exchange_val_acq (mem, newval, oldval)
+# endif
+#endif
+
+
+#ifndef catomic_compare_and_exchange_val_rel
+# ifndef atomic_compare_and_exchange_val_rel
+#  define catomic_compare_and_exchange_val_rel(mem, newval, oldval)	      \
+  catomic_compare_and_exchange_val_acq (mem, newval, oldval)
+# else
+#  define catomic_compare_and_exchange_val_rel(mem, newval, oldval)	      \
+  atomic_compare_and_exchange_val_rel (mem, newval, oldval)
+# endif
 #endif
 
 
 #ifndef atomic_compare_and_exchange_val_rel
 # define atomic_compare_and_exchange_val_rel(mem, newval, oldval)	      \
-  atomic_compare_and_exchange_val_acq (mem, newval, oldval)
-#endif
-
-
-#ifndef catomic_compare_and_exchange_val_rel
-# define catomic_compare_and_exchange_val_rel(mem, newval, oldval)	      \
   atomic_compare_and_exchange_val_acq (mem, newval, oldval)
 #endif
 
@@ -125,8 +130,8 @@
 #  define atomic_compare_and_exchange_bool_acq(mem, newval, oldval) \
   __atomic_bool_bysize (__arch_compare_and_exchange_bool,acq,		      \
 		        mem, newval, oldval)
-#  else
-#   define atomic_compare_and_exchange_bool_acq(mem, newval, oldval) \
+# else
+#  define atomic_compare_and_exchange_bool_acq(mem, newval, oldval) \
   ({ /* Cannot use __oldval here, because macros later in this file might     \
 	call this macro with __oldval argument.	 */			      \
      __typeof (oldval) __atg3_old = (oldval);				      \
@@ -142,8 +147,8 @@
 #  define catomic_compare_and_exchange_bool_acq(mem, newval, oldval) \
   __atomic_bool_bysize (__arch_c_compare_and_exchange_bool,acq,		      \
 		        mem, newval, oldval)
-#  else
-#   define catomic_compare_and_exchange_bool_acq(mem, newval, oldval) \
+# else
+#  define catomic_compare_and_exchange_bool_acq(mem, newval, oldval) \
   ({ /* Cannot use __oldval here, because macros later in this file might     \
 	call this macro with __oldval argument.	 */			      \
      __typeof (oldval) __atg4_old = (oldval);				      \
@@ -154,15 +159,20 @@
 #endif
 
 
-#ifndef atomic_compare_and_exchange_bool_rel
-# define atomic_compare_and_exchange_bool_rel(mem, newval, oldval) \
-  atomic_compare_and_exchange_bool_acq (mem, newval, oldval)
+#ifndef catomic_compare_and_exchange_bool_rel
+# ifndef atomic_compare_and_exchange_bool_rel
+#  define catomic_compare_and_exchange_bool_rel(mem, newval, oldval)	      \
+  catomic_compare_and_exchange_bool_acq (mem, newval, oldval)
+# else
+#  define catomic_compare_and_exchange_bool_rel(mem, newval, oldval)	      \
+  atomic_compare_and_exchange_bool_rel (mem, newval, oldval)
+# endif
 #endif
 
 
-#ifndef catomic_compare_and_exchange_bool_rel
-# define catomic_compare_and_exchange_bool_rel(mem, newval, oldval) \
-  catomic_compare_and_exchange_bool_acq (mem, newval, oldval)
+#ifndef atomic_compare_and_exchange_bool_rel
+# define atomic_compare_and_exchange_bool_rel(mem, newval, oldval) \
+  atomic_compare_and_exchange_bool_acq (mem, newval, oldval)
 #endif
 
 
@@ -174,7 +184,7 @@
      __typeof (*(mem)) __atg5_value = (newvalue);			      \
 									      \
      do									      \
-       __atg5_oldval = *__atg5_memp;					      \
+       __atg5_oldval = *(volatile __typeof (mem))__atg5_memp;		      \
      while (__builtin_expect						      \
 	    (atomic_compare_and_exchange_bool_acq (__atg5_memp, __atg5_value, \
 						   __atg5_oldval), 0));	      \
@@ -188,14 +198,18 @@
 
 
 /* Add VALUE to *MEM and return the old value of *MEM.  */
-#ifndef atomic_exchange_and_add
-# define atomic_exchange_and_add(mem, value) \
+#ifndef atomic_exchange_and_add_acq
+# ifdef atomic_exchange_and_add
+#  define atomic_exchange_and_add_acq(mem, value) \
+  atomic_exchange_and_add (mem, value)
+# else
+#  define atomic_exchange_and_add_acq(mem, value) \
   ({ __typeof (*(mem)) __atg6_oldval;					      \
      __typeof (mem) __atg6_memp = (mem);				      \
      __typeof (*(mem)) __atg6_value = (value);				      \
 									      \
      do									      \
-       __atg6_oldval = *__atg6_memp;					      \
+       __atg6_oldval = *(volatile __typeof (mem))__atg6_memp;		      \
      while (__builtin_expect						      \
 	    (atomic_compare_and_exchange_bool_acq (__atg6_memp,		      \
 						   __atg6_oldval	      \
@@ -203,8 +217,18 @@
 						   __atg6_oldval), 0));	      \
 									      \
      __atg6_oldval; })
+# endif
 #endif
 
+#ifndef atomic_exchange_and_add_rel
+# define atomic_exchange_and_add_rel(mem, value) \
+  atomic_exchange_and_add_acq(mem, value)
+#endif
+
+#ifndef atomic_exchange_and_add
+# define atomic_exchange_and_add(mem, value) \
+  atomic_exchange_and_add_acq(mem, value)
+#endif
 
 #ifndef catomic_exchange_and_add
 # define catomic_exchange_and_add(mem, value) \
@@ -213,7 +237,7 @@
      __typeof (*(mem)) __atg7_value = (value);				      \
 									      \
      do									      \
-       __atg7_oldv = *__atg7_memp;					      \
+       __atg7_oldv = *(volatile __typeof (mem))__atg7_memp;		      \
      while (__builtin_expect						      \
 	    (catomic_compare_and_exchange_bool_acq (__atg7_memp,	      \
 						    __atg7_oldv		      \
@@ -231,7 +255,7 @@
     __typeof (mem) __atg8_memp = (mem);					      \
     __typeof (*(mem)) __atg8_value = (value);				      \
     do {								      \
-      __atg8_oldval = *__atg8_memp;					      \
+      __atg8_oldval = *(volatile __typeof (mem))__atg8_memp;		      \
       if (__atg8_oldval >= __atg8_value)				      \
 	break;								      \
     } while (__builtin_expect						      \
@@ -248,7 +272,7 @@
     __typeof (mem) __atg9_memp = (mem);					      \
     __typeof (*(mem)) __atg9_value = (value);				      \
     do {								      \
-      __atg9_oldv = *__atg9_memp;					      \
+      __atg9_oldv = *(volatile __typeof (mem))__atg9_memp;		      \
       if (__atg9_oldv >= __atg9_value)					      \
 	break;								      \
     } while (__builtin_expect						      \
@@ -266,7 +290,7 @@
     __typeof (mem) __atg10_memp = (mem);				      \
     __typeof (*(mem)) __atg10_value = (value);				      \
     do {								      \
-      __atg10_oldval = *__atg10_memp;					      \
+      __atg10_oldval = *(volatile __typeof (mem))__atg10_memp;		      \
       if (__atg10_oldval <= __atg10_value)				      \
 	break;								      \
     } while (__builtin_expect						      \
@@ -350,7 +374,7 @@
 									      \
      do									      \
        {								      \
-	 __atg11_oldval = *__atg11_memp;				      \
+	 __atg11_oldval = *(volatile __typeof (mem))__atg11_memp;	      \
 	 if (__builtin_expect (__atg11_oldval <= 0, 0))			      \
 	   break;							      \
        }								      \
@@ -389,7 +413,7 @@
      __typeof (*(mem)) __atg14_mask = ((__typeof (*(mem))) 1 << (bit));	      \
 									      \
      do									      \
-       __atg14_old = (*__atg14_memp);					      \
+       __atg14_old = (*(volatile __typeof (mem))__atg14_memp);		      \
      while (__builtin_expect						      \
 	    (atomic_compare_and_exchange_bool_acq (__atg14_memp,	      \
 						   __atg14_old | __atg14_mask,\
@@ -407,11 +431,27 @@
     __typeof (*(mem)) __atg15_mask = (mask);				      \
 									      \
     do									      \
-      __atg15_old = (*__atg15_memp);					      \
+      __atg15_old = (*(volatile __typeof (mem))__atg15_memp);		      \
     while (__builtin_expect						      \
 	   (atomic_compare_and_exchange_bool_acq (__atg15_memp,		      \
 						  __atg15_old & __atg15_mask, \
 						  __atg15_old), 0));	      \
+  } while (0)
+#endif
+
+#ifndef catomic_and
+# define catomic_and(mem, mask) \
+  do {									      \
+    __typeof (*(mem)) __atg20_old;					      \
+    __typeof (mem) __atg20_memp = (mem);				      \
+    __typeof (*(mem)) __atg20_mask = (mask);				      \
+									      \
+    do									      \
+      __atg20_old = (*__atg20_memp);					      \
+    while (__builtin_expect						      \
+	   (catomic_compare_and_exchange_bool_acq (__atg20_memp,	      \
+						   __atg20_old & __atg20_mask,\
+						   __atg20_old), 0));	      \
   } while (0)
 #endif
 
@@ -423,7 +463,7 @@
      __typeof (*(mem)) __atg16_mask = (mask);				      \
 									      \
      do									      \
-       __atg16_old = (*__atg16_memp);					      \
+       __atg16_old = (*(volatile __typeof (mem))__atg16_memp);		      \
      while (__builtin_expect						      \
 	    (atomic_compare_and_exchange_bool_acq (__atg16_memp,	      \
 						   __atg16_old & __atg16_mask,\
@@ -441,7 +481,7 @@
     __typeof (*(mem)) __atg17_mask = (mask);				      \
 									      \
     do									      \
-      __atg17_old = (*__atg17_memp);					      \
+      __atg17_old = (*(volatile __typeof (mem))__atg17_memp);		      \
     while (__builtin_expect						      \
 	   (atomic_compare_and_exchange_bool_acq (__atg17_memp,		      \
 						  __atg17_old | __atg17_mask, \
@@ -457,7 +497,7 @@
     __typeof (*(mem)) __atg18_mask = (mask);				      \
 									      \
     do									      \
-      __atg18_old = (*__atg18_memp);					      \
+      __atg18_old = (*(volatile __typeof (mem))__atg18_memp);		      \
     while (__builtin_expect						      \
 	   (catomic_compare_and_exchange_bool_acq (__atg18_memp,	      \
 						   __atg18_old | __atg18_mask,\
@@ -473,7 +513,7 @@
      __typeof (*(mem)) __atg19_mask = (mask);				      \
 									      \
      do									      \
-       __atg19_old = (*__atg19_memp);					      \
+       __atg19_old = (*(volatile __typeof (mem))__atg19_memp);		      \
      while (__builtin_expect						      \
 	    (atomic_compare_and_exchange_bool_acq (__atg19_memp,	      \
 						   __atg19_old | __atg19_mask,\

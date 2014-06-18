@@ -1,5 +1,5 @@
 /* Resource limits for the Hurd.
-   Copyright (C) 1994, 1995, 1997 Free Software Foundation, Inc.
+   Copyright (C) 1994-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _HURD_RESOURCE_H
 #define _HURD_RESOURCE_H
@@ -43,8 +42,8 @@ extern error_t _hurd_priority_which_map (enum __priority_which which, int who,
 
 /* Convert between Mach priority values and the priority
    values used by getpriority, setpriority, and nice.  */
-#define MACH_PRIORITY_TO_NICE(prio) (2 * ((prio) - 12))
-#define NICE_TO_MACH_PRIORITY(nice) (12 + ((nice) / 2))
+#define MACH_PRIORITY_TO_NICE(prio) ((prio) - 25)
+#define NICE_TO_MACH_PRIORITY(nice) ((nice) + 25)
 
 
 

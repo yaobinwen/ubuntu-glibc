@@ -1,5 +1,4 @@
-/* Copyright (C) 1992,93,94,95,96,97,98,99,2000,01
-   	Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -176,7 +174,7 @@ _hurd_new_proc_init (char **argv,
     /* This process is "traced", meaning it should stop on signals or exec.
        We are all set up now to handle signals.  Stop ourselves, to inform
        our parent (presumably a debugger) that the exec has completed.  */
-    __msg_sig_post (_hurd_msgport, SIGTRAP, 0, __mach_task_self ());
+    __msg_sig_post (_hurd_msgport, SIGTRAP, TRAP_TRACE, __mach_task_self ());
 }
 
 #include <shlib-compat.h>
