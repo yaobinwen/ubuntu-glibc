@@ -1916,6 +1916,10 @@ if test -n "$submachine"; then
 		 libc_cv_cc_submachine, [dnl
   libc_cv_cc_submachine=no
   for opt in "-march=$submachine" "-mcpu=$submachine"; do
+    # dirty hack to tune all power7 builds for power8:
+    if [ "$opt" = "-mcpu=power7" ]; then
+      opt="-mcpu=power7 -mtune=power8"
+    fi
     LIBC_TRY_CC_OPTION([$opt], [
       libc_cv_cc_submachine="$opt"
       break], [])
