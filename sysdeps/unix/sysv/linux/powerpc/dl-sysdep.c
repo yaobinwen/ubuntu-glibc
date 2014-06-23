@@ -31,16 +31,22 @@ int __cache_line_size attribute_hidden;
    correctly.  That requires reading SPR, which is a privileged
    operation.  Fortunately 2.2.18 and later emulates PowerPC mfspr
    reads from the PVR register.   */
-#define DL_PLATFORM_AUXV						      \
+#ifndef __powerpc64__
+ #define DL_PLATFORM_AUXV						      \
       case AT_DCACHEBSIZE:						      \
-	if (__LINUX_KERNEL_VERSION >= 0x020218)				      \
-	  {								      \
-	    unsigned pvr = 0;						      \
-	    asm ("mfspr %0, 287" : "=r" (pvr));				      \
-	    if ((pvr & 0xffff0000) == 0x00500000)			      \
-	      break;							      \
-	  }								      \
+	{								      \
+	  unsigned pvr = 0;						      \
+	  asm ("mfspr %0, 287" : "=r" (pvr));				      \
+	  if ((pvr & 0xffff0000) == 0x00500000)				      \
+	    break;							      \
+	}								      \
+ 	__cache_line_size = av->a_un.a_val;				      \
+ 	break;
+#else
+ #define DL_PLATFORM_AUXV						      \
+      case AT_DCACHEBSIZE:						      \
 	__cache_line_size = av->a_un.a_val;				      \
 	break;
+#endif
 
 #include <sysdeps/unix/sysv/linux/dl-sysdep.c>
