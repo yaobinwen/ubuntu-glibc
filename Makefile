@@ -160,7 +160,7 @@ others: $(common-objpfx)testrun.sh
 subdir-stubs := $(foreach dir,$(subdirs),$(common-objpfx)$(dir)/stubs)
 
 # gnu/stubs.h depends (via the subdir 'stubs' targets) on all the .o
-# files in EGLIBC.  For bootstrapping a GCC/EGLIBC pair, an empty
+# files in GLIBC.  For bootstrapping a GCC/GLIBC pair, an empty
 # gnu/stubs.h is good enough.
 ifeq ($(install-bootstrap-headers),yes)
 $(inst_includedir)/gnu/stubs.h: include/stubs-bootstrap.h $(+force)

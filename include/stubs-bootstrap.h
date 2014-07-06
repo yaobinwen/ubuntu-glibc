@@ -1,7 +1,7 @@
 /* Placeholder stubs.h file for bootstrapping.
 
    When bootstrapping a GCC/GLIBC pair, GCC requires that the GLIBC
-   headers be installed, but we can't fully build EGLIBC without that
+   headers be installed, but we can't fully build GLIBC without that
    GCC.  So we run the command:
 
       make install-headers install-bootstrap-headers=yes
