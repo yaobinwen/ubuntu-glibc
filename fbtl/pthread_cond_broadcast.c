@@ -85,6 +85,7 @@ __pthread_cond_broadcast (cond)
 #endif
 wake_all:
       lll_futex_wake (&cond->__data.__futex, INT_MAX, pshared);
+      return 0;
     }
 
   /* We are done.  */
