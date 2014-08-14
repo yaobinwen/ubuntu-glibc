@@ -401,6 +401,12 @@ FREM_X_NAN_INF:
 { .mfi
       nop.m 999
       fclass.m.unc  p8,p0 = f8, 0x23
+      nop.i 999
+}
+// X infinity? Return QNAN indefinite
+{ .mfi
+      nop.m 999
+      fclass.m.unc  p11,p0 = f8, 0x23
       nop.i 999;;
 }
 // Y NaN ?
@@ -423,7 +429,7 @@ FREM_X_NAN_INF:
 
 {.mfi
       nop.m 999
-(p8)  mov f10=f8
+(p11) mov f10=f8
 	  nop.i 0
 }
 { .mfi
@@ -435,7 +441,7 @@ FREM_X_NAN_INF:
 { .mfb
       nop.m 999
       frcpa.s0 f8,p7=f8,f9
-(p8)  br.cond.spnt EXP_ERROR_RETURN;;
+	  (p11) br.cond.spnt EXP_ERROR_RETURN;;
 }
 { .mib
 	nop.m 0
@@ -507,10 +513,10 @@ FREM_Y_ZERO:
       nop.i 999
 }
 
-{ .mfb
+{ .mfi
       nop.m 999
       fma.d.s0 f8=f11,f1,f0
-(p9)  br.ret.spnt b0 ;;
+      nop.i 999
 }
 
 
