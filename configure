@@ -6873,6 +6873,10 @@ if ${libc_cv_cc_submachine+:} false; then :
 else
     libc_cv_cc_submachine=no
   for opt in "-march=$submachine" "-mcpu=$submachine"; do
+    # dirty hack to tune all power7 builds for power8:
+    if [ "$opt" = "-mcpu=power7" ]; then
+      opt="-mcpu=power7 -mtune=power8"
+    fi
     if { ac_try='${CC-cc} $opt -xc /dev/null -S -o /dev/null'
   { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
   (eval $ac_try) 2>&5

@@ -182,6 +182,7 @@ mips/submitted-rld_map.diff
 powerpc/local-math-logb.diff
 powerpc/cvs-ibm-branch.diff
 powerpc/local-powerpc8xx-dcbz.diff
+powerpc/local-tune-power8.diff
 
 s390/submitted-nexttowardf.diff
 s390/cvs-s390-abi-reversal.diff
@@ -262,3 +263,12 @@ any/cvs-posix_spawn_file_actions_addopen.diff
 any/cvs-setlocale-alloca.diff
 any/cvs-CVE-2014-0475.diff
 any/cvs-CVE-2014-5119.diff
+
+# Ubuntu patches live in their own little world, to maintain sanity
+ubuntu/lddebug-scopes.diff
+ubuntu/local-altlocaledir.diff
+ubuntu/local-CVE-2012-3406.diff
+ubuntu/local-disable-ld_audit.diff
+ubuntu/local-disable-nscd-netgroup-caching.diff
+ubuntu/submitted-no-sprintf-pre-truncate.diff
+ubuntu/submitted-no-stack-backtrace.diff
