@@ -239,6 +239,10 @@ start_thread (void *arg)
   THREAD_SETMEM (pd, cpuclock_offset, now);
 #endif
 
+#if 1
+  _FPU_SETCW(pd->fpu_control_init);
+#endif
+
   /* Initialize resolver state pointer.  */
   __resp = &pd->res;
 
@@ -530,6 +534,10 @@ __pthread_create_2_1 (newthread, attr, start_routine, arg)
   pd->schedpolicy = self->schedpolicy;
   pd->schedparam = self->schedparam;
 
+#if 1
+  _FPU_GETCW(pd->fpu_control_init); 
+#endif
+  
   /* Copy the stack guard canary.  */
 #ifdef THREAD_COPY_STACK_GUARD
   THREAD_COPY_STACK_GUARD (pd);

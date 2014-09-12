@@ -38,6 +38,7 @@
 #define __need_res_state
 #include <resolv.h>
 #include <kernel-features.h>
+#include <fpu_control.h>
 
 #ifndef TCB_ALIGNMENT
 # define TCB_ALIGNMENT	sizeof (double)
@@ -395,6 +396,9 @@ struct pthread
   /* Resolver state.  */
   struct __res_state res;
 
+  /* FPU initial control word */
+  fpu_control_t fpu_control_init;
+  
   /* This member must be last.  */
   char end_padding[];
 

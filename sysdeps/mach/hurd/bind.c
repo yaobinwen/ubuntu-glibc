@@ -64,22 +64,16 @@ __bind  (int fd, __CONST_SOCKADDR_ARG addrarg, socklen_t len)
 	      enum retry_type doretry;
 	      char retryname[1024];
 	      /* Get a port to the ifsock translator.  */
-	      err = __dir_lookup(node, "", 0, 0, &doretry, retryname, &ifsock);
-	      if (! err)
-		if (doretry != FS_RETRY_NORMAL || retryname[0] != '\0')
-		  err = EADDRINUSE;
+	      err = __dir_lookup (node, "", 0, 0, &doretry, retryname, &ifsock);
+	      if (! err && (doretry != FS_RETRY_NORMAL || retryname[0] != '\0'))
+		err = EADDRINUSE;
 	    }
 	  if (! err)
 	    {
 	      /* Get the address port.  */
 	      err = __ifsock_getsockaddr (ifsock, &aport);
 	      if (err == MIG_BAD_ID || err == EOPNOTSUPP)
-		/* We are not talking to /hurd/ifsock.  Probably
-		   someone came in after we linked our node, unlinked
-		   it, and replaced it with a different node, before we
-		   did our lookup.  Treat it as if our link had failed
-		   with EEXIST.  */
-		err = EADDRINUSE;
+		err = EGRATUITOUS;
 	      if (! err)
 		{
 		  /* Fix the access mode before showing the file.  */
@@ -87,7 +81,7 @@ __bind  (int fd, __CONST_SOCKADDR_ARG addrarg, socklen_t len)
 		  if (! err)
 		    {
 		      /* Link the node, now a socket with proper mode, into the
-		       * target directory.  */
+		         target directory.  */
 		      err = __dir_link (dir, node, n, 1);
 		      if (err == EEXIST)
 			err = EADDRINUSE;
