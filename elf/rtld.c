@@ -2455,7 +2455,7 @@ process_dl_audit (char *str)
   while ((p = (strsep) (&str, ":")) != NULL)
     if (p[0] != '\0'
 	&& (__builtin_expect (! INTUSE(__libc_enable_secure), 1)
-	    || strchr (p, '/') == NULL))
+	))
       {
 	/* This is using the local malloc, not the system malloc.  The
 	   memory can never be freed.  */
