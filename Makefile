@@ -68,17 +68,8 @@ subdir-dirs = include
 vpath %.h $(subdir-dirs)
 
 # What to install.
-install-bin-script =
-
-# If we're bootstrapping, install a dummy gnu/stubs.h along with the
-# other headers, so 'make install-headers' produces a useable include
-# tree.  Otherwise, install gnu/stubs.h later, after the rest of the
-# build is done.
-ifeq ($(install-bootstrap-headers),yes)
-install-headers: $(inst_includedir)/gnu/stubs.h
-else
 install-others = $(inst_includedir)/gnu/stubs.h
-endif
+install-bin-script =
 
 ifeq (yes,$(build-shared))
 headers += gnu/lib-names.h
@@ -159,16 +150,6 @@ others: $(common-objpfx)testrun.sh
 
 subdir-stubs := $(foreach dir,$(subdirs),$(common-objpfx)$(dir)/stubs)
 
-# gnu/stubs.h depends (via the subdir 'stubs' targets) on all the .o
-# files in GLIBC.  For bootstrapping a GCC/GLIBC pair, an empty
-# gnu/stubs.h is good enough.
-ifeq ($(install-bootstrap-headers),yes)
-$(inst_includedir)/gnu/stubs.h: include/stubs-bootstrap.h $(+force)
-	$(make-target-directory)
-	$(INSTALL_DATA) $< $@
-
-installed-stubs =
-else
 ifndef abi-variants
 installed-stubs = $(inst_includedir)/gnu/stubs.h
 else
@@ -195,8 +176,14 @@ $(inst_includedir)/gnu/stubs.h: $(+force)
 
 install-others-nosubdir: $(installed-stubs)
 endif
-endif
 
+# If we're bootstrapping, install a dummy gnu/stubs.h along with the
+# other headers, so 'make install-headers' produces a useable include
+# tree.  Otherwise, install gnu/stubs.h later, after the rest of the
+# build is done.
+ifeq ($(install-bootstrap-headers),yes)
+install-headers: $(inst_includedir)/gnu/stubs.h $(installed-stubs)
+endif
 
 # Since stubs.h is never needed when building the library, we simplify the
 # hairy installation process by producing it in place only as the last part
@@ -204,6 +191,14 @@ endif
 # iterates over all the subdirs; subdir_install in each subdir depends on
 # the subdir's stubs file.  Having more direct dependencies would result in
 # extra iterations over the list for subdirs and many recursive makes.
+ifeq ($(install-bootstrap-headers),yes)
+# gnu/stubs.h depends (via the subdir 'stubs' targets) on all the .o
+# files in GLIBC.  For bootstrapping a GCC/GLIBC pair, an empty
+# gnu/stubs.h is good enough.
+$(installed-stubs): include/stubs-bootstrap.h $(+force)
+	$(make-target-directory)
+	$(INSTALL_DATA) $< $@
+else
 $(installed-stubs): include/stubs-prologue.h subdir_install
 	$(make-target-directory)
 	@rm -f $(objpfx)stubs.h
@@ -212,6 +207,7 @@ $(installed-stubs): include/stubs-prologue.h subdir_install
 	then echo 'stubs.h unchanged'; \
 	else $(INSTALL_DATA) $(objpfx)stubs.h $@; fi
 	rm -f $(objpfx)stubs.h
+endif
 
 # This makes the Info or DVI file of the documentation from the Texinfo source.
 .PHONY: info dvi pdf html
