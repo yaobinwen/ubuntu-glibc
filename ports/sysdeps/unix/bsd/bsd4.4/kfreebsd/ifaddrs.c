@@ -147,12 +147,15 @@ getifaddrs(struct ifaddrs **pif)
 			if (ifm->ifm_addrs & RTA_IFP) {
 				idx = ifm->ifm_index;
 				++icnt;
-				/* XXX: smooth over a kfreebsd 9.0->10.1 ABI break:
-				  sizeof(struct rt_msghdr) is correct for 10.1 kernel */
 				dl = (struct sockaddr_dl *)(void *)(ifm + 1);
+				/* XXX: smooth over a kfreebsd 9.0->10.1 ABI break */
 				if (rtm->rtm_msglen == 152) {
 					/* on kfreebsd-i386 9.0, struct rt_msghdr is 96 bytes */
 					dl = (struct sockaddr_dl *)((char *)ifm + 96);
+				}
+				if (rtm->rtm_msglen == 156) {
+					/* on kfreebsd-i386 10.1, struct rt_msghdr is 100 bytes */
+					dl = (struct sockaddr_dl *)((char *)ifm + 100);
 				}
 				dcnt += SA_RLEN((struct sockaddr *)(void*)dl) +
 				    ALIGNBYTES;
@@ -240,12 +243,15 @@ getifaddrs(struct ifaddrs **pif)
 			ifm = (struct if_msghdr *)(void *)rtm;
 			if (ifm->ifm_addrs & RTA_IFP) {
 				idx = ifm->ifm_index;
-				/* XXX: smooth over a kfreebsd 9.0->10.1 ABI break:
-				  sizeof(struct rt_msghdr) is correct for 10.1 kernel */
 				dl = (struct sockaddr_dl *)(void *)(ifm + 1);
+				/* XXX: smooth over a kfreebsd 9.0->10.1 ABI break */
 				if (rtm->rtm_msglen == 152) {
 					/* on kfreebsd-i386 9.0, struct rt_msghdr is 96 bytes */
 					dl = (struct sockaddr_dl *)((char *)ifm + 96);
+				}
+				if (rtm->rtm_msglen == 156) {
+					/* on kfreebsd-i386 10.1, struct rt_msghdr is 100 bytes */
+					dl = (struct sockaddr_dl *)((char *)ifm + 100);
 				}
 
 				cif = ift;
