@@ -87,8 +87,8 @@ $(stamp)configure_%: $(stamp)mkbuilddir_%
 		--without-selinux \
 		--enable-stackguard-randomization \
 		--enable-obsolete-rpc \
-		--with-pkgversion="Debian GLIBC $(DEB_VERSION)" \
-		--with-bugurl="http://www.debian.org/Bugs/" \
+		--with-pkgversion="Ubuntu GLIBC $(DEB_VERSION)" \
+		--with-bugurl="https://bugs.launchpad.net/ubuntu/+source/glibc/+bugs" \
 		$(if $(filter $(pt_chown),yes),--enable-pt_chown) \
 		$(if $(filter $(threads),no),--disable-nscd) \
 		$(call xx,with_headers) $(call xx,extra_config_options))
@@ -137,19 +137,17 @@ $(stamp)check_%: $(stamp)build_%
 	  chmod +x debian/testsuite-checking/convertlog.sh ; \
 	  debian/testsuite-checking/convertlog.sh $(log_test) | tee $(log_results) ; \
 	  if test -f $(log_expected) ; then \
-	    echo "***************" ; \
 	    chmod +x debian/testsuite-checking/compare.sh ; \
 	    debian/testsuite-checking/compare.sh $(log_expected) $(log_results) $(DEB_BUILDDIR) ; \
-	    echo "***************" ; \
 	  else \
-	    echo "*** WARNING ***" ; \
+	    echo "*************************** WARNING ***************************" ; \
 	    echo "Please generate expected testsuite results for this arch ($(log_expected))!" ; \
-	    echo "*** WARNING ***" ; \
+	    echo "*************************** WARNING ***************************" ; \
 	  fi ; \
 	fi
-	@n=$$(grep '^make.* Error' $(log_test) | wc -l || true); \
+	@n=$$(grep '^FAIL: ' $(log_test) | wc -l || true); \
 	  echo "TEST SUMMARY $(log_test) ($$n matching lines)"; \
-	  grep '^make.* Error' $(log_test) || true; \
+	  grep '^FAIL: ' $(log_test) || true; \
 	  echo "END TEST SUMMARY $(log_test)"
 	touch $@
 
