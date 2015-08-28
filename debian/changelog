@@ -1,3 +1,112 @@
+glibc (2.21-0experimental1) experimental; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/cvs-libpthread.diff: Update from upstream.
+  * patches/hurd-i386/cvs-libpthread-dlopen.diff: Merged.
+  * patches/hurd-i386/cvs-libpthread-libc-lockP2.diff: Merged.
+  * patches/hurd-i386/cvs-bind_umask.diff: Merged.
+  * patches/hurd-i386/cvs-fork_ss_hang.diff: Merged.
+  * patches/hurd-i386/cvs-munmap-0.diff: Merged.
+  * patches/hurd-i386/cvs-static-dlopen.diff: Merged.
+  * patches/hurd-i386/cvs-tcbhead_t.diff: Merged.
+  * patches/hurd-i386/cvs-libpthread_versions.diff: Rebased.
+  * patches/hurd-i386/local-disable-tst-xmmymm.diff: Dropped.
+  * patches/hurd-i386/local-hurdsig-global-dispositions-version.diff: Rebased.
+  * patches/hurd-i386/submitted-exec_filename.diff: Rebased.
+  * patches/hurd-i386/submitted-net.diff: Rebased.
+  * patches/hurd-i386/tg-EIEIO-fr.diff: Rebased.
+  * patches/hurd-i386/tg-af_local_strlen.diff: Rebased.
+  * patches/hurd-i386/tg-chflags.diff: Rebased.
+  * patches/hurd-i386/tg-tls-threadvar.diff: Update.
+  * patches/hurd-i386/tg-tls.diff: Rebased.
+  * patches/hurd-i386/tg-tls_thread_leak.diff: Rebased.
+  * patches/hurd-i386/unsubmitted-NO_HIDDEN.diff: Rebased.
+  * patches/hurd-i386/tg-no-hp-timing.diff: Update.
+  * patches/series: Re-enable all hurd patches.
+  * patches/hurd-i386/libpthread-versions.diff: New patch, updates to new
+    version engine.
+  * patches/hurd-i386/cvs-revert-gnu-gnu-cleanup.diff: New patch, reverts
+    cleanup of the gnu-gnu hack.
+  * patches/hurd-i386/libpthread_pthread_types.diff: New patch, fixes
+    inclusion of pthread_types.h
+  * patches/hurd-i386/unsubmitted-libc_alloca_cutoff.diff: New patch,
+    implements alloca cutoff limit.
+  * patches/hurd-i386/cvs-unwind-resume.diff: New patch, fixes unwind-resume
+    build.
+  * patches/hurd-i386/unsubmitted-libpthread-semaphore.h.diff: New patch,
+    fixes semaphore header inclusion.
+  * patches/hurd-i386/unsubmitted-timer_routines.diff: New patch, fixes
+    timer_routines build.
+  * patches/hurd-i386/cvs-libc-modules.h.diff: New patch, adds missing
+    dependency on libc-modules.h.
+  * patches/hurd-i386/cvs-warnings.diff: New patch, fixes warnings.
+  * patches/hurd-i386/cvs-check-local-headers.diff: New patch, clears spurious
+    local-header warnings.
+  * sysdeps/hurd.mk: Disable -Werror since MIG currently generates warnings.
+  * testsuite-checking/expected-results-{i586-gnu-libc,i686-gnu-
+    {i386,i686,xen}}: update testsuite results
+
+  [ Adam Conrad ]
+  * debian/{rules.d/debhelper.mk,sysdeps/*}: Define per-platform pldd
+    variable to control installation of usr/bin/pldd in libc-bin, and
+    leverage the same trick to decide to install usr/lib/pt_chown too.
+  * debian/patches/kfreebsd/local-no-pldd.diff: Drop, no longer used.
+  * debian/patches/alpha/submitted-PTR_MANGLE.diff: Use IS_IN macros.
+  * debian/patches/powerpc/cvs-ppc-sqrt.diff: Fix sqrt() on powerpc.
+  * debian/patches/powerpc/cvs-ppc-sqrtf.diff: Likewise for sqrtf().
+  * debian/patches/powerpc/cvs-ppc-pow.diff: Likewise for pow().
+  * debian/patches/powerpc/cvs-ppc-feraiseexcept.diff: Fix inline
+    feraiseexcept and feclearexcept macro input conversion on PPC.
+  * debian/patches/any/submitted-longdouble.diff: Refresh for above.
+  * debian/patches/any/local-disable-test-tgmath2.diff: Likewise.
+  * debian/patches/any/cvs-logbl-accuracy.diff: Fix ldbl-128ibm logbl.
+  * debian/patches/powerpc/local-math-logb.diff: Refresh and move to
+    debian/patches/any/local-math-logb.diff, as it's not PPC-specific.
+  * debian/patches/any/cvs-localplt-new-readelf.diff: Preemptively
+    fix localplt test breakage with binutils 2.26 before it lands.
+  * debian/patches/any/cvs-make-typo.diff: Fix typo in elf/Makefile.
+  * debian/patches/powerpc/cvs-power7-strncpy.diff: Optimize strncpy
+    for POWER7 drastically (10-70%) on strings longer than 16 chars.
+  * debian/patches/powerpc/cvs-ppc-tabort-le.diff: Fix TABORT encoding
+    when building on toolchains without HTM support (no-op on gcc-4.9)
+  * debian/patches/arm/cvs-arm-sfi_breg.diff: Fix LDR_GLOBAL macro.
+  * debian/patches/arm/cvs-memcpy-memmove-always-bx.diff: Fix memcpy
+    and memmove for the ARM_ALWAYS_BX class of hardware like ArmadaXP.
+  * debian/{control.in/*,debhelper.in/*,rules.d/*}: Stop hardcoding our
+    upstream version all over the place and use GLIBC_VERSION instead.
+  * debian/debhelper.in/libc.preinst: Unconditionally wipe ld.so.cache
+    on major version upgrades, which is significantly less error-prone.
+
+  [ Aurelien Jarno ]
+  * debian/patches/any/local-libgcc-compat-main.diff: Fix definition of
+    __floatdisf for sparc.
+  * debian/patches/any/local-libgcc-compat-ports.diff: Fix definition of
+    __floatdisf for mips. Remove usage of INTUSE (Closes: #782198).
+  * debian/sysdeps/linux.mk, debhelper.in/libc.preinst: bump minimal Linux
+    kernel version to 3.2 (ie the version in Wheezy).
+  * debian/patches/localedata/locale-C.diff: fix d_fmt time format (Closes:
+    #775179).
+  * Create source tarball in a deterministic manner: adjust file modification
+    time, user, group, permissions, and file order (addresses: #783210).
+  * Update from upstream stable branch:
+    - Fix a buffer overflow in overflow in getanswer_r (CVE-2015-1781)
+      Closes: #796105.
+  * sysdeps/linux.mk: don't build pt_chown (CVE-2013-2207). Closes: #717544.
+  * Move translation to a new libc-l10n package from the locales packages.
+    Add a dependency from locales and locales-all to libc-l10n, so that they
+    both provide the same feature. Closes: #788352.
+  * control.in/main: Bump Standards-Version to 3.9.6 (no changes).
+
+  [ Breno Leitao ]
+  * Remove --without-cvs that is not used anymore as a valid configuration.
+    It was removed in commit 92963737c4376bcfd65235d5c325fa7f48302f89
+    (Closes: #781245).
+
+  [ Matthias Klose ]
+  * Fix multilib enabled stage1 cross builds (closes: #766877).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 29 Aug 2015 00:43:02 +0200
+
 glibc (2.21-0experimental0) experimental; urgency=medium
 
   * New upstream release: version 2.21, with git updates up to 2015-02-10:
@@ -119,6 +228,43 @@ glibc (2.21-0experimental0) experimental; urgency=medium
   * Failing on testsuite failures is disabled to attempt to get full builds.
 
  -- Adam Conrad <adconrad@0c3.net>  Fri, 06 Mar 2015 13:47:43 -0700
+
+glibc (2.19-20~0) UNRELEASED; urgency=medium
+
+  * patches/hurd-i386/tg-mmap32th_bit.diff: New patch to fix libpciaccess
+    mapping of BARs above 2GiB. Closes: #793543.
+  * rules.d/build.mk: Also install crt0.o in stage1, if any.
+  * sysdeps/hurd-i386.mk: Fix stage1 about xen packages for hurd-i386 too.
+  * patches/hurd-i386/tg-sysheaders.diff: New patch to fix stage1 finding hurd
+    headers.
+  * patches/hurd-i386/cvs-libpthread_clean2.diff: New patch to drop spurious
+    code getting in the way for stage1.
+  * patches/hurd-i386/cvs-libpthread_build.diff: New patch to fix build of
+    generic libpthread code.
+  * patches/hurd-i386/libpthread_build.diff: Fix header inclusion to get
+    pthread headers from libpthread/ instead of system.
+  * sysdeps/hurd.mk: Create symlinks to kernel and hurd headers required for
+    build, so that we can pass --with-headers to configure to make the build
+    really self-hosted.
+  * patches/hurd-i386/local-clock_gettime_MONOTONIC.diff: Update patch to not
+    advertise _POSIX_CLOCK_SELECTION for vlc
+
+ -- Samuel Thibault <sthibault@debian.org>  Sun, 09 Aug 2015 20:00:16 +0000
+
+glibc (2.19-19) unstable; urgency=medium
+
+  * patches/hurd-i386/cvs-mlock.diff: New patch to permit to use mlock from
+    non-root process.
+
+ -- Samuel Thibault <sthibault@debian.org>  Thu, 09 Jul 2015 14:28:56 +0200
+
+glibc (2.19-18) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debhelper.in/locales.templates: allow the C.UTF-8 locale to be
+    selected as the default locale. Closes: #782241.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 14 Apr 2015 19:50:11 +0200
 
 glibc (2.19-17) unstable; urgency=medium
 
