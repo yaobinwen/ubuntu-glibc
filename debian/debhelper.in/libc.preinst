@@ -171,7 +171,8 @@ then
 	    fi
 
 	    check="kdm postgresql xdm"
-	    # NSS services check: NSS_CHECK
+	    # NSS services check:
+	    __NSS_CHECK__
 	    if [ -n "$services" ]; then 
 		if [ -f /usr/share/debconf/confmodule ] ; then
 	            db_version 2.0
@@ -361,7 +362,7 @@ then
         if linux_compare_versions "$kernel_ver" lt 3.2
         then
             echo WARNING: this version of the GNU libc requires kernel version
-            echo 2.6.32 or later.  Please upgrade your kernel before installing
+            echo 3.2 or later.  Please upgrade your kernel before installing
             echo glibc.
             kernel26_help
 

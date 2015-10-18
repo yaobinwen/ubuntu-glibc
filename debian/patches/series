@@ -43,7 +43,7 @@ alpha/submitted-dl-support.diff
 alpha/submitted-rtld-fPIC.diff
 alpha/local-string-functions.diff
 
-amd64/local-blacklist-on-TSX-Haswell.diff
+amd64/local-blacklist-for-Intel-TSX.diff
 
 arm/local-ioperm.diff
 arm/local-sigaction.diff
@@ -54,14 +54,20 @@ arm/local-vfp-sysdeps.diff
 arm/unsubmitted-ldso-multilib.diff
 arm/cvs-arm-sfi_breg.diff
 arm/cvs-memcpy-memmove-always-bx.diff
+arm/local-arm-futex.diff
 
 hppa/local-inlining.diff
 hppa/local-stack-grows-up.diff
 hppa/local-elf-make-cflags.diff
 hppa/local-fcntl-osync.diff
-hppa/local-fpu.diff
 hppa/local-shmlba.diff
 hppa/local-pthread_spin_unlock.diff
+hppa/cvs-fpu-r2.diff
+hppa/cvs-fpu2.diff
+hppa/local-fptr-table-size.diff
+hppa/local-setcontext.diff
+hppa/cvs-start.diff
+hppa/cvs-alloca-werror.diff
 
 hurd-i386/local-enable-ldconfig.diff
 hurd-i386/tg-context_functions.diff
@@ -78,6 +84,7 @@ hurd-i386/local-disable-ioctls.diff
 hurd-i386/tg-locarchive.diff
 hurd-i386/tg-no-hp-timing.diff
 hurd-i386/tg-sendmsg-SCM_RIGHTS.diff
+hurd-i386/tg-sendmsg-SCM_CREDS.diff
 hurd-i386/tg-grantpt.diff
 hurd-i386/submitted-add-needed.diff
 hurd-i386/local-ED.diff
@@ -147,6 +154,10 @@ hurd-i386/cvs-check-local-headers.diff
 hurd-i386/cvs-mlock.diff
 hurd-i386/tg-mmap32th_bit.diff
 hurd-i386/tg-sysheaders.diff
+hurd-i386/cvs-bootstrap.diff
+hurd-i386/local-bootstrap.diff
+hurd-i386/cvs-cache-mach_host_self.diff
+hurd-i386/local-mach_print.diff
 
 i386/local-biarch.diff
 i386/local-cmov.diff
@@ -256,3 +267,5 @@ any/cvs-localplt-new-readelf.diff
 any/cvs-make-typo.diff
 any/cvs-logbl-accuracy.diff
 any/local-math-logb.diff
+any/cvs-ld_pointer_guard.diff
+any/cvs-mangle-tls_dtor_list.diff
