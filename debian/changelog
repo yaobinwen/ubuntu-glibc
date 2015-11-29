@@ -1,3 +1,38 @@
+glibc (2.21-0experimental4) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * testsuite-checking/expected-results-*kfreebsd-gnu-*: re-add tst-getpid1
+    and tst-getpid2 as it seems they can still occasionally fail on the
+    buildds.
+  * testsuite-checking/expected-results-mips64el-linux-gnu-libc: rename into
+    testsuite-checking/expected-results-mips64el-linux-gnuabi64-libc.
+  * testsuite-checking/expected-results-{arm,mips}*: allow nptl/tst-stack4 to
+    fail. It's a new test which fails intermitently on the buildds and a known
+    upstream problem.
+  * patches/hppa/submitted-mathdef.diff: new patch from John David Anglin to
+    define __NO_LONG_DOUBLE_MATH on hppa.  Closes: #805836.
+  * patches/hppa/cvs-inline-syscall-rewrite.diff: new patch backported from
+    upstream as requested by John David Anglin.
+  * patches/hppa/cvs-sysdep-errno.diff: new patch backported from upstream as
+    requested by John David Anglin.
+  * testsuite-checking/expected-results-hppa-linux-gnu-libc: update testsuite
+    result, from John David Anglin.
+  * testsuite-checking/*{arm,mips,hppa}*: allow nptl/tst-cancel24-static to
+    fail on armel, armhf, hppa, mips, mipsel. It's an upstream regression
+    only affecting static binaries currently under investigation.
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/tg-tls-threadvar.diff: Update, to fix recursion while
+    accessing TLS while locking for accessing TLS.
+  * patches/hurd-i386/tg-context_functions.diff: Update, to fix sigprocmask
+    visibility.
+  * patches/hurd-i386/cvs-hidden.diff: New patch, to fix build with hidden
+    support.
+  * sysdeps/hurd-i386.mk: Disable libc0.3-i686 and libc0.3-xen build for now,
+    to get 2.21 out against the binutils version which broke them.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 29 Nov 2015 23:24:08 +0100
+
 glibc (2.21-0experimental3) experimental; urgency=medium
 
   [ Aurelien Jarno ]
@@ -5,7 +40,7 @@ glibc (2.21-0experimental3) experimental; urgency=medium
     to fix a set-but-unused warning in nptl/allocatestack.c, causing a
     build failure.
   * patches/hppa/local-stack-grows-up.diff: rebase.
-  * patches/any/cvs-tls-dtv.diff: new patch from upstream to fix fix DTV race,
+  * patches/any/cvs-tls-dtv.diff: new patch from upstream to fix DTV race,
     assert, and DTV_SURPLUS Static TLS limit.  This also reduces the failure
     rate of nptl/tst-stack4.  Closes: #793641.
   * Add expected testsuite result for mips64el:
