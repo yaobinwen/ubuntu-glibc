@@ -37,6 +37,7 @@ localedata/submitted-en_AU-date_fmt.diff
 localedata/submitted-es_MX-decimal_point.diff
 localedata/submitted-locale-bo.diff
 localedata/submitted-it_IT-thousands_sep.diff
+localedata/cvs-bg_BG-t_fmt.diff
 
 alpha/local-gcc4.1.diff
 alpha/submitted-dl-support.diff
@@ -75,6 +76,8 @@ hppa/submitted-mathdef.diff
 hppa/cvs-sysdep-errno.diff
 hppa/cvs-inline-syscall-rewrite.diff
 hppa/cvs-inline-syscall.diff
+hppa/cvs-update-mman.h.diff
+hppa/submitted-dladdr.diff
 
 hurd-i386/local-enable-ldconfig.diff
 hurd-i386/tg-context_functions.diff
@@ -167,6 +170,9 @@ hurd-i386/cvs-cache-mach_host_self.diff
 hurd-i386/local-mach_print.diff
 hurd-i386/cvs-hidden.diff
 hurd-i386/cvs-libpthread-api.diff
+hurd-i386/cvs-libpthread-sigstate.diff
+hurd-i386/cvs-O_DIRECTORY.diff
+hurd-i386/cvs-raise-longjump.diff
 
 i386/local-biarch.diff
 i386/local-cmov.diff
@@ -282,3 +288,4 @@ any/cvs-tls-dtv.diff
 any/cvs-rfc3542-advanced-api.diff
 any/cvs-check-localplt.diff
 any/cvs-grantpt-pty-owner.diff
+any/submitted-hle-checking-mutex.diff
