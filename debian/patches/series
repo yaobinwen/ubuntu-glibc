@@ -36,12 +36,11 @@ localedata/locale-nb_NO.diff
 localedata/submitted-en_AU-date_fmt.diff
 localedata/submitted-es_MX-decimal_point.diff
 localedata/submitted-it_IT-thousands_sep.diff
+localedata/cvs-bg_BG-t_fmt.diff
 
 alpha/local-gcc4.1.diff
 alpha/submitted-dl-support.diff
-alpha/submitted-rtld-fPIC.diff
 alpha/local-string-functions.diff
-alpha/submitted-abilist.diff
 alpha/submitted-fegetenv-namespace.diff
 alpha/submitted-termios_h.diff
 
@@ -63,10 +62,10 @@ hppa/local-elf-make-cflags.diff
 hppa/local-shmlba.diff
 hppa/local-pthread_spin_unlock.diff
 hppa/local-fptr-table-size.diff
-hppa/cvs-start.diff
 hppa/submitted-gmon-start.diff
 hppa/submitted-mathdef.diff
-hppa/cvs-inline-syscall.diff
+hppa/cvs-update-mman.h.diff
+hppa/submitted-dladdr.diff
 
 hurd-i386/local-enable-ldconfig.diff
 hurd-i386/tg-context_functions.diff
@@ -147,11 +146,14 @@ hurd-i386/cvs-s_scalbn.diff
 hurd-i386/local-mach_print.diff
 hurd-i386/cvs-hidden.diff
 hurd-i386/cvs-libpthread-api.diff
+hurd-i386/cvs-libpthread-sigstate.diff
+hurd-i386/cvs-O_DIRECTORY.diff
+hurd-i386/cvs-raise-longjump.diff
 
 i386/local-biarch.diff
 i386/local-cmov.diff
 i386/local-cpuid-level2.diff
-i386/submitted-i586-ulps.diff
+i386/local-i386-ulps.diff
 i386/submitted-i686-timing.diff
 i386/unsubmitted-quiet-ldconfig.diff
 
@@ -167,8 +169,6 @@ kfreebsd/local-getaddrinfo-freebsd-kernel.diff
 kfreebsd/local-no-execfn.diff
 
 m68k/local-dwarf2-buildfix.diff
-m68k/local-fpic.diff
-# m68k/local-mathinline_h.diff
 m68k/local-reloc.diff
 m68k/submitted-gcc34-seccomment.diff
 
@@ -177,12 +177,11 @@ mips/cvs-testsuite-o32-fp.diff
 
 powerpc/local-powerpc8xx-dcbz.diff
 
-s390/submitted-nexttowardf.diff
+s390/submitted-socketcall.diff
 
 sh4/local-fpscr_values.diff
 
 sparc/local-sparcv9-target.diff
-sparc/submitted-timing.diff
 
 all/local-alias-et_EE.diff
 all/local-remove-manual.diff
@@ -210,9 +209,8 @@ any/local-mktemp.diff
 any/local-no-pagesize.diff
 any/local-nss-upgrade.diff
 any/local-stubs_h.diff
-any/local-stdio-lock.diff
+any/cvs-stdio-lock.diff
 any/local-tcsetaddr.diff
-any/local-disable-test-tgmath2.diff
 any/local-tst-mktime2.diff
 any/submitted-nis-netgrp.diff
 any/submitted-longdouble.diff
@@ -221,7 +219,6 @@ any/local-nss-overflow.diff
 #any/local-disable-gethostbyname4.diff
 any/submitted-missing-etc-hosts.diff
 any/submitted-bits-fcntl_h-at.diff
-any/local-no-SOCK_NONBLOCK.diff
 any/submitted-nptl-invalid-td.patch
 any/local-dlfptr.diff
 any/submitted-string2-strcmp.diff
@@ -232,14 +229,16 @@ any/local-revert-bz13979.diff
 any/local-tst-eintr1-eagain.diff
 any/unsubmitted-ldso-machine-mismatch.diff
 any/unsubmitted-dlopen-static-crash.diff
-any/unsubmitted-scanf-includes.diff
 any/local-ldconfig-ignore-ld.so.diff
-any/local-no-malloc-backtrace.diff
 any/local-dynamic-resolvconf.diff
 any/local-libpic.diff
 any/local-bootstrap-headers.diff
 any/submitted-argp-attribute.diff
 any/local-static-dlopen-search-path.diff
 any/local-math-logb.diff
+any/cvs-gawk-gensub.diff
 any/cvs-grantpt-namespace.diff
 any/cvs-grantpt-pty-owner.diff
+any/cvs-bits-libc-stdio-lock.diff
+any/submitted-hle-checking-mutex.diff
+any/local-CVE-2015-7547.diff
