@@ -197,6 +197,9 @@ tests-unsupported += tst-timer4
 tests-unsupported += tst-timer5
 tests-unsupported += tst-malloc-backtrace
 
+# bounding memory allocation is not supported yet
+tests-unsupported += tst-malloc-thread-fail
+
 # Need actual porting
 test-xfail-exe = yes
 test-xfail-tst-mqueue5 = yes
@@ -1284,6 +1287,10 @@ test-xfail-tst-backtrace5 = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-waitid = yes
+
+# Known failure not a regression, see https://sourceware.org/bugzilla/show_bug.cgi?id=6527
+test-xfail-tst-malloc-thread-exit = yes
+test-xfail-tst-malloc-thread-fail = yes
 endif
 
 
@@ -1297,7 +1304,8 @@ test-xfail-tst-mqueue5 = yes
 test-xfail-tst-waitid = yes
 
 # Known failure not a regression, see https://sourceware.org/bugzilla/show_bug.cgi?id=6527
-tst-malloc-thread-fail = yes
+test-xfail-tst-malloc-thread-exit = yes
+test-xfail-tst-malloc-thread-fail = yes
 
 # Failures due to a GCC bug, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=59412
 #                            and http://gcc.gnu.org/bugzilla/show_bug.cgi?id=64811
@@ -1352,9 +1360,15 @@ endif
 ifeq ($(config-machine)-$(config-os),s390x-linux-gnu)
 test-xfail-tst-cancel17 = yes
 test-xfail-tst-cancelx17 = yes
+test-xfail-tst-cond10 = yes
+test-xfail-tst-cond25 = yes
 test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
 test-xfail-tst-waitid = yes
+
+# Known failure not a regression, see https://sourceware.org/bugzilla/show_bug.cgi?id=6527
+test-xfail-tst-malloc-thread-exit = yes
+test-xfail-tst-malloc-thread-fail = yes
 endif
 
 

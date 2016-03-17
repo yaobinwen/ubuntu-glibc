@@ -65,6 +65,9 @@ endif
 
 	dh_compress -p$(curpass)
 	dh_fixperms -p$(curpass) -Xpt_chown
+	if [ $(curpass) = locales ] ; then \
+		chmod +x debian/$(curpass)/usr/share/locales/*-language-pack ; \
+	fi
 	# Use this instead of -X to dh_fixperms so that we can use
 	# an unescaped regular expression.  ld.so must be executable;
 	# libc.so and NPTL's libpthread.so print useful version
