@@ -25,7 +25,6 @@ localedata/locale-se_NO.diff
 localedata/tailor-iso14651_t1.diff
 localedata/locale-hsb_DE.diff
 localedata/tailor-iso14651_t1-common.diff
-localedata/fr_CA-first_weekday.diff
 localedata/fr_CH-first_weekday.diff
 localedata/locale-de_LI.diff
 localedata/submitted-bz9725-locale-sv_SE.diff
@@ -40,6 +39,7 @@ alpha/submitted-dl-support.diff
 alpha/local-string-functions.diff
 alpha/submitted-fegetenv-namespace.diff
 alpha/submitted-termios_h.diff
+alpha/submitted-fts64.diff
 
 amd64/local-blacklist-for-Intel-TSX.diff
 
@@ -86,6 +86,7 @@ hurd-i386/tg-hurdsig-SA_SIGINFO.diff
 hurd-i386/tg-hurdsig-fixes-2.diff
 hurd-i386/tg-hooks.diff
 hurd-i386/cvs-libpthread.diff
+hurd-i386/cvs-libpthread-2.23.diff
 hurd-i386/libpthread_spin-lock.diff
 hurd-i386/libpthread_build.diff
 hurd-i386/libpthread_sigmask.diff
@@ -131,6 +132,17 @@ hurd-i386/cvs-hidden.diff
 hurd-i386/cvs-libpthread-api.diff
 hurd-i386/cvs-libpthread-sigstate.diff
 hurd-i386/submitted-hurd-abilist.diff
+hurd-i386/cvs-openat.diff
+hurd-i386/cvs-gai_sigqueue.diff
+hurd-i386/cvs-aio_sigqueue.diff
+hurd-i386/cvs-pt-kill.diff
+hurd-i386/cvs-open.diff
+hurd-i386/cvs-c++-types.diff
+hurd-i386/local-ihash-use.diff
+hurd-i386/cvs-errnos.d.diff
+hurd-i386/cvs-mach-syscalls.mk.diff
+hurd-i386/local-versions.diff
+hurd-i386/cvs-libpthread.so.diff
 
 i386/local-biarch.diff
 i386/local-cmov.diff
@@ -207,3 +219,4 @@ any/local-libpic.diff
 any/local-bootstrap-headers.diff
 any/submitted-argp-attribute.diff
 any/submitted-dlopen-noload.diff
+any/cvs-tst-malloc-thread-exit.diff
