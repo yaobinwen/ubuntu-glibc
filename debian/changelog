@@ -1,3 +1,20 @@
+glibc (2.23-0experimental2) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * patches/kfreebsd/local-fbtl.diff: update to revision 5973 (from
+    glibc-bsd).
+  * debian/rules, debian/rules.d/build.mk: rename localedir into complocaledir
+    following upstream change.
+  * debian/patches/local-allocalim-header.diff: drop, obsolete.
+  * debian/patches/any/local-no-pagesize.diff: drop, obsolete.
+
+  [ Adam Conrad ]
+  * debian/testsuite-xfail-debian.mk: Also allow tst-malloc-thread-fail to
+    fail where we've already done so for test-xfail-tst-malloc-thread-exit.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 14 Apr 2016 14:20:30 +0200
+
 glibc (2.23-0experimental1) experimental; urgency=medium
 
   [ Aurelien Jarno ]
@@ -124,6 +141,37 @@ glibc (2.23-0experimental0) experimental; urgency=medium
     glibc-bsd).
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 13 Mar 2016 19:22:45 +0100
+
+glibc (2.22-6) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * hurd-i386/submitted-auxv.diff: New patch, fixes cvs crash.
+  * hurd-i386/submitted-anon-mmap-shared.diff: New patch, fixes inheritence of
+    shared anonymous memory.
+
+  [ Aurelien Jarno ]
+  * Update from upstream stable branch:
+    - Fix stack overflow when getnetbyname is invoked on a very long name
+      (CVE-2016-3075).
+    - Fix HTM on powerpc/ppc64/ppc64el.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 09 Apr 2016 13:35:19 +0200
+
+glibc (2.22-5) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * testsuite-xfail-debian.mk: Disable the problematic test-lfs test on hurd.
+
+  [ Aurelien Jarno ]
+  * Update from upstream stable branch:
+    - Fix assertion failure with unconnectable name server addresses.  Closes:
+      #816669.
+  * Drop libnss-dns-udeb and libnss-files-udeb and merge the files they
+    include in libc6-udeb.
+  * debian/patches/any/cvs-sys-personality-h.diff: new patch to synchronise
+    <sys/personality.h> with kernel headers.  Closes: #697456.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 29 Mar 2016 00:44:21 +0200
 
 glibc (2.22-4) unstable; urgency=medium
 
