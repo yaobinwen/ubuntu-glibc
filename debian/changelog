@@ -1,3 +1,12 @@
+glibc (2.21-0ubuntu4.3) wily-security; urgency=medium
+
+  * REGRESSION UPDATE: revert CVE-2014-9761 fix due to added symbol
+    dependency from libm to libc (LP: #1585614)
+    - debian/patches/any/CVE-2014-9761-2.diff: keep exporting
+      __strto*_nan symbols added to libc.
+
+ -- Steve Beattie <sbeattie@ubuntu.com>  Thu, 26 May 2016 01:28:23 -0700
+
 glibc (2.21-0ubuntu4.2) wily-security; urgency=medium
 
   * SECURITY UPDATE: buffer overflow in gethostbyname_r and related
