@@ -40,6 +40,7 @@ alpha/local-string-functions.diff
 alpha/submitted-fegetenv-namespace.diff
 alpha/submitted-termios_h.diff
 alpha/submitted-fts64.diff
+alpha/submitted-trunc.diff
 
 amd64/local-blacklist-for-Intel-TSX.diff
 
@@ -58,7 +59,7 @@ hppa/local-shmlba.diff
 hppa/local-fptr-table-size.diff
 hppa/submitted-gmon-start.diff
 hppa/submitted-dladdr.diff
-hppa/submitted-start.diff
+hppa/submitted-libm-test-ulps.diff
 
 hurd-i386/local-enable-ldconfig.diff
 hurd-i386/tg-context_functions.diff
@@ -180,6 +181,7 @@ sh4/local-fpscr_values.diff
 
 sparc/local-sparcv9-target.diff
 sparc/submitted-sparc64-socketcall.diff
+sparc/cvs-sparc-nearbyint.diff
 
 all/local-alias-et_EE.diff
 all/local-remove-manual.diff
