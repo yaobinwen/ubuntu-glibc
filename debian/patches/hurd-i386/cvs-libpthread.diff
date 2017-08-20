@@ -1,7 +1,7 @@
-git diff empty --patch-with-stat --src-prefix=glibc/libpthread/ --dst-prefix=glibc/libpthread/ 79e9d2b78ec0747a94731d45e0e5149269e96159
+git diff empty --patch-with-stat --src-prefix=glibc/libpthread/ --dst-prefix=glibc/libpthread/ de1a908af2944e6601fb14f88933abebd02649e1
 from git.savannah.gnu.org:/srv/git/hurd/libpthread.git/
 thus by construction only libpthread/ files, thus hurd-only
-Date:   Mon Oct 24 22:34:36 2016 +0200
+Date:   Thu Aug 3 11:52:22 2017 +0200
 
  ChangeLog                                     |   6 +
  Makeconfig                                    |  13 +
@@ -252,7 +252,7 @@ new file mode 100644
 index 0000000..e90f5f7
 --- /dev/null
 +++ glibc/libpthread/Makeconfig
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,20 @@
 +# Makeconfig fragment for Hurd libpthread add-on.
 +# This gets included at the end of the main glibc Makeconfig.
 +
@@ -262,6 +262,13 @@ index 0000000..e90f5f7
 +			$(common-objpfx)libpthread/libpthread.so
 +static-thread-library = $(common-objpfx)libpthread/libpthread.a
 +bounded-thread-library = $(static-thread-library)
++
++ifeq ($(subdir),malloc)
++LDLIBS-tst-interpose-static-thread += -lihash
++endif
++ifeq ($(subdir),elf)
++LDLIBS-tst-linkall-static += -lihash
++endif
 +
 +rpath-dirs += libpthread
 +
@@ -1237,11 +1244,11 @@ index 0000000..c819357
 +    }
 +  __mutex_unlock (&atfork_lock);
 +}
-diff --git glibc/libpthread/include/pthread.h glibc/libpthread/include/pthread.h
+diff --git glibc/libpthread/sysdeps/pthread/pthread.h glibc/libpthread/sysdeps/pthread/pthread.h
 new file mode 100644
 index 0000000..1d4d3c7
 --- /dev/null
-+++ glibc/libpthread/include/pthread.h
++++ glibc/libpthread/sysdeps/pthread/pthread.h
 @@ -0,0 +1,7 @@
 +#ifndef _PTHREAD_H
 +#include <pthread/pthread.h>

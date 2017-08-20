@@ -1,3 +1,59 @@
+glibc (2.25-0experimental1) experimental; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/submitted-net.diff: rebased.
+  * patches/hurd-i386/tg-tls.diff: update.
+  * patches/hurd-i386/submitted-malloc-setstate.diff: update.
+  * patches/hurd-i386/submitted-shm_open_pthread.diff: new patch.
+  * patches/hurd-i386/cvs-libc_init_secure.diff: new patch.
+  * patches/hurd-i386/cvs-libpthread.diff: update.
+  * patches/hurd-i386/git-__inet6_scopeid_pton.diff: new patch from upstream.
+  * patches/hurd-i386/tg2.25-tls.diff: new patch.
+  * patches/hurd-i386/local-nocheck-installed-headers.diff: New patch to
+    disable checking hurd and mach headers for standards, they are not.
+  * patches/hurd-i386/submitted-net.diff: Disable installing if_ppp.h, it just
+    does not work without OS-specific ppp_defs.h.
+  * testsuite-xfail-debian.mk: update for hurd-i386.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Reduce EDNS payload size to 1200 bytes (CVE-2017-12132). Closes:
+      #870650.
+    - debian/patches/hppa/local-fptr-table-size.diff: upstreamed.
+    - debian/patches/hppa/local-shmlba.diff: upstreamed.
+    - debian/patches/hppa/submitted-gmon-start.diff: partially upstreamed.
+    - debian/patches/hppa/submitted-dladdr.diff: upstreamed.
+    - debian/patches/hppa/local-stack-grows-up.diff: upstreamed.
+    - debian/patches/hppa/submitted-setcontext.diff: upstreamed.
+    - debian/patches/hppa/submitted-sysdeps-cancel.diff: upstreamed.
+    - debian/patches/hppa/submitted-longjmp.diff: upstreamed.
+  * debian/patches/kfreebsd/local-sysdeps.diff, local-fbtl.diff:
+    update to revision 6171 (from glibc-bsd).
+  * testsuite-xfail-debian.mk: update for kfreebsd-i386.
+  * debian/patches/any/local-bits-sigstack.diff: new patch to fix
+    <bits/sigstack.h> on Hurd and kFreeBSD.
+  * debian/control.in/main: Build-Depends on python3 when running the
+    testsuite.
+  * debian/rules.d/build.mk, debian/debhelper.in/libc-dev.install,
+    debian/debhelper.in/libc-dev-alt.install: install the NPTL GDB
+    pretty-printer python macros in the libc6-dev and libc6-*-dev packages.
+    Closes: #868247.
+  * debian/debhelper.in/libc-dev-alt.{preinst,postinst}: remove, used to
+    handle the multiarch transition.
+  * debian/debhelper.in/libc.{preinst,postinst}: remove code not needed
+    since jessie.
+  * debian/patches/mips/submitted-syscalls5-7-unbound-stack.diff: new
+    patch to fix unbounded stack allocation in O32 syscalls with 5 to 7
+    arguments, causing nptl/tst-rwlock15 to fail on mips and mipsel.
+  * debian/control.in/main,debian/compat: switch to debhelper 10.
+
+  [ John David Anglin ]
+  * debian/patches/any/submitted-resolv-unaligned.diff: new patch to fix
+    misaligned accesses in res_query.c to fields in HEADER struct (closes:
+    #827703).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 20 Aug 2017 19:02:51 +0200
+
 glibc (2.25-0experimental0) experimental; urgency=medium
 
   * New upstream release:
@@ -43,6 +99,27 @@ glibc (2.25-0experimental0) experimental; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 02 Aug 2017 18:54:56 +0200
 
+glibc (2.24-15) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Avoid use-after-free read access in clntudp_call (CVE-2017-12133).
+      Closes: #870648.
+  * debian/control.in/*: Change back gcc-multilib to a Recommends for
+    biarch packages. It provides the /usr/include/linux/asm symlink.
+  * debian/control.in/x32: Add a gcc-multilib Recommends for libc6-dev-x32.
+  * Update French debconf translation, by Alban Vidal.  Closes: #872025.
+  * debian/control.in/main: Change gcc-multiarch to priority optional and
+    section oldlibs.
+  * debian/control.in/opt: Remove transitional packages libc0.1-i686,
+    libc0.3-i686, libc6-i686.
+  * debian/control.in/libc, debian/control.in/main, debian/control.in/opt:
+    change the priority of libc0.1-dbg, libc0.1-udeb, libc0.3-dbg,
+    libc0.3-udeb, libc0.3-xen, libc6.1-alphaev67, libc6.1-dbg, libc6.1-udeb,
+    libc6-dbg, libc6-udeb, libc6-xen and locales-all to optional.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 20 Aug 2017 15:12:10 +0200
+
 glibc (2.24-14) unstable; urgency=medium
 
   [ Aurelien Jarno ]
@@ -75,8 +152,6 @@ glibc (2.24-13) unstable; urgency=medium
   * Update Dutch debconf translation, by Frans Spiesschaert.  Closes: #867981.
   * debian/debhelper.in/libc-bin.triggers: declare the trigger as
     interest-await.
-  * debian/control.in/*: Demote gcc-multilib 'Recommends' to a 'Suggests'.
-    Closes: #865429.
 
   [ Adam Conrad ]
   * debian/patches/arm/submitted-strip-bit-0.diff: Fix ld.so crash on armv7t.
