@@ -684,6 +684,8 @@ test-xfail-tst-get-cpu-features = yes
 # new in 2.24
 test-xfail-tst-execvpe5 = yes
 test-xfail-tst-spawn2 = yes
+test-xfail-tst-support_record_failure = yes
+test-xfail-tst-support_record_failure-2 = yes
 
 test-xfail-UNIX98/fcntl.h/conform = yes
 test-xfail-XOPEN2K/fcntl.h/conform = yes
@@ -1008,6 +1010,7 @@ test-xfail-tst-renameat = yes
 test-xfail-tst-setcontext2 = yes
 test-xfail-tst-shm = yes
 test-xfail-tst-spawn2 = yes
+test-xfail-tst-udp-error = yes
 test-xfail-tst-waitid = yes
 test-xfail-tst-writev = yes
 endif
@@ -1033,6 +1036,7 @@ test-xfail-tst-renameat = yes
 test-xfail-tst-setcontext2 = yes
 test-xfail-tst-shm = yes
 test-xfail-tst-spawn2 = yes
+test-xfail-tst-udp-error = yes
 test-xfail-tst-waitid = yes
 endif
 
