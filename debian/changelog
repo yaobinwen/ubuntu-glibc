@@ -1,3 +1,34 @@
+glibc (2.25-0experimental2) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * Do not try to install NPTL GDB pretty-printers on non-Linux.
+  * debian/control.in/main: build-depends on autotools-dev.
+  * debian/rules, debian/rules.d/build.mk: update/restore config.guess and
+    config.sub on configure/clean.
+  * debian/debhelper.in/libc-dev{-alt,}.install: install libm-*.a to also
+    install the versioned static library on architectures with mvec support.
+    Closes: #872852.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/rules.d/build.mk: reduce TIMEOUTFACTOR to 15 from 25. This should
+    fix FTBFS on HPPA.
+  * debian/debhelper.in/nscd.init: add support for the try-restart argument
+    to nscd's init script.
+  * debian/debhelper.in/libc.postinst, debian/script.in/nsscheck.sh: drop
+    wheezy to jessie upgrade code for samba.
+  * debian/debhelper.in/libc.postinst, debian/debhelper.in/libc.templates,
+    debian/po/*: do not call /etc/init.d scripts even as a fallback as
+    invoke-rc.d is now always available.
+  * debian/debhelper.in/libc.preinst, debian/debhelper.in/libc.postrm: drop
+    code to handle upgrades from wheezy.
+  * debian/script.in/nohwcap.sh: drop code to support libc0.1-i686 and
+    libc6-i686.
+  * debhelper.in/*.lintian-overrides: cleanup lintian overrides.
+  * debian/control.in/main: drop the XS-Testsuite field, it has been replaced
+    by a Testsuite field automatically added by dpkg.
+  * debian/control.in/main: bump Standards-Version to 4.0.1.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 26 Aug 2017 16:22:03 +0200
+
 glibc (2.25-0experimental1) experimental; urgency=medium
 
   [ Samuel Thibault ]
@@ -99,6 +130,33 @@ glibc (2.25-0experimental0) experimental; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 02 Aug 2017 18:54:56 +0200
 
+glibc (2.24-17) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/unsubmitted-clock_t_centiseconds.diff: Drop clock() part
+    from patch, it always uses CLOCKS_PER_SEC which is always 1000000. Should
+    fix ffmpeg build.  Closes: Bug#872556.
+
+  [ Aurelien Jarno ]
+  * debian/patches/any/submitted-intl-tstgettext.diff: new patch to fix the
+    intl/tst-gettext with newer gettext versions.  Closes: #873097.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 26 Aug 2017 11:09:24 +0200
+
+glibc (2.24-16) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/sysdeps/kfreebsd-i386.mk: don't try to build libc0.1-i686.
+  * debian/sysdeps/hurd-i386.mk: don't try to build libc0.3-i686.
+  * debian/sysdeps/i386.mk: don't try to build libc6-i686.
+  * debian/testsuite-xfail-debian.mk: update kfreebsd* according to
+    git-updates.diff.
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: update hurd according to git-updates.diff.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 21 Aug 2017 08:51:25 +0200
+
 glibc (2.24-15) unstable; urgency=medium
 
   [ Aurelien Jarno ]
@@ -109,8 +167,8 @@ glibc (2.24-15) unstable; urgency=medium
     biarch packages. It provides the /usr/include/linux/asm symlink.
   * debian/control.in/x32: Add a gcc-multilib Recommends for libc6-dev-x32.
   * Update French debconf translation, by Alban Vidal.  Closes: #872025.
-  * debian/control.in/main: Change gcc-multiarch to priority optional and
-    section oldlibs.
+  * debian/control.in/main: Change multiarch-support to priority optional
+    and section oldlibs.
   * debian/control.in/opt: Remove transitional packages libc0.1-i686,
     libc0.3-i686, libc6-i686.
   * debian/control.in/libc, debian/control.in/main, debian/control.in/opt:
@@ -152,6 +210,8 @@ glibc (2.24-13) unstable; urgency=medium
   * Update Dutch debconf translation, by Frans Spiesschaert.  Closes: #867981.
   * debian/debhelper.in/libc-bin.triggers: declare the trigger as
     interest-await.
+  * debian/control.in/*: Demote gcc-multilib 'Recommends' to a 'Suggests'.
+    Closes: #865429.
 
   [ Adam Conrad ]
   * debian/patches/arm/submitted-strip-bit-0.diff: Fix ld.so crash on armv7t.

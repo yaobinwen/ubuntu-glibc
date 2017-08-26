@@ -20,14 +20,19 @@ ifdef WITH_SYSROOT
     libc_extra_config_options += --with-headers=$(WITH_SYSROOT)/$(includedir)
 endif
 
+$(stamp)config_sub_guess: $(stamp)patch
+	@echo Updating config.sub and config.guess
+	dh_autotools-dev_updateconfig
+	touch $@
+
 $(patsubst %,mkbuilddir_%,$(GLIBC_PASSES)) :: mkbuilddir_% : $(stamp)mkbuilddir_%
-$(stamp)mkbuilddir_%: $(stamp)patch $(KERNEL_HEADER_DIR)
+$(stamp)mkbuilddir_%:
 	@echo Making builddir for $(curpass)
 	test -d $(DEB_BUILDDIR) || mkdir -p $(DEB_BUILDDIR)
 	touch $@
 
 $(patsubst %,configure_%,$(GLIBC_PASSES)) :: configure_% : $(stamp)configure_%
-$(stamp)configure_%: $(stamp)mkbuilddir_%
+$(stamp)configure_%: $(stamp)config_sub_guess $(stamp)patch $(KERNEL_HEADER_DIR) $(stamp)mkbuilddir_%
 	@echo Configuring $(curpass)
 	rm -f $(DEB_BUILDDIR)/configparms
 	echo "MIG = $(call xx,MIG)"               >> $(DEB_BUILDDIR)/configparms
@@ -124,7 +129,7 @@ $(stamp)check_%: $(stamp)build_%
 	  echo "Testsuite disabled for $(curpass), skipping tests."; \
 	else \
 	  find $(DEB_BUILDDIR) -name '*.out' -delete ; \
-	  LD_PRELOAD="" LANG="" TIMEOUTFACTOR="15" $(MAKE) -C $(DEB_BUILDDIR) $(NJOBS) check 2>&1 | tee $(log_test) ; \
+	  LD_PRELOAD="" LANG="" TIMEOUTFACTOR="25" $(MAKE) -C $(DEB_BUILDDIR) $(NJOBS) check 2>&1 | tee $(log_test) ; \
 	  if ! test -f $(DEB_BUILDDIR)/tests.sum ; then \
 	    echo "+---------------------------------------------------------------------+" ; \
 	    echo "|                     Testsuite failed to build.                      |" ; \
