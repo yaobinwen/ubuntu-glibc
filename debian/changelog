@@ -1,3 +1,19 @@
+glibc (2.25-0experimental3) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/debhelper.in/libc-dev-alt.install, debian/rules.d/debhelper.mk: do
+    no try to install libm-*.a for builds without mvec.
+  * debian/rules.d/build.mk: run configure with --enable-stack-protector=
+    strong.
+  * debian/sysdeps/hurd.mk: disable stack-protector on the Hurd.
+  * debian/patches/kfreebsd/local-sysdeps.diff: update to revision 6172 (from
+    glibc-bsd).
+  * debian/rules, debian/rules.d/build.mk, debian/control.in/main: use
+    dh_update_autotools_config from debhelper instead of
+    dh_autotools-dev_updateconfig from autotools-dev.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 27 Aug 2017 01:49:39 +0200
+
 glibc (2.25-0experimental2) experimental; urgency=medium
 
   [ Aurelien Jarno ]

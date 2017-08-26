@@ -22,7 +22,7 @@ endif
 
 $(stamp)config_sub_guess: $(stamp)patch
 	@echo Updating config.sub and config.guess
-	dh_autotools-dev_updateconfig
+	dh_update_autotools_config
 	touch $@
 
 $(patsubst %,mkbuilddir_%,$(GLIBC_PASSES)) :: mkbuilddir_% : $(stamp)mkbuilddir_%
@@ -94,6 +94,7 @@ $(stamp)configure_%: $(stamp)config_sub_guess $(stamp)patch $(KERNEL_HEADER_DIR)
 		--enable-add-ons=$(standard-add-ons)"$(call xx,add-ons)" \
 		--without-selinux \
 		--enable-stackguard-randomization \
+		--enable-stack-protector=strong \
 		--enable-obsolete-rpc \
 		--with-pkgversion="Debian GLIBC $(DEB_VERSION)" \
 		--with-bugurl="http://www.debian.org/Bugs/" \
