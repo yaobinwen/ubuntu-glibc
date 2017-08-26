@@ -1,3 +1,16 @@
+glibc (2.24-17) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/unsubmitted-clock_t_centiseconds.diff: Drop clock() part
+    from patch, it always uses CLOCKS_PER_SEC which is always 1000000. Should
+    fix ffmpeg build.  Closes: Bug#872556.
+
+  [ Aurelien Jarno ]
+  * debian/patches/any/submitted-intl-tstgettext.diff: new patch to fix the
+    intl/tst-gettext with newer gettext versions.  Closes: #873097.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 26 Aug 2017 11:09:24 +0200
+
 glibc (2.24-16) unstable; urgency=medium
 
   [ Aurelien Jarno ]
