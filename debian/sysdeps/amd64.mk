@@ -1,9 +1,9 @@
 # configuration options for all flavours
 extra_config_options = --enable-multi-arch
-MIN_KERNEL_SUPPORTED := 2.6.32
 
 # main library
 libc_mvec = yes
+libc_extra_cflags = -O3
 libc_rtlddir = /lib64
 
 # build 32-bit (i386) alternative library

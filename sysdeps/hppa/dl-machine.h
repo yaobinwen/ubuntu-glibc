@@ -112,6 +112,7 @@ elf_machine_load_address (void)
 /* Fixup a PLT entry to bounce directly to the function at VALUE. */
 static inline struct fdesc __attribute__ ((always_inline))
 elf_machine_fixup_plt (struct link_map *map, lookup_t t,
+		       const ElfW(Sym) *refsym, const ElfW(Sym) *sym,
 		       const Elf32_Rela *reloc,
 		       Elf32_Addr *reloc_addr, struct fdesc value)
 {
@@ -302,6 +303,10 @@ elf_machine_runtime_setup (struct link_map *l, int lazy, int profile)
 #define ARCH_LA_PLTENTER hppa_gnu_pltenter
 #define ARCH_LA_PLTEXIT hppa_gnu_pltexit
 
+/* Adjust DL_STACK_END to get value we want in __libc_stack_end.  */
+#define DL_STACK_END(cookie) \
+  ((void *) (((long) (cookie)) + 0x160))
+
 /* Initial entry point code for the dynamic linker.
    The C function `_dl_start' is the real entry point;
    its return value is the user program's entry point.  */
@@ -400,11 +405,6 @@ asm (									\
 "_dl_start_user:\n"							\
 	/* Save the entry point in %r3. */				\
 "	copy	%ret0,%r3\n"						\
-									\
-	/* Remember the lowest stack address. */			\
-"	addil	LT'__libc_stack_end,%r19\n"				\
-"	ldw	RT'__libc_stack_end(%r1),%r20\n"			\
-"	stw	%sp,0(%r20)\n"						\
 									\
 	/* See if we were called as a command with the executable file	\
 	   name as an extra leading argument. */			\
@@ -653,13 +653,13 @@ elf_machine_rela (struct link_map *map,
     case R_PARISC_IPLT:
       if (__builtin_expect (sym_map != NULL, 1))
 	{
-	  elf_machine_fixup_plt (NULL, sym_map, reloc, reloc_addr,
+	  elf_machine_fixup_plt (NULL, sym_map, NULL, NULL, reloc, reloc_addr,
 				 DL_FIXUP_MAKE_VALUE(sym_map, value));
 	}
       else
 	{
 	  /* If we get here, it's a (weak) undefined sym.  */
-	  elf_machine_fixup_plt (NULL, map, reloc, reloc_addr,
+	  elf_machine_fixup_plt (NULL, map, NULL, NULL, reloc, reloc_addr,
 				 DL_FIXUP_MAKE_VALUE(map, value));
 	}
       return;

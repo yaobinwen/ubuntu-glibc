@@ -11,7 +11,15 @@ sysdep-rtld-routines += dl-machine hwcapinfo
 # Don't optimize GD tls sequence to LE.
 LDFLAGS-tst-tlsopt-powerpc += -Wl,--no-tls-optimize
 tests += tst-tlsopt-powerpc
-endif
+
+ifneq (no,$(multi-arch))
+tests-static += tst-tlsifunc-static
+tests-internal += tst-tlsifunc-static
+ifeq (yes,$(build-shared))
+tests-internal += tst-tlsifunc
+endif # build-shared
+endif # multi-arch
+endif # subdir = elf
 
 ifeq ($(subdir),setjmp)
 ifeq (yes,$(build-shared))
@@ -27,13 +35,14 @@ gen-as-const-headers += locale-defines.sym
 endif
 
 ifeq ($(subdir),nptl)
-tests += test-get_hwcap test-get_hwcap-static
+tests-internal += test-get_hwcap test-get_hwcap-static
 tests-static += test-get_hwcap-static
 endif
 
 ifeq ($(subdir),misc)
 sysdep_headers += sys/platform/ppc.h
 tests += test-gettimebase
+tests += tst-set_ppr
 endif
 
 ifneq (,$(filter %le,$(config-machine)))
