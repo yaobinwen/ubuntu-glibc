@@ -1,3 +1,17 @@
+glibc (2.26-0ubuntu2) artful; urgency=medium
+
+  * Cherry-pick some changes from Debian git for a few pending Ubuntu bugfixes:
+    - Update to master and drop redundant submitted-tst-tlsopt-powerpc.diff.
+    - debian/patches/any/local-cudacc-float128.diff: Local patch to prevent
+      defining __HAVE_FLOAT128 on NVIDIA's CUDA compilers (LP: #1717257)
+    - debian/patches/arm/git-arm64-memcmp.diff: Backport optimized memcmp
+      for AArch64, improving performance from 25% to 500% (LP: #1720832)
+    - debian/patches/amd64/git-x86_64-search.diff: Backport upstream commit
+      to put x86_64 back in the search path, like in 2.25 (LP: #1718928)
+    - debian/rules.d/debhelper.mk: Filter python hooks in stage1 (LP: #1715366)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 11 Oct 2017 14:21:40 -0600
+
 glibc (2.26-0ubuntu1) artful; urgency=medium
 
   * Merge with current 2.26 from Debian experimental git, remaining changes:

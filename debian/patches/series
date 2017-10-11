@@ -36,6 +36,8 @@ alpha/submitted-dl-support.diff
 alpha/local-string-functions.diff
 alpha/submitted-fts64.diff
 
+amd64/git-x86_64-search.diff
+
 arm/local-sigaction.diff
 arm/unsubmitted-ldconfig-cache-abi.diff
 arm/unsubmitted-ldso-abi-check.diff
@@ -43,6 +45,7 @@ arm/local-soname-hack.diff
 arm/local-vfp-sysdeps.diff
 arm/unsubmitted-ldso-multilib.diff
 arm/local-arm-futex.diff
+arm/git-arm64-memcmp.diff
 
 hppa/local-inlining.diff
 hppa/local-elf-make-cflags.diff
@@ -156,7 +159,6 @@ mips/submitted-rld_map.diff
 mips/git-syscalls5-7-unbound-stack.diff
 
 powerpc/local-powerpc8xx-dcbz.diff
-powerpc/submitted-tst-tlsopt-powerpc.diff
 
 sh4/local-fpscr_values.diff
 
@@ -201,6 +203,7 @@ any/local-libpic.diff
 any/local-bootstrap-headers.diff
 any/submitted-resolv-unaligned.diff
 any/submitted-intl-tstgettext.diff
+any/local-cudacc-float128.diff
 
 # Ubuntu patches live in their own little world, to maintain sanity
 ubuntu/lddebug-scopes.diff
