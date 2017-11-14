@@ -127,11 +127,15 @@ hurd-i386/tg-NOFOLLOW-DIRECTORY.diff
 hurd-i386/tg-libc_rwlock_recursive.diff
 hurd-i386/tg-magic-pid.diff
 hurd-i386/tg-mlockall.diff
+hurd-i386/local-no_unsupported_ioctls.diff
 hurd-i386/submitted-shm_open_pthread.diff
 hurd-i386/cvs-libc_init_secure.diff
 hurd-i386/tg2.25-tls.diff
 hurd-i386/git-__inet6_scopeid_pton.diff
 hurd-i386/local-nocheck-installed-headers.diff
+hurd-i386/git-bits-sysmacros.h.diff
+hurd-i386/git-stack_chk_fail_local.diff
+hurd-i386/git-stack-protect-static.diff
 
 i386/local-biarch.diff
 i386/local-cmov.diff
@@ -153,7 +157,7 @@ m68k/local-reloc.diff
 m68k/submitted-gcc34-seccomment.diff
 
 mips/submitted-rld_map.diff
-mips/submitted-syscalls5-7-unbound-stack.diff
+mips/git-syscalls5-7-unbound-stack.diff
 
 powerpc/local-powerpc8xx-dcbz.diff
 powerpc/submitted-tst-tlsopt-powerpc.diff
