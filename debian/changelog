@@ -1,3 +1,11 @@
+glibc (2.25-1) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/rules.d/debhelper.mk: relax the dependency on linux-libc-dev
+    to the major upstream version.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 18 Nov 2017 10:13:37 +0100
+
 glibc (2.25-0experimental4) experimental; urgency=medium
 
   [ Samuel Thibault ]
@@ -190,6 +198,9 @@ glibc (2.24-18) UNRELEASED; urgency=medium
   * patches/hurd-i386/local-no_unsupported_ioctls.diff: New patch.
   * patches/hurd-i386/local-clock_gettime_MONOTONIC.diff: Complete with
     clock_getres().
+  * patches/hurd-i386/local-bootstrap.diff: Renamed to tg-bootstrap.diff.
+  * patches/hurd-i386/submitted-add-needed.diff: Renamed to
+    tg-mach-hurd-link.diff.
 
   [ Svante Signell ]
   * patches/hurd-i386/submitted-exec_filename.diff: Update, fixes
