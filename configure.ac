@@ -313,6 +313,13 @@ AC_ARG_ENABLE([multi-arch],
 	      [multi_arch=$enableval],
 	      [multi_arch=default])
 
+AC_ARG_ENABLE([experimental-malloc],
+	      AC_HELP_STRING([--disable-experimental-malloc],
+			     [disable experimental malloc features]),
+	      [experimental_malloc=$enableval],
+	      [experimental_malloc=yes])
+AC_SUBST(experimental_malloc)
+
 AC_ARG_ENABLE([nss-crypt],
 	      AC_HELP_STRING([--enable-nss-crypt],
 			     [enable libcrypt to use nss]),
@@ -374,6 +381,17 @@ if test "$link_obsolete_rpc" = yes; then
   AC_DEFINE(LINK_OBSOLETE_RPC)
 fi
 
+AC_ARG_ENABLE([obsolete-nsl],
+              AC_HELP_STRING([--enable-obsolete-nsl],
+                             [build and install the obsolete libnsl library and depending NSS modules]),
+              [build_obsolete_nsl=$enableval],
+              [build_obsolete_nsl=no])
+AC_SUBST(build_obsolete_nsl)
+
+if test "$build_obsolete_nsl" = yes; then
+  AC_DEFINE(LINK_OBSOLETE_NSL)
+fi
+
 AC_ARG_ENABLE([systemtap],
               [AS_HELP_STRING([--enable-systemtap],
 	       [enable systemtap static probe points @<:@default=no@:>@])],
@@ -425,7 +443,7 @@ AC_ARG_ENABLE([tunables],
 	      [AS_HELP_STRING([--enable-tunables],
 	       [Enable tunables support. Known values are 'yes', 'no' and 'valstring'])],
 	      [have_tunables=$enableval],
-	      [have_tunables=no])
+	      [have_tunables=yes])
 AC_SUBST(have_tunables)
 if test "$have_tunables" = yes; then
   AC_DEFINE(HAVE_TUNABLES)
@@ -1065,10 +1083,19 @@ AC_CHECK_PROG_VER(AS, $AS, --version,
 		  [GNU assembler.* \([0-9]*\.[0-9.]*\)],
 		  [2.1[0-9][0-9]*|2.2[2-9]*|2.[3-9][0-9]*|[3-9].*|[1-9][0-9]*],
 		  AS=: critic_missing="$critic_missing as")
-AC_CHECK_PROG_VER(LD, $LD, --version,
-		  [GNU ld.* \([0-9][0-9]*\.[0-9.]*\)],
-		  [2.1[0-9][0-9]*|2.2[2-9]*|2.[3-9][0-9]*|[3-9].*|[1-9][0-9]*],
-		  LD=: critic_missing="$critic_missing ld")
+
+if test -n "`$LD --version | sed -n 's/^GNU \(gold\).*$/\1/p'`"; then
+  # Accept gold 1.14 or higher
+  AC_CHECK_PROG_VER(LD, $LD, --version,
+		    [GNU gold.* \([0-9][0-9]*\.[0-9.]*\)],
+		    [1.1[4-9]*|1.[2-9][0-9]*|1.1[0-9][0-9]*|[2-9].*|[1-9][0-9]*],
+		    LD=: critic_missing="$critic_missing GNU gold")
+else
+  AC_CHECK_PROG_VER(LD, $LD, --version,
+		    [GNU ld.* \([0-9][0-9]*\.[0-9.]*\)],
+		    [2.1[0-9][0-9]*|2.2[5-9]*|2.[3-9][0-9]*|[3-9].*|[1-9][0-9]*],
+		    LD=: critic_missing="$critic_missing GNU ld")
+fi
 
 # These programs are version sensitive.
 AC_CHECK_TOOL_PREFIX
@@ -1094,7 +1121,7 @@ AC_CHECK_PROG_VER(AWK, gawk, --version,
 
 AC_CACHE_CHECK([if $CC is sufficient to build libc], libc_cv_compiler_ok, [
 AC_TRY_COMPILE([], [
-#if !defined __GNUC__ || __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
+#if !defined __GNUC__ || __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 9)
 #error insufficient compiler
 #endif],
 	       [libc_cv_compiler_ok=yes],
@@ -1176,13 +1203,16 @@ AC_SUBST(CXX_SYSINCLUDES)
 # copy of those headers in Makerules.
 if test -n "$CXX"; then
   find_cxx_header () {
-    echo "#include <$1>" | $CXX -M -MP -x c++ - | sed -n "/$1:/{s/:\$//;p}"
+    echo "#include <$1>" | $CXX -M -MP -x c++ - 2>/dev/null \
+	 | sed -n "\,$1:,{s/:\$//;p}"
   }
   CXX_CSTDLIB_HEADER="$(find_cxx_header cstdlib)"
   CXX_CMATH_HEADER="$(find_cxx_header cmath)"
+  CXX_BITS_STD_ABS_H="$(find_cxx_header bits/std_abs.h)"
 fi
 AC_SUBST(CXX_CSTDLIB_HEADER)
 AC_SUBST(CXX_CMATH_HEADER)
+AC_SUBST(CXX_BITS_STD_ABS_H)
 
 # Test if LD_LIBRARY_PATH contains the notation for the current directory
 # since this would lead to problems installing/building glibc.
@@ -1390,8 +1420,8 @@ dnl The following test is a bit weak.  We must use a tool which can test
 dnl cross-platform since the gcc used can be a cross compiler.  Without
 dnl introducing new options this is not easily doable.  Instead use a tool
 dnl which always is cross-platform: readelf.  To detect whether -z combreloc
-dnl look for a section named .rel.dyn.
-  if $READELF -S conftest.so | grep '\.rel\(a\|\)\.dyn' > /dev/null; then
+dnl look for a section named .rel.dyn or .rela.dyn.
+  if $READELF -S conftest.so | grep -E '.rela?.dyn' > /dev/null; then
     libc_cv_z_combreloc=yes
   else
     libc_cv_z_combreloc=no
@@ -1586,7 +1616,7 @@ void zero (void *x)
 }
 EOF
 dnl
-if AC_TRY_COMMAND([${CC-cc} -O3 -S conftest.c -o - | fgrep "memset" > /dev/null]);
+if AC_TRY_COMMAND([${CC-cc} -O3 -S conftest.c -o - | grep -F "memset" > /dev/null]);
 then
   libc_cv_gcc_builtin_memset=no
 else
@@ -1606,7 +1636,7 @@ char *foo (const char *a, const char *b)
 }
 EOF
 dnl
-if AC_TRY_COMMAND([${CC-cc} -O3 -S conftest.c -o - | fgrep "my_strstr" > /dev/null]);
+if AC_TRY_COMMAND([${CC-cc} -O3 -S conftest.c -o - | grep -F "my_strstr" > /dev/null]);
 then
   libc_cv_gcc_builtin_redirection=yes
 else
@@ -1747,7 +1777,7 @@ typedef struct {
 extern const Ehdr __ehdr_start __attribute__ ((visibility ("hidden")));
 long ehdr (void) { return __ehdr_start.val; }
 ])],
-	       [if $READELF -r conftest | fgrep __ehdr_start >/dev/null; then
+	       [if $READELF -r conftest | grep -F __ehdr_start >/dev/null; then
 		  libc_cv_ehdr_start=broken
 		else
 		  libc_cv_ehdr_start=yes

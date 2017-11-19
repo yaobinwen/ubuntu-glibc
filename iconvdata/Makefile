@@ -63,6 +63,11 @@ modules	:= ISO8859-1 ISO8859-2 ISO8859-3 ISO8859-4 ISO8859-5		 \
 	   MAC-CENTRALEUROPE KOI8-RU ISO8859-9E				 \
 	   CP770 CP771 CP772 CP773 CP774
 
+# If lazy binding is disabled, use BIND_NOW for the gconv modules.
+ifeq ($(bind-now),yes)
+LDFLAGS.so += -Wl,-z,now
+endif
+
 modules.so := $(addsuffix .so, $(modules))
 
 ifeq (yes,$(build-shared))
@@ -285,7 +290,7 @@ cpp-srcs-left := $(modules) $(generated-modules) $(libJIS-routines) \
 		 $(libKSC-routines) $(libGB-routines) $(libCNS-routines) \
 		 $(libISOIR165-routines) $(libJISX0213-routines)
 lib := iconvdata
-include $(patsubst %,$(..)cppflags-iterator.mk,$(cpp-srcs-left))
+include $(patsubst %,$(..)libof-iterator.mk,$(cpp-srcs-left))
 
 tst-loading-ENV = MALLOC_TRACE=$(objpfx)tst-loading.mtrace
 $(objpfx)mtrace-tst-loading.out: $(objpfx)tst-loading.out
