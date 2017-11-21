@@ -120,6 +120,7 @@ test-xfail-tst-backtrace4 = yes
 test-xfail-tst-backtrace5 = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-cleanupx4 = yes
+test-xfail-tst-create-detached = yes
 test-xfail-tst-makecontext = yes
 test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
@@ -1187,6 +1188,18 @@ test-xfail-XOPEN2K8/netdb.h/conform = yes
 test-xfail-XOPEN2K8/netinet/in.h/conform = yes
 test-xfail-XOPEN2K8/sys/socket.h/conform = yes
 test-xfail-XPG4/sys/socket.h/conform = yes
+
+# Theses failures are due to a bug in the cvt.s.d instruction on some FPU
+# (at least Octeon 3 and XBurst). The tininess detection is done on a
+# before-rounding basis instead of an after-rounding basis.
+test-xfail-test-float = yes
+test-xfail-test-float-finite = yes
+
+# Theses failures are due to a bug in the cvt.d.s instruction on some FPU
+# (at least Octeon 3 and XBurst). The qNaN payload is not preserved in
+# the conversion and a new qNaN is generated.
+test-xfail-tst-strfrom = yes
+test-xfail-tst-strfrom-locale = yes
 endif
 
 
@@ -1204,18 +1217,6 @@ test-xfail-XOPEN2K8/sys/stat.h/conform = yes
 test-xfail-XOPEN2K/sys/stat.h/conform = yes
 test-xfail-XPG3/sys/stat.h/conform = yes
 test-xfail-XPG4/sys/stat.h/conform = yes
-
-# Theses failures are due to a bug in the cvt.s.d instruction on some FPU
-# (at least Octeon 3 and XBurst). The tininess detection is done on a
-# before-rounding basis instead of an after-rounding basis.
-test-xfail-test-float = yes
-test-xfail-test-float-finite = yes
-
-# Theses failures are due to a bug in the cvt.d.s instruction on some FPU
-# (at least Octeon 3 and XBurst). The qNaN payload is not preserved in
-# the conversion and a new qNaN is generated.
-test-xfail-tst-strfrom = yes
-test-xfail-tst-strfrom-locale = yes
 endif
 
 
