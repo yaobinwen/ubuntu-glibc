@@ -114,6 +114,7 @@ test-xfail-tst-backtrace4 = yes
 test-xfail-tst-backtrace5 = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-cleanupx4 = yes
+test-xfail-tst-create-detached = yes
 test-xfail-tst-makecontext = yes
 test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
@@ -327,6 +328,7 @@ test-xfail-tst-env-setuid-tunables = yes
 # new in 2.26
 test-xfail-tst-malloc-usable-static-tunables = yes
 test-xfail-tst-malloc-usable-static = yes
+test-xfail-tst-malloc-tcache-leak = yes
 test-xfail-tst-dynarray-fail-mem = yes
 test-xfail-test-errno = yes
 
@@ -808,6 +810,11 @@ test-xfail-tst-cond16 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-stack4 = yes
 test-xfail-tst-waitid = yes
+
+# These failures are due to a bug in the Loongson 3A FPU
+test-xfail-test-double-lround = yes
+test-xfail-test-double-finite-lround = yes
+test-xfail-test-idouble-lround = yes
 endif
 
 
