@@ -95,9 +95,7 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  __file_chown@Base 2.11
  __file_exec@Base 2.11
  __file_exec_file_name@Base 2.13-33~
- __file_get_children@Base 2.18-5
  __file_get_fs_options@Base 2.11
- __file_get_source@Base 2.18-5
  __file_get_storage_info@Base 2.11
  __file_get_translator@Base 2.11
  __file_get_translator_cntl@Base 2.11
@@ -115,7 +113,9 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  __file_syncfs@Base 2.11
  __file_utimes@Base 2.11
  __fsys_forward@Base 2.11
+ __fsys_get_children@Base 2.25-3
  __fsys_get_options@Base 2.11
+ __fsys_get_source@Base 2.25-3
  __fsys_getfile@Base 2.11
  __fsys_getpriv@Base 2.11
  __fsys_getroot@Base 2.11
@@ -265,6 +265,7 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  __proc_get_arg_locations_request@Base 2.11
  __proc_get_code@Base 2.17-93~
  __proc_get_code_request@Base 2.17-93~
+ __proc_get_entry@Base 2.25-4
  __proc_get_exe@Base 2.24-17
  __proc_get_tty@Base 2.11
  __proc_get_tty_request@Base 2.11
@@ -342,6 +343,7 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  __proc_set_arg_locations_request@Base 2.11
  __proc_set_code@Base 2.17-93~
  __proc_set_code_request@Base 2.17-93~
+ __proc_set_entry@Base 2.25-4
  __proc_set_exe@Base 2.24-17
  __proc_set_init_task@Base 2.17-94~
  __proc_set_init_task_request@Base 2.17-94~
@@ -462,9 +464,7 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  file_chown@Base 2.11
  file_exec@Base 2.11
  file_exec_file_name@Base 2.13-33~
- file_get_children@Base 2.18-5
  file_get_fs_options@Base 2.11
- file_get_source@Base 2.18-5
  file_get_storage_info@Base 2.11
  file_get_translator@Base 2.11
  file_get_translator_cntl@Base 2.11
@@ -482,7 +482,9 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  file_syncfs@Base 2.11
  file_utimes@Base 2.11
  fsys_forward@Base 2.11
+ fsys_get_children@Base 2.25-3
  fsys_get_options@Base 2.11
+ fsys_get_source@Base 2.25-3
  fsys_getfile@Base 2.11
  fsys_getpriv@Base 2.11
  fsys_getroot@Base 2.11
@@ -632,6 +634,7 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  proc_get_arg_locations_request@Base 2.11
  proc_get_code@Base 2.17-93~
  proc_get_code_request@Base 2.17-93~
+ proc_get_entry@Base 2.25-4
  proc_get_exe@Base 2.24-17
  proc_get_tty@Base 2.11
  proc_get_tty_request@Base 2.11
@@ -709,6 +712,7 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  proc_set_arg_locations_request@Base 2.11
  proc_set_code@Base 2.17-93~
  proc_set_code_request@Base 2.17-93~
+ proc_set_entry@Base 2.25-4
  proc_set_exe@Base 2.24-17
  proc_set_init_task@Base 2.17-94~
  proc_set_init_task_request@Base 2.17-94~

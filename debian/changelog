@@ -1,3 +1,30 @@
+glibc (2.26-0experimental2) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/testsuite-xfail-debian.mk: move double-lround XFAILs from mips64el
+    to mipsel.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix malloc returning pointer from tcache_get when it should returns
+      NULL (CVE-2017-17426).  Closes: #883729.
+    - Drop debian/patches/ia64/git-ia64-crash-thread-exit.diff (merged
+      upstream).
+  * debian/control.in/libc: add a Breaks: libperl5.26 (<< 5.26.1-3) to
+    @libc@-dev to handle the xlocale.h removal.  Closes: #883392.
+  * debian/control.in/main: point the Vcs-Git field to the glibc-2.26 branch
+    to shut up tracker.debian.org about missing commits.
+  * debian/testsuite-xfail-debian.mk: x32: remove a bunch of conform issues,
+    add tst-platform-1, as this test has x86-64 specific expectations.
+  * debian/sysdeps/sparc64.mk: don't force -mcpu=ultrasparc as that
+    miscompiles at least pthread_barrier_wait.c. Mark tst-realloc as XFAIL, as
+    there are way to trigger the issue on older libc and/or other
+    architectures.
+  * debian/patches/locale/fix-LC_COLLATE-rules.diff: drop, not useful anymore
+    and has side effects.
+  * debian/patches/localedata/local-hu_HU-sort.diff: removed, the hu_HU
+    collation is now the same than upstream.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 17 Dec 2017 18:44:55 +0100
+
 glibc (2.26-0experimental1) experimental; urgency=medium
 
   [ Samuel Thibault ]
@@ -135,6 +162,90 @@ glibc (2.26-0experimental0) experimental; urgency=medium
     mips64el.
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 19 Nov 2017 12:49:13 +0100
+
+glibc (2.25-5) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * hurd-i386/git-rtld-access.diff: Fix spurious errno update.
+
+  [ Aurelien Jarno ]
+  * debian/rules.d/debhelper.mk: strip all *crt*.o files, unless
+    DEB_BUILD_OPTIONS contains nostrip.  Closes: #884524.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix memory leak in ld.so (CVE-2017-1000408).  Closes: #884132.
+    - Fix buffer overflow in ld.so (CVE-2017-1000409).  Closes: #884133.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 16 Dec 2017 15:37:43 +0100
+
+glibc (2.25-4) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/kfreebsd/local-sysdeps.diff: update to revision 6194 (from
+    glibc-bsd):
+    - Provide TCP_KEEPIDLE in netinet/tcp.h.  Closes: #881185.
+    - Fix FTBFS on kfreebsd-amd64.
+  * debian/control.in/libc: add conflicts with libc0.1-i686 on kfreebsd-i386
+    and libc6-i686 on i386, to make sure the transitional packages are not
+    kept when upgrading from stretch.
+  * debian/patches/any/local-ldso-disable-hwcap.diff: use __access_noerrno
+    instead of __access.  Closes: #877493.
+  * debian/rules, debian/rules.d/debhelper.mk: reverse the logic to build
+    libc6-dbg. Only fill it with files from the main libc and optimized
+    flavours. Other debugging symbols are available in the dbgsym packages.
+    Closes: #520680.
+  * debian/rules.d/build.mk: add /usr/local multi-arch paths to ld.so.conf
+    files.  Closes: #685519, #771934.
+  * debian/patches/any/git-any-ld.so-newline.diff: add missing newline after
+    "cannot allocate TLS data structures for initial thread".  Closes:
+    #776659.
+  * debian/glibc-source.filelist: update with the latest mips* symbol files.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix SysV IPC on IA64.  Closes: #884194.
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/local-no-bootstrap-fs-access.diff: Refresh.
+  * patches/hurd-i386/git-rtld-access.diff: New patch.
+  * patches/hurd-i386/local-msg-nosignal.diff: Remove, now useless.
+  * testsuite-xfail-debian.mk: Update gnu-gnu according to git-updates.diff.
+  * control: Bump hurd-dev build-dep.
+  * libc0.3.symbols.hurd-i386: Update symbols accordingly.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 12 Dec 2017 20:21:48 +0100
+
+glibc (2.25-3) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix assertion failure in posix_spawn().  Closes: #882794.
+    - Fix missing posix_fadvise64 from static mips64el build. Closes:
+      #883186.
+    - Fix buffer overflow in glob with GLOB_TILDE (CVE-2017-15670).  Closes:
+      #879501.
+    - Fix memory leak in glob with GLOB_TILDE (CVE-2017-15671).  Closes:
+      #879500.
+    - Fix a buffer overflow in glob with GLOB_TILDE in unescaping
+      (CVE-2017-15804).  Closes: #879955.
+  * debian/patches/any/local-dlfptr.diff: remove, it's not used anymore by
+    HPPA and causes issues on IA64.  Closes: #882874.
+  * debian/patches/submitted-ldconfig-c-collation.diff: New patch to process
+    include directives in ldconfig using the C/POSIX collation.
+  * debian/patches/ia64/git-ia64-crash-thread-exit.diff: Fix crash on thread
+    exit on IA64.  Closes: #883285.
+  * debian/sysdeps/x32.mk: set the minimum kernel version to 2.6.32 for the
+    libc6-amd64:x32 and libc6-i386:x32 flavours, to match libc6:amd64 and
+    libc6:i386.  Closes: #882255.
+  * debian/sysdeps/linux.mk: note that all builds for a given gnu triplet
+    have the same minimum kernel version.
+
+  [ Samuel Thibault ]
+  * libc0.3.symbols.hurd-i386: Update against newer hurd definitions.
+  * control: Bump dependency accordingly.
+
+  [ Jason Duerstock ]
+  * debian/control.in/libc, debian/control.in/main, debian/rules.d/control.mk:
+    Add support for IA64.  Closes: #883012.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 02 Dec 2017 11:07:17 +0100
 
 glibc (2.25-2) unstable; urgency=medium
 
@@ -304,7 +415,7 @@ glibc (2.25-0experimental1) experimental; urgency=medium
     arguments, causing nptl/tst-rwlock15 to fail on mips and mipsel.
   * debian/control.in/main,debian/compat: switch to debhelper 10.
 
-  [ John David Anglin ]
+  [ John David Anglin ]
   * debian/patches/any/submitted-resolv-unaligned.diff: new patch to fix
     misaligned accesses in res_query.c to fields in HEADER struct (closes:
     #827703).
@@ -1794,7 +1905,7 @@ glibc (2.21-5) unstable; urgency=medium
   [ Aurelien Jarno ]
   * sysdeps/armel.mk, sysdeps/armhf.mk: pass --disable-multi-arch on armel and
     armhf as IFUNC support is broken in binutils (see #807974).
-  
+
  -- Samuel Thibault <sthibault@debian.org>  Tue, 22 Dec 2015 15:23:35 +0100
 
 glibc (2.21-4) unstable; urgency=medium
@@ -1830,7 +1941,7 @@ glibc (2.21-2) unstable; urgency=medium
 
   [ Aurelien Jarno ]
   * debhelper.in/libc.preinst: drop outdated code about pre-2.6 kernels.
-  * rules.d/debhelper.mk: prefix calls to objcopy and strip with 
+  * rules.d/debhelper.mk: prefix calls to objcopy and strip with
     $(DEB_HOST_GNU_TYPE)-.
   * testsuite-checking/expected-results-hppa-linux-gnu-libc: update testsuite
     result, from John David Anglin.  Closes: #806839.
@@ -1844,7 +1955,7 @@ glibc (2.21-2) unstable; urgency=medium
 glibc (2.21-1) unstable; urgency=medium
 
   [ Aurelien Jarno ]
-  * testsuite-checking/expected-results-mips64el-linux-gnu-*: allow 
+  * testsuite-checking/expected-results-mips64el-linux-gnu-*: allow
     nptl/tst-cancel24-static to fail on mips64el.  It's an upstream regression
     only affecting static binaries currently under investigation.
   * patches/hppa/submitted-mathdef.diff: update to include the ABI baseline
@@ -1932,7 +2043,7 @@ glibc (2.21-0experimental3) experimental; urgency=medium
   * patches/hppa/submitted-gmon-start.diff: new patch from upstream to
     fix __gmon_start__ symbol proliferation on hppa.  Closes: #805730.
   * Update from upstream stable branch:
-    - patches/any/cvs-make-typo.diff: Merged. 
+    - patches/any/cvs-make-typo.diff: Merged.
     - Fix FTBFS with libselinux 2.4.
 
   [ Samuel Thibault ]
@@ -2032,7 +2143,7 @@ glibc (2.21-0experimental2) experimental; urgency=medium
     and fix the pulsesink (and others) regression on ARM (closes: #788799)
 
   [ Henrique de Moraes Holschuh ]
-  * Replace patches/amd64/local-blacklist-on-TSX-Haswell.diff by 
+  * Replace patches/amd64/local-blacklist-on-TSX-Haswell.diff by
     local-blacklist-for-Intel-TSX.diff also blacklisting some Broadwell
     models.  Closes: #800574.
 

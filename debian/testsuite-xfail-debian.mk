@@ -324,6 +324,8 @@ test-xfail-tst-vfork3 = yes
 test-xfail-tst-wcstod-round = yes
 test-xfail-tst-env-setuid = yes
 test-xfail-tst-env-setuid-tunables = yes
+test-xfail-tst-glob-tilde = yes
+test-xfail-tst-glob-tilde-mem = yes
 
 # new in 2.26
 test-xfail-tst-malloc-usable-static-tunables = yes
@@ -799,6 +801,11 @@ test-xfail-tst-cond16 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-stack4 = yes
 test-xfail-tst-waitid = yes
+
+# These failures are due to a bug in the Loongson 3A FPU
+test-xfail-test-double-lround = yes
+test-xfail-test-double-finite-lround = yes
+test-xfail-test-idouble-lround = yes
 endif
 
 
@@ -810,11 +817,6 @@ test-xfail-tst-cond16 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-stack4 = yes
 test-xfail-tst-waitid = yes
-
-# These failures are due to a bug in the Loongson 3A FPU
-test-xfail-test-double-lround = yes
-test-xfail-test-double-finite-lround = yes
-test-xfail-test-idouble-lround = yes
 endif
 
 
@@ -994,6 +996,7 @@ test-xfail-XOPEN2K8/setjmp.h/conform = yes
 test-xfail-XPG4/setjmp.h/conform = yes
 test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
+test-xfail-tst-realloc = yes
 test-xfail-tst-waitid = yes
 endif
 
@@ -1002,25 +1005,8 @@ endif
 # x32
 ######################################################################
 ifeq ($(config-machine)-$(config-os),x86_64-linux-gnux32)
-test-xfail-ISO11/time.h/conform = yes
-test-xfail-POSIX2008/mqueue.h/conform = yes
-test-xfail-POSIX2008/sys/select.h/conform = yes
-test-xfail-POSIX2008/sys/stat.h/conform = yes
-test-xfail-POSIX2008/time.h/conform = yes
-test-xfail-POSIX/mqueue.h/conform = yes
-test-xfail-POSIX/sched.h/conform = yes
-test-xfail-POSIX/time.h/conform = yes
-test-xfail-UNIX98/mqueue.h/conform = yes
-test-xfail-UNIX98/sched.h/conform = yes
-test-xfail-UNIX98/time.h/conform = yes
-test-xfail-XOPEN2K8/mqueue.h/conform = yes
-test-xfail-XOPEN2K8/sys/select.h/conform = yes
-test-xfail-XOPEN2K8/sys/stat.h/conform = yes
-test-xfail-XOPEN2K8/time.h/conform = yes
-test-xfail-XOPEN2K/mqueue.h/conform = yes
-test-xfail-XOPEN2K/sys/select.h/conform = yes
-test-xfail-XOPEN2K/time.h/conform = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-mqueue5 = yes
+test-xfail-tst-platform-1 = yes
 test-xfail-tst-waitid = yes
 endif
