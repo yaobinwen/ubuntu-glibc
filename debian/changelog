@@ -1,3 +1,15 @@
+glibc (2.26-1) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/unsubmitted-mount_namespace.diff: New patch to fix build
+    of support/support_enter_mount_namespace.c on hurd-i386.
+
+  [ Aurelien Jarno ]
+  * debian/control.in/main: this upload targets unstable, update Vcs-Git
+    accordingly.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 03 Jan 2018 18:30:46 +0100
+
 glibc (2.26-0experimental3) experimental; urgency=medium
 
   [ Aurelien Jarno ]
