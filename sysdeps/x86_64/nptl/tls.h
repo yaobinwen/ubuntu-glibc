@@ -1,5 +1,5 @@
 /* Definition for thread-local data handling.  nptl/x86_64 version.
-   Copyright (C) 2002-2017 Free Software Foundation, Inc.
+   Copyright (C) 2002-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -56,7 +56,10 @@ typedef struct
 # else
   int __glibc_reserved1;
 # endif
-  int __glibc_unused1;
+  /* Bit 0: IBT.
+     Bit 1: SHSTK.
+   */
+  unsigned int feature_1;
   /* Reservation of some values for the TM ABI.  */
   void *__private_tm[4];
   /* GCC split stack support.  */

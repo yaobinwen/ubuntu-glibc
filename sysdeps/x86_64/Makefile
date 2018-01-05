@@ -52,6 +52,31 @@ $(objpfx)tst-quad2pie: $(objpfx)tst-quadmod2pie.o
 CFLAGS-tst-quad1pie.c = $(PIE-ccflag)
 CFLAGS-tst-quad2pie.c = $(PIE-ccflag)
 
+tests += tst-x86_64-1
+modules-names += x86_64/tst-x86_64mod-1
+LDFLAGS-tst-x86_64mod-1.so = -Wl,-soname,tst-x86_64mod-1.so
+ifneq (no,$(have-tunables))
+# Test the state size for XSAVE when XSAVEC is disabled.
+tst-x86_64-1-ENV = GLIBC_TUNABLES=glibc.tune.hwcaps=-XSAVEC_Usable
+endif
+
+$(objpfx)tst-x86_64-1: $(objpfx)x86_64/tst-x86_64mod-1.so
+
+ifneq (no,$(have-tunables))
+tests += tst-platform-1
+modules-names += tst-platformmod-1 x86_64/tst-platformmod-2
+CFLAGS-tst-platform-1.c = -mno-avx
+CFLAGS-tst-platformmod-1.c = -mno-avx
+CFLAGS-tst-platformmod-2.c = -mno-avx
+LDFLAGS-tst-platformmod-2.so = -Wl,-soname,tst-platformmod-2.so
+$(objpfx)tst-platform-1: $(objpfx)tst-platformmod-1.so
+$(objpfx)tst-platform-1.out: $(objpfx)x86_64/tst-platformmod-2.so
+# Turn off AVX512F_Usable and AVX2_Usable so that GLRO(dl_platform) is
+# always set to x86_64.
+tst-platform-1-ENV = LD_PRELOAD=$(objpfx)\$$PLATFORM/tst-platformmod-2.so \
+	GLIBC_TUNABLES=glibc.tune.hwcaps=-AVX512F_Usable,-AVX2_Usable
+endif
+
 tests += tst-audit3 tst-audit4 tst-audit5 tst-audit6 tst-audit7 \
 	 tst-audit10 tst-sse tst-avx tst-avx512
 test-extras += tst-audit4-aux tst-audit10-aux \
@@ -59,9 +84,11 @@ test-extras += tst-audit4-aux tst-audit10-aux \
 extra-test-objs += tst-audit4-aux.o tst-audit10-aux.o \
 		   tst-avx-aux.o tst-avx512-aux.o
 
+ifeq ($(have-insert),yes)
 tests += tst-split-dynreloc
 LDFLAGS-tst-split-dynreloc = -Wl,-T,$(..)sysdeps/x86_64/tst-split-dynreloc.lds
 tst-split-dynreloc-ENV = LD_BIND_NOW=1
+endif
 
 modules-names += tst-auditmod3a tst-auditmod3b \
 		tst-auditmod4a tst-auditmod4b \
@@ -122,3 +149,19 @@ endif
 ifeq ($(subdir),csu)
 gen-as-const-headers += tlsdesc.sym rtld-offsets.sym
 endif
+
+$(objpfx)x86_64/tst-x86_64mod-1.os: $(objpfx)tst-x86_64mod-1.os
+	$(make-target-directory)
+	rm -f $@
+	ln $< $@
+
+do-tests-clean common-mostlyclean: tst-x86_64-1-clean
+
+.PHONY: tst-x86_64-1-clean
+tst-x86_64-1-clean:
+	-rm -rf $(objpfx)x86_64
+
+$(objpfx)x86_64/tst-platformmod-2.os: $(objpfx)tst-platformmod-2.os
+	$(make-target-directory)
+	rm -f $@
+	ln $< $@

@@ -1,5 +1,5 @@
 /* Convert an IPv6 scope ID from text to the internal representation.
-   Copyright (C) 2016-2017 Free Software Foundation, Inc.
+   Copyright (C) 2016-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 
 /* Parse SOURCE as a scope ID for ADDRESS.  Return 0 on success and -1
    on error.  */
-internal_function int
+int
 __inet6_scopeid_pton (const struct in6_addr *address, const char *scope,
                       uint32_t *result)
 {

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Build many configurations of glibc.
-# Copyright (C) 2016-2017 Free Software Foundation, Inc.
+# Copyright (C) 2016-2018 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 #
 # The GNU C Library is free software; you can redistribute it and/or
@@ -160,7 +160,9 @@ class Context(object):
     def add_all_configs(self):
         """Add all known glibc build configurations."""
         self.add_config(arch='aarch64',
-                        os_name='linux-gnu')
+                        os_name='linux-gnu',
+                        extra_glibcs=[{'variant': 'disable-multi-arch',
+                                       'cfg': ['--disable-multi-arch']}])
         self.add_config(arch='aarch64_be',
                         os_name='linux-gnu')
         self.add_config(arch='alpha',
@@ -174,13 +176,21 @@ class Context(object):
                         variant='be8',
                         gcc_cfg=['--with-arch=armv7-a'])
         self.add_config(arch='arm',
-                        os_name='linux-gnueabihf')
+                        os_name='linux-gnueabihf',
+                        gcc_cfg=['--with-float=hard', '--with-cpu=arm926ej-s'],
+                        extra_glibcs=[{'variant': 'v7a',
+                                       'ccopts': '-march=armv7-a -mfpu=vfpv3'},
+                                      {'variant': 'v7a-disable-multi-arch',
+                                       'ccopts': '-march=armv7-a -mfpu=vfpv3',
+                                       'cfg': ['--disable-multi-arch']}])
         self.add_config(arch='armeb',
-                        os_name='linux-gnueabihf')
+                        os_name='linux-gnueabihf',
+                        gcc_cfg=['--with-float=hard', '--with-cpu=arm926ej-s'])
         self.add_config(arch='armeb',
                         os_name='linux-gnueabihf',
                         variant='be8',
-                        gcc_cfg=['--with-arch=armv7-a'])
+                        gcc_cfg=['--with-float=hard', '--with-arch=armv7-a',
+                                 '--with-fpu=vfpv3'])
         self.add_config(arch='hppa',
                         os_name='linux-gnu')
         self.add_config(arch='ia64',
@@ -211,15 +221,12 @@ class Context(object):
                         os_name='linux-gnu',
                         variant='soft',
                         gcc_cfg=['--with-mips-plt', '--with-float=soft'],
-                        glibcs=[{'variant': 'n32-soft',
-                                 'cfg': ['--without-fp']},
+                        glibcs=[{'variant': 'n32-soft'},
                                 {'variant': 'soft',
                                  'arch': 'mips',
-                                 'ccopts': '-mabi=32',
-                                 'cfg': ['--without-fp']},
+                                 'ccopts': '-mabi=32'},
                                 {'variant': 'n64-soft',
-                                 'ccopts': '-mabi=64',
-                                 'cfg': ['--without-fp']}])
+                                 'ccopts': '-mabi=64'}])
         self.add_config(arch='mips64',
                         os_name='linux-gnu',
                         variant='nan2008',
@@ -239,15 +246,12 @@ class Context(object):
                                  '--with-arch-64=mips64r2',
                                  '--with-arch-32=mips32r2',
                                  '--with-float=soft'],
-                        glibcs=[{'variant': 'n32-nan2008-soft',
-                                 'cfg': ['--without-fp']},
+                        glibcs=[{'variant': 'n32-nan2008-soft'},
                                 {'variant': 'nan2008-soft',
                                  'arch': 'mips',
-                                 'ccopts': '-mabi=32',
-                                 'cfg': ['--without-fp']},
+                                 'ccopts': '-mabi=32'},
                                 {'variant': 'n64-nan2008-soft',
-                                 'ccopts': '-mabi=64',
-                                 'cfg': ['--without-fp']}])
+                                 'ccopts': '-mabi=64'}])
         self.add_config(arch='mips64el',
                         os_name='linux-gnu',
                         gcc_cfg=['--with-mips-plt'],
@@ -260,15 +264,12 @@ class Context(object):
                         os_name='linux-gnu',
                         variant='soft',
                         gcc_cfg=['--with-mips-plt', '--with-float=soft'],
-                        glibcs=[{'variant': 'n32-soft',
-                                 'cfg': ['--without-fp']},
+                        glibcs=[{'variant': 'n32-soft'},
                                 {'variant': 'soft',
                                  'arch': 'mipsel',
-                                 'ccopts': '-mabi=32',
-                                 'cfg': ['--without-fp']},
+                                 'ccopts': '-mabi=32'},
                                 {'variant': 'n64-soft',
-                                 'ccopts': '-mabi=64',
-                                 'cfg': ['--without-fp']}])
+                                 'ccopts': '-mabi=64'}])
         self.add_config(arch='mips64el',
                         os_name='linux-gnu',
                         variant='nan2008',
@@ -288,15 +289,12 @@ class Context(object):
                                  '--with-arch-64=mips64r2',
                                  '--with-arch-32=mips32r2',
                                  '--with-float=soft'],
-                        glibcs=[{'variant': 'n32-nan2008-soft',
-                                 'cfg': ['--without-fp']},
+                        glibcs=[{'variant': 'n32-nan2008-soft'},
                                 {'variant': 'nan2008-soft',
                                  'arch': 'mipsel',
-                                 'ccopts': '-mabi=32',
-                                 'cfg': ['--without-fp']},
+                                 'ccopts': '-mabi=32'},
                                 {'variant': 'n64-nan2008-soft',
-                                 'ccopts': '-mabi=64',
-                                 'cfg': ['--without-fp']}])
+                                 'ccopts': '-mabi=64'}])
         self.add_config(arch='nios2',
                         os_name='linux-gnu')
         self.add_config(arch='powerpc',
@@ -309,8 +307,7 @@ class Context(object):
                         os_name='linux-gnu',
                         variant='soft',
                         gcc_cfg=['--disable-multilib', '--with-float=soft',
-                                 '--enable-secureplt'],
-                        glibcs=[{'variant': 'soft', 'cfg': ['--without-fp']}])
+                                 '--enable-secureplt'])
         self.add_config(arch='powerpc64',
                         os_name='linux-gnu',
                         gcc_cfg=['--disable-multilib', '--enable-secureplt'])
@@ -320,13 +317,11 @@ class Context(object):
         self.add_config(arch='powerpc',
                         os_name='linux-gnuspe',
                         gcc_cfg=['--disable-multilib', '--enable-secureplt',
-                                 '--enable-e500-double'],
-                        glibcs=[{'cfg': ['--without-fp']}])
+                                 '--enable-e500-double'])
         self.add_config(arch='powerpc',
                         os_name='linux-gnuspe',
                         variant='e500v1',
-                        gcc_cfg=['--disable-multilib', '--enable-secureplt'],
-                        glibcs=[{'variant': 'e500v1', 'cfg': ['--without-fp']}])
+                        gcc_cfg=['--disable-multilib', '--enable-secureplt'])
         self.add_config(arch='s390x',
                         os_name='linux-gnu',
                         glibcs=[{},
@@ -342,18 +337,22 @@ class Context(object):
         self.add_config(arch='sh4',
                         os_name='linux-gnu',
                         variant='soft',
-                        gcc_cfg=['--without-fp'],
-                        glibcs=[{'variant': 'soft', 'cfg': ['--without-fp']}])
+                        gcc_cfg=['--without-fp'])
         self.add_config(arch='sh4eb',
                         os_name='linux-gnu',
                         variant='soft',
-                        gcc_cfg=['--without-fp'],
-                        glibcs=[{'variant': 'soft', 'cfg': ['--without-fp']}])
+                        gcc_cfg=['--without-fp'])
         self.add_config(arch='sparc64',
                         os_name='linux-gnu',
                         glibcs=[{},
                                 {'arch': 'sparcv9',
-                                 'ccopts': '-m32 -mlong-double-128'}])
+                                 'ccopts': '-m32 -mlong-double-128'}],
+                        extra_glibcs=[{'variant': 'disable-multi-arch',
+                                       'cfg': ['--disable-multi-arch']},
+                                      {'variant': 'disable-multi-arch',
+                                       'arch': 'sparcv9',
+                                       'ccopts': '-m32 -mlong-double-128',
+                                       'cfg': ['--disable-multi-arch']}])
         self.add_config(arch='tilegx',
                         os_name='linux-gnu',
                         glibcs=[{},
@@ -362,8 +361,6 @@ class Context(object):
                         os_name='linux-gnu',
                         glibcs=[{},
                                 {'variant': '32', 'ccopts': '-m32'}])
-        self.add_config(arch='tilepro',
-                        os_name='linux-gnu')
         self.add_config(arch='x86_64',
                         os_name='linux-gnu',
                         gcc_cfg=['--with-multilib-list=m64,m32,mx32'],
@@ -372,6 +369,15 @@ class Context(object):
                                 {'arch': 'i686', 'ccopts': '-m32 -march=i686'}],
                         extra_glibcs=[{'variant': 'disable-multi-arch',
                                        'cfg': ['--disable-multi-arch']},
+                                      {'variant': 'static-pie',
+                                       'cfg': ['--enable-static-pie']},
+                                      {'variant': 'x32-static-pie',
+                                       'ccopts': '-mx32',
+                                       'cfg': ['--enable-static-pie']},
+                                      {'variant': 'static-pie',
+                                       'arch': 'i686',
+                                       'ccopts': '-m32 -march=i686',
+                                       'cfg': ['--enable-static-pie']},
                                       {'variant': 'disable-multi-arch',
                                        'arch': 'i686',
                                        'ccopts': '-m32 -march=i686',
@@ -686,9 +692,9 @@ class Context(object):
                             'gcc': 'vcs-7',
                             'glibc': 'vcs-mainline',
                             'gmp': '6.1.2',
-                            'linux': '4.12',
+                            'linux': '4.14',
                             'mpc': '1.0.3',
-                            'mpfr': '3.1.5'}
+                            'mpfr': '3.1.6'}
         use_versions = {}
         explicit_versions = {}
         for v in versions:
@@ -1342,7 +1348,6 @@ class Glibc(object):
         cmdlist.create_copy_dir(srcdir, srcdir_copy)
         cfg_cmd = [os.path.join(srcdir_copy, 'configure'),
                    '--prefix=/usr',
-                   '--enable-add-ons',
                    '--enable-profile',
                    '--build=%s' % self.ctx.build_triplet,
                    '--host=%s' % self.triplet,

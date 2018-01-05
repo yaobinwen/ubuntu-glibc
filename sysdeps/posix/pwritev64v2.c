@@ -1,5 +1,5 @@
 /* Generic version of pwritev2.
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,17 +16,18 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
+#include <errno.h>
 #include <unistd.h>
 #include <sys/uio.h>
 
 /* Since we define no flags for pwritev2 just route to pwritev.  */
 ssize_t
-pwritev64v2 (int fd, const struct iovec *vector, int count, OFF_T offset,
+pwritev64v2 (int fd, const struct iovec *vector, int count, off64_t offset,
 	     int flags)
 {
   if (flags != 0)
     {
-      __set_errno (EOPNOTSUPP);
+      __set_errno (ENOTSUP);
       return -1;
     }
 

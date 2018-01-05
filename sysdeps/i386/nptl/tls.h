@@ -1,5 +1,5 @@
 /* Definition for thread-local data handling.  nptl/i386 version.
-   Copyright (C) 2002-2017 Free Software Foundation, Inc.
+   Copyright (C) 2002-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -50,6 +50,10 @@ typedef struct
   void *__private_tm[4];
   /* GCC split stack support.  */
   void *__private_ss;
+  /* Bit 0: IBT.
+     Bit 1: SHSTK.
+   */
+  unsigned int feature_1;
 } tcbhead_t;
 
 # define TLS_MULTIPLE_THREADS_IN_TCB 1

@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2017 Free Software Foundation, Inc.
+# Copyright (C) 1991-2018 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -81,6 +81,10 @@ $(inlines:%=$(objpfx)%.c): $(objpfx)%-inlines.c: %.h
 	 echo '#include "$<"') > $@-new
 	mv -f $@-new $@
 generated += $(inlines:=.c)
+
+# Avoid ssp before TLS is initialized.
+CFLAGS-hurdstartup.o = $(no-stack-protector)
+CFLAGS-RPC_exec_startup_get_info.o = $(no-stack-protector)
 
 include ../mach/Machrules
 include ../Rules

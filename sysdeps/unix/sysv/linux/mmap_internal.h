@@ -1,5 +1,5 @@
 /* Common mmap definition for Linux implementation.
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -27,13 +27,13 @@
 #endif
 
 #if MMAP2_PAGE_UNIT == -1
-static int page_unit;
-
+static uint64_t page_unit;
 # define MMAP_CHECK_PAGE_UNIT()			\
   if (page_unit == 0)				\
     page_unit = __getpagesize ();
+# undef MMAP2_PAGE_UNIT
+# define MMAP2_PAGE_UNIT page_unit
 #else
-# define page_unit MMAP2_PAGE_UNIT
 # define MMAP_CHECK_PAGE_UNIT()
 #endif
 

@@ -697,9 +697,9 @@ ldouble: 1
 
 Function: Real part of "clog10_downward":
 double: 5
-float: 4
+float: 5
 idouble: 5
-ifloat: 4
+ifloat: 5
 
 Function: Imaginary part of "clog10_downward":
 double: 3
@@ -1497,28 +1497,6 @@ ifloat: 2
 
 Function: "pow":
 float: 1
-ifloat: 1
-
-Function: "pow10":
-double: 2
-idouble: 2
-
-Function: "pow10_downward":
-double: 2
-float: 1
-idouble: 2
-ifloat: 1
-
-Function: "pow10_towardzero":
-double: 2
-float: 1
-idouble: 2
-ifloat: 1
-
-Function: "pow10_upward":
-double: 2
-float: 1
-idouble: 2
 ifloat: 1
 
 Function: "pow_downward":

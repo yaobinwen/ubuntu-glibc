@@ -1,6 +1,6 @@
 /* x86 CPU feature tuning.
    This file is part of the GNU C Library.
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017-2018 Free Software Foundation, Inc.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -164,6 +164,7 @@ TUNABLE_CALLBACK (set_hwcaps) (tunable_val_t *valp)
 	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, CX8, 3);
 	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, FMA, 3);
 	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, HTT, 3);
+	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, IBT, 3);
 	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, RTM, 3);
 	    }
 	  break;
@@ -186,6 +187,7 @@ TUNABLE_CALLBACK (set_hwcaps) (tunable_val_t *valp)
 	    {
 	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, LZCNT, 5);
 	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, MOVBE, 5);
+	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, SHSTK, 5);
 	      CHECK_GLIBC_IFUNC_CPU_OFF (n, cpu_features, SSSE3, 5);
 	    }
 	  break;
@@ -239,6 +241,16 @@ TUNABLE_CALLBACK (set_hwcaps) (tunable_val_t *valp)
 	  CHECK_GLIBC_IFUNC_ARCH_NEED_CPU_BOTH (n, cpu_features,
 						Slow_SSE4_2, SSE4_2,
 						disable, 11);
+	  break;
+	case 13:
+	  if (disable)
+	    {
+	      /* Update xsave_state_size to XSAVE state size.  */
+	      cpu_features->xsave_state_size
+		= cpu_features->xsave_state_full_size;
+	      CHECK_GLIBC_IFUNC_ARCH_OFF (n, cpu_features,
+					  XSAVEC_Usable, 13);
+	    }
 	  break;
 	case 14:
 	  if (disable)
@@ -301,18 +313,18 @@ TUNABLE_CALLBACK (set_hwcaps) (tunable_val_t *valp)
 		 disable, 23);
 	    }
 	  break;
+	case 24:
+	    {
+	      CHECK_GLIBC_IFUNC_ARCH_NEED_ARCH_BOTH
+		(n, cpu_features, MathVec_Prefer_No_AVX512,
+		 AVX512F_Usable, disable, 24);
+	    }
+	  break;
 	case 26:
 	    {
 	      CHECK_GLIBC_IFUNC_ARCH_NEED_CPU_BOTH
 		(n, cpu_features, Prefer_PMINUB_for_stringop, SSE2,
 		 disable, 26);
-	    }
-	  break;
-	case 27:
-	    {
-	      CHECK_GLIBC_IFUNC_ARCH_BOTH (n, cpu_features,
-					   Use_dl_runtime_resolve_slow,
-					   disable, 27);
 	    }
 	  break;
 	}

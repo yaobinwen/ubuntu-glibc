@@ -1,5 +1,5 @@
 /* getifaddrs -- get names and addresses of all network interfaces
-   Copyright (C) 2003-2017 Free Software Foundation, Inc.
+   Copyright (C) 2003-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -286,7 +286,6 @@ __netlink_open (struct netlink_handle *h)
    Since we get at first all RTM_NEWLINK entries, it can never happen
    that a RTM_NEWADDR index is not known to this map.  */
 static int
-internal_function
 map_newlink (int index, struct ifaddrs_storage *ifas, int *map, int max)
 {
   int i;
@@ -834,6 +833,7 @@ __getifaddrs (struct ifaddrs **ifap)
   return res;
 }
 weak_alias (__getifaddrs, getifaddrs)
+libc_hidden_def (__getifaddrs)
 libc_hidden_weak (getifaddrs)
 
 
@@ -843,4 +843,5 @@ __freeifaddrs (struct ifaddrs *ifa)
   free (ifa);
 }
 weak_alias (__freeifaddrs, freeifaddrs)
+libc_hidden_def (__freeifaddrs)
 libc_hidden_weak (freeifaddrs)

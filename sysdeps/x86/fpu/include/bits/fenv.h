@@ -1,5 +1,5 @@
 /* Wrapper for x86 bits/fenv.h for use when building glibc.
-   Copyright (C) 1997-2017 Free Software Foundation, Inc.
+   Copyright (C) 1997-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 #ifndef _BITS_FENV_H
 
 #if defined _LIBC && defined __USE_EXTERN_INLINES
-# if defined SHARED && IS_IN (libm)
+# if defined SHARED && !defined NO_HIDDEN && IS_IN (libm)
 extern int __REDIRECT_NTH (__feraiseexcept_renamed, (int), __GI_feraiseexcept);
 # else
 extern int __REDIRECT_NTH (__feraiseexcept_renamed, (int), feraiseexcept);

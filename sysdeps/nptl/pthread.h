@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2017 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -27,6 +27,7 @@
 #include <bits/setjmp.h>
 #include <bits/wordsize.h>
 #include <bits/types/struct_timespec.h>
+#include <bits/types/__cancel_jmp_buf_tag.h>
 
 
 /* Detach state.  */
@@ -83,7 +84,7 @@ enum
 #endif
 
 
-#ifdef __PTHREAD_MUTEX_HAVE_PREV
+#if __PTHREAD_MUTEX_HAVE_PREV
 # define PTHREAD_MUTEX_INITIALIZER \
   { { 0, 0, 0, 0, 0, __PTHREAD_SPINS, { 0, 0 } } }
 # ifdef __USE_GNU
@@ -523,11 +524,7 @@ extern void pthread_testcancel (void);
 
 typedef struct
 {
-  struct
-  {
-    __jmp_buf __cancel_jmp_buf;
-    int __mask_was_saved;
-  } __cancel_jmp_buf[1];
+  struct __cancel_jmp_buf_tag __cancel_jmp_buf[1];
   void *__pad[4];
 } __pthread_unwind_buf_t __attribute__ ((__aligned__));
 

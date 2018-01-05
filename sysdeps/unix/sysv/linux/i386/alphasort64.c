@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2017 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -30,7 +30,7 @@ versioned_symbol (libc, __alphasort64, alphasort64, GLIBC_2_2);
 
 #if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2)
 
-#include <sysdeps/unix/sysv/linux/i386/olddirent.h>
+#include <olddirent.h>
 
 int
 __old_alphasort64 (const struct __old_dirent64 **a,
