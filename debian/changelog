@@ -1,3 +1,34 @@
+glibc (2.26.9000+20180108.401311cf-0experimental0) experimental; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/sysdeps/hurd.mk: Do not add libpthread add-on since add-ons
+    mechanism is no more.
+  * debian/patches/hurd-i386/submitted-net.diff: rebased.
+  * debian/patches/hurd-i386/unsubmitted-prof-eintr.diff: rebased.
+  * debian/patches/hurd-i386/libpthread_build.diff: Add more Implies to fix
+    build.  Drop deprecated internal_function.
+  * debian/patches/hurd-i386/libpthread_includes.diff: Move headers for
+    sysdeps to find them.
+  * debian/patches/hurd-i386/tg-gsync-libc.diff: Update.
+  * debian/testsuite-xfail-debian.mk: Update for hurd-i386.
+
+  [ Aurelien Jarno ]
+  * New upstream snapshot from 20180108.
+  * debian/control.in/main: Update Vcs-Git to point to the 2.27 branch.
+  * debian/testsuite-xfail-debian.mk: update XFAILs for the mips*el Loongson 3
+    FPU bug with the new tests.
+  * debian/testsuite-xfail-debian.mk: the arm kernel also pulled the new pkey
+    syscalls without real support, XFAIL the corresponding test.
+  * debian/testsuite-xfail-debian.mk: remove two math XFAIL on armel now that
+    GCC has been fixed.
+  * debian/testsuite-xfail-debian.mk: update XFAILs for the mips* Octeon 3 FPU
+    bug with the new tests.
+  * debian/testsuite-xfail-debian.mk: update XFAILs on alpha, add new math
+    tests only causing wrong exception flags, remove tests that have been
+    fixed in this release.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 08 Jan 2018 23:27:20 +0100
+
 glibc (2.26.9000+20180105.a6d0afb5-0experimental0) experimental; urgency=medium
 
   * New upstream snapshot from 20180105:
