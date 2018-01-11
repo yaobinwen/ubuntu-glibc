@@ -1,3 +1,25 @@
+glibc (2.26-3) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/testsuite-xfail-debian.mk: the Loongson 3 FPU bug also applies
+    to mips64el.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix memchr pointer overflow on ia64.  Closes: #886840.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/submitted-malloc-setstate.diff: Disable for now, it
+    actually introduces issues.
+  * debian/patches/hurd-i386/submitted-exec_filename.diff: Update submitted
+    patch into committed git-exec_filename.diff.
+  * debian/patches/hurd-i386/local-exec_filename.diff: New patch to keep
+    compatibility with previous submission.
+  * debian/patches/hurd-i386/tg-io_select_timeout.diff: Refresh.
+  * debian/control: Bump hurd-dev build-dependency to get exec_paths RPC
+    definitions.
+  * debian/libc0.3.symbols.hurd-i386: Update accordingly.
+
+ -- Samuel Thibault <sthibault@debian.org>  Thu, 11 Jan 2018 23:12:24 +0100
+
 glibc (2.26-2) unstable; urgency=medium
 
   [ Samuel Thibault ]
