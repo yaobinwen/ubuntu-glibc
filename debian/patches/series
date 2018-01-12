@@ -220,3 +220,11 @@ ubuntu/localedata/lv_LV-currency.diff
 ubuntu/localedata/pt_BR-d_fmt.diff
 ubuntu/localedata/sd_PK.diff
 ubuntu/localedata/ug_CN@latin.diff
+
+any/cvs-make-getcwd-fail-if-path-is-no-absolute.diff
+any/cvs-compute-correct-array-size-in-_dl_init_paths.diff
+any/cvs-count-components-of-expanded-path-in-_dl_init_paths.diff
+any/cvs-fix-one-byte-glob-overflow.diff
+any/cvs-fix-glob-buffer-overflow.diff
+any/cvs-elf-check-for-empty-tokens.diff
+any/cvs-fix-integer-overflow-in-malloc.diff
