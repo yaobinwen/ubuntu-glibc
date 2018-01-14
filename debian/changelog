@@ -1,3 +1,32 @@
+glibc (2.23-0ubuntu10) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: Memory leak in dynamic loader (ld.so)
+    - debian/patches/any/cvs-compute-correct-array-size-in-_dl_init_paths.diff:
+      Compute correct array size in _dl_init_paths
+    - CVE-2017-1000408
+  * SECURITY UPDATE: Buffer overflow in dynamic loader (ld.so)
+    - debian/patches/any/cvs-count-components-of-expanded-path-in-_dl_init_paths.diff:
+      Count components of the expanded path in _dl_init_path
+    - CVE-2017-1000409
+  * SECURITY UPDATE: One-byte overflow in glob
+    - debian/patches/any/cvs-fix-one-byte-glob-overflow.diff: Fix one-byte
+      overflow in glob
+    - CVE-2017-15670
+  * SECURITY UPDATE: Buffer overflow in glob
+    - debian/patches/any/cvs-fix-glob-buffer-overflow.diff: Fix buffer overflow
+      during GLOB_TILDE unescaping
+    - CVE-2017-15804
+  * SECURITY UPDATE: Local privilege escalation via mishandled RPATH / RUNPATH
+    - debian/patches/any/cvs-elf-check-for-empty-tokens.diff: elf: Check for
+      empty tokens before dynamic string token expansion
+    - CVE-2017-16997
+  * SECURITY UPDATE: Buffer underflow in realpath()
+    - debian/patches/any/cvs-make-getcwd-fail-if-path-is-no-absolute.diff:
+      Make getcwd(3) fail if it cannot obtain an absolute path
+    - CVE-2018-1000001
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Sun, 14 Jan 2018 20:06:26 +0000
+
 glibc (2.23-0ubuntu9) xenial-security; urgency=medium
 
   * SECURITY UPDATE: LD_LIBRARY_PATH stack corruption

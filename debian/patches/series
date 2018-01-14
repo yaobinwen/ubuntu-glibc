@@ -244,3 +244,9 @@ any/CVE-2017-1000366.patch
 any/upstream-harden-rtld-Reject-overly-long-LD_PRELOAD.patch
 any/cvs-harden-glibc-malloc-metadata.patch
 any/cvs-harden-ignore-LD_HWCAP_MASK.patch
+any/cvs-compute-correct-array-size-in-_dl_init_paths.diff
+any/cvs-count-components-of-expanded-path-in-_dl_init_paths.diff
+any/cvs-fix-one-byte-glob-overflow.diff
+any/cvs-fix-glob-buffer-overflow.diff
+any/cvs-elf-check-for-empty-tokens.diff
+any/cvs-make-getcwd-fail-if-path-is-no-absolute.diff
