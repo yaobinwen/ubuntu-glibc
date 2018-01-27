@@ -1,3 +1,526 @@
+2018-01-27  James Clarke  <jrtc27@jrtc27.com>
+
+	* sysdeps/hppa/fpu/libm-test-ulps: Update.
+
+	* sysdeps/alpha/fpu/libm-test-ulps: Update.
+
+2018-01-26  Andreas Schwab  <schwab@linux-m68k.org>
+
+	[BZ #22701]
+	* nis/Makefile (libnsl-inhibit-o) [$(build-obsolete-nsl) != yes]:
+	Build only shared objects.
+
+2018-01-26  Carlos O'Donell  <carlos@redhat.com>
+
+	* README: Update for hppa.
+
+2018-01-26  Patrick McGehearty  <patrick.mcgehearty@oracle.com>
+
+	* sysdeps/sparc/fpu/libm-test-ulps: Update
+	cpow, ctan, ctanh, j0, j1, y0, yn ulps.
+
+2018-01-26  Carlos O'Donell  <carlos@redhat.com>
+
+	Revert:
+
+	2017-12-19  H.J. Lu  <hongjiu.lu@intel.com>
+
+	[BZ #22563]
+	* sysdeps/i386/nptl/tcb-offsets.sym (FEATURE_1_OFFSET): New.
+	* sysdeps/i386/nptl/tls.h (tcbhead_t): Add feature_1.
+	* sysdeps/x86_64/nptl/tcb-offsets.sym (FEATURE_1_OFFSET): New.
+	* sysdeps/x86_64/nptl/tls.h (tcbhead_t): Rename __glibc_unused1
+	to feature_1.
+
+	2017-12-19  H.J. Lu  <hongjiu.lu@intel.com>
+
+	[BZ #22563]
+	* bits/types/__cancel_jmp_buf_tag.h: New file.
+	* sysdeps/unix/sysv/linux/x86/bits/types/__cancel_jmp_buf_tag.h
+	* sysdeps/unix/sysv/linux/x86/pthreaddef.h: Likewise.
+	* sysdeps/unix/sysv/linux/x86/nptl/pthreadP.h: Likewise.
+	* nptl/Makefile (headers): Add
+	bits/types/__cancel_jmp_buf_tag.h.
+	* nptl/descr.h [NEED_SAVED_MASK_IN_CANCEL_JMP_BUF]
+	(pthread_unwind_buf): Add saved_mask to cancel_jmp_buf.
+	* sysdeps/nptl/pthread.h: Include
+	<bits/types/__cancel_jmp_buf_tag.h>.
+	(__pthread_unwind_buf_t): Use struct __cancel_jmp_buf_tag with
+	__cancel_jmp_buf.
+	* sysdeps/unix/sysv/linux/hppa/pthread.h: Likewise.
+
+2018-01-25  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* localedata/locales/uk_UA (mon): Renamed to...
+	(alt_mon): This.
+	(alt_digits): "0" removed and then renamed to...
+	(mon): This.
+	(date_fmt): Definition changed not to use the alternative
+	digits hack.
+
+2018-01-25  Palmer Dabbelt  <palmer@sifive.com>
+
+	* elf/cache.c (print_entry): Add FLAG_RISCV_FLOAT_ABI_SOFT and
+	FLAG_RISCV_FLOAT_ABI_DOUBLE.
+	* elf/elf.h (EF_RISCV_RVC): New define.
+	(EF_RISCV_FLOAT_ABI): Likewise.
+	(EF_RISCV_FLOAT_ABI_SOFT): Likewise.
+	(EF_RISCV_FLOAT_ABI_SINGLE): Likewise.
+	(EF_RISCV_FLOAT_ABI_DOUBLE): Likewise.
+	(EF_RISCV_FLOAT_ABI_QUAD): Likewise.
+	* sysdeps/generic/ldconfig.h (FLAG_RISCV_FLOAT_ABI_SOFT): New
+	define.
+	(FLAG_RISCV_FLOAT_ABI_DOUBLE): Likewise.
+
+2018-01-25  Andreas Schwab  <schwab@suse.de>
+
+	* aclocal.m4 (LIBC_SLIBDIR_RTLDDIR): Consistently put arguments in
+	single quotes.
+	* sysdeps/gnu/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/aarch64/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/mips/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/powerpc/powerpc64/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/s390/s390-64/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/sparc/sparc64/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/tile/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/x86_64/64/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/x86_64/x32/configure: Regenerate.
+
+2018-01-25  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+	* scripts/build-many-glibcs.py (checkout_vcs): Add hurd repository
+	URL, and run autoconf, make it the default for now.
+
+2018-01-24  Joseph Myers  <joseph@codesourcery.com>
+
+	* scripts/build-many-glibcs.py (Context.add_all_configs): Add
+	soft-float ColdFire configuration.
+
+	* sysdeps/unix/sysv/linux/m68k/localplt.data: Move to ....
+	* sysdeps/unix/sysv/linux/m68k/m680x0/localplt.data: ... here.
+	* sysdeps/unix/sysv/linux/m68k/coldfire/localplt.data: New file.
+
+	* sysdeps/m68k/coldfire/nofpu/math_private.h: New file.  Based on
+	MicroBlaze file.
+
+	* sysdeps/unix/sysv/linux/m68k/coldfire/jmp_buf-macros.h: Move to
+	....
+	* sysdeps/unix/sysv/linux/m68k/coldfire/fpu/jmp_buf-macros.h:
+	... here.
+	* sysdeps/unix/sysv/linux/m68k/coldfire/nofpu/jmp_buf-macros.h:
+	New file.
+
+	* sysdeps/unix/sysv/linux/m68k/jmp_buf-macros.h: Move to ....
+	* sysdeps/unix/sysv/linux/m68k/m680x0/jmp_buf-macros.h: ... here.
+	* sysdeps/unix/sysv/linux/m68k/coldfire/jmp_buf-macros.h: New
+	file.
+
+2018-01-24  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	[BZ #22742]
+	* sysdeps/unix/sysv/linux/aarch64/sys/ucontext.h (__glibc_reserved1):
+	Rename to __reserved and add comment.
+	* sysdeps/unix/sysv/linux/aarch64/ucontext_i.sym (__glibc_reserved1):
+	Rename to __reserved.
+
+2018-01-24  Joseph Myers  <joseph@codesourcery.com>
+
+	* scripts/build-many-glibcs.py (Context.add_all_configs): Add
+	i686-gnu configurations.
+	(Context.run_builds): Include mig, gnumach and hurd in components
+	considered.
+	(Context.checkout): Add mig, gnumach and hurd to components.
+	(Context.checkout_tar): Add URL mappings for mig, gnumach and
+	hurd.
+	(Context.bot_cycle): Check for changes to mig, gnumach and hurd.
+	(Config.build): Install gnumach headers, build mig and install
+	hurd headers for 'gnu' OS.
+	(Config.install_gnumach_headers): New function.
+	(Config.install_hurd_headers): Likewise.
+	(Glibc.build_glibc): Do not use /usr for 'gnu' OS.  Specifiy MIG
+	when building for 'gnu' OS.
+
+2018-01-23  Tobias Klauser  <tklauser@distanz.ch>
+
+	* manual/tunables.texi (Hardware Capability Tunables): Fix
+	spelling.
+
+2018-01-22  Rical Jasan  <ricaljasan@pacific.net>
+
+	* manual/locale.texi (ALTMON_1, ALTMON_2, ALTMON_3, ALTMON_4)
+	(ALTMON_5, ALTMON_6, ALTMON_7, ALTMON_8, ALTMON_9, ALTMON_10)
+	(ALTMON_11, ALTMON_12): Improve documentation.
+	* manual/time.texi (strftime): Likewise.
+
+2018-01-22  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* localedata/locales/pl_PL: Alternative month names added,
+	primary month names are genitive now.
+	* time/tst-strptime.c (day_tests): Actually use a genitive case
+	of a month name in Polish language.
+
+2018-01-22  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* manual/locale.texi: Document ALTMON_1..12 constants for
+	nl_langinfo.  Specify when to use ALTMON instead of MON.
+	* manual/time.texi (strftime, strptime): Document GNU extension
+	permitting O modifier with %B and %b.  Specify when to use
+	%OB instead of %B.
+
+2018-01-22  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* locale/C-time.c (_nl_C_LC_TIME): Add abbreviated alternative month
+	names, define them as the same as abbreviated month names explicitly.
+	* locale/categories.def (LC_TIME): Add ab_alt_mon and wide-ab_alt_mon.
+	* locale/langinfo.h: (_NL_ABALTMON_1, _NL_ABALTMON_2, _NL_ABALTMON_3,
+	_NL_ABALTMON_4, _NL_ABALTMON_5, _NL_ABALTMON_6, _NL_ABALTMON_7,
+	_NL_ABALTMON_8, _NL_ABALTMON_9, _NL_ABALTMON_10, _NL_ABALTMON_11,
+	_NL_ABALTMON_12, _NL_WABALTMON_1, _NL_WABALTMON_2, _NL_WABALTMON_3,
+	_NL_WABALTMON_4, _NL_WABALTMON_5, _NL_WABALTMON_6, _NL_WABALTMON_7,
+	_NL_WABALTMON_8, _NL_WABALTMON_9, _NL_WABALTMON_10, _NL_WABALTMON_11,
+	_NL_WABALTMON_12): New enum constants.
+	* locale/programs/ld-time.c (struct locale_time_t): Add ab_alt_mon,
+	wab_alt_mon, and ab_alt_mon_defined members.
+	(time_output): Output ab_alt_mon and wab_alt_mon members.
+	(time_read): Read them, initialize them as copies of abmon and wabmon
+	respectively if they are missing, initialize ab_alt_mon_defined.
+	* locale/programs/locfile-kw.gperf (ab_alt_mon): Define.
+	* locale/programs/locfile-kw.h: Regenerate.
+	* locale/programs/locfile-token.h (tok_ab_alt_mon): New enum constant.
+	* time/Makefile [$(run-built-tests) = yes] (LOCALES): Add es_ES.UTF-8
+	and ru_RU.UTF-8.
+	* time/strftime_l.c (a_altmonth, aam_len): New macros.
+	[!COMPILE_WIDE] (ABALTMON_1): New macro.
+	(__strftime_internal): Handle %Ob and %Oh formats.
+	* time/strptime_l.c [_LIBC] (ab_alt_month_name): New macro.
+	(__strptime_internal): Handle %Ob and %Oh formats.
+	* time/tst-strptime.c (day_tests): Add more tests to parse different
+	forms of month names including the new %Ob format specifier.
+
+2018-01-22  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* locale/C-time.c (_nl_C_LC_TIME): Add alternative month names,
+	define them as the same as primary full month names explicitly.
+	* locale/categories.def (LC_TIME): Add alt_mon and wide-alt_mon.
+	* locale/langinfo.h (__ALTMON_1, __ALTMON_2, __ALTMON_3, __ALTMON_4,
+	__ALTMON_5, __ALTMON_6, __ALTMON_7, __ALTMON_8, __ALTMON_9, __ALTMON_10,
+	__ALTMON_11, __ALTMON_12, _NL_WALTMON_1, _NL_WALTMON_2, _NL_WALTMON_3,
+	_NL_WALTMON_4, _NL_WALTMON_5, _NL_WALTMON_6, _NL_WALTMON_7,
+	_NL_WALTMON_8, _NL_WALTMON_9, _NL_WALTMON_10, _NL_WALTMON_11,
+	_NL_WALTMON_12): New enum constants.
+	[__USE_GNU] (ALTMON_1, ALTMON_2, ALTMON_3, ALTMON_4, ALTMON_5, ALTMON_6,
+	ALTMON_7, ALTMON_8, ALTMON_9, ALTMON_10, ALTMON_11, ALTMON_12): New
+	macros.
+	* locale/programs/ld-time.c (struct locale_time_t): Add alt_mon,
+	walt_mon, and alt_mon_defined members.
+	(time_output): Output alt_mon and walt_mon members.
+	(time_read): Read them, initialize them as copies of mon and wmon
+	respectively if they are missing, initialize alt_mon_defined.
+	* locale/programs/locfile-kw.gperf (alt_mon): Define.
+	* locale/programs/locfile-kw.h: Regenerate.
+	* locale/programs/locfile-token.h (tok_alt_mon): New enum constant.
+	* localedata/tst-langinfo.c (map): Add tests for the new constants
+	ALTMON_1 .. ALTMON_12.
+	* time/Makefile [$(run-built-tests) = yes] (LOCALES): Add fr_FR.UTF-8
+	and pl_PL.UTF-8.
+	* time/strftime_l.c (f_altmonth): New macro.
+	(__strftime_internal): Handle %OB format.
+	* time/strptime_l.c [_LIBC] (alt_month_name): New macro.
+	(__strptime_internal): Handle %OB format.
+	* time/tst-strptime.c (day_tests): Add tests to parse different forms
+	of month names including the new %OB format specifier.
+
+2018-01-19  Tulio Magno Quites Machado Filho  <tuliom@linux.vnet.ibm.com>
+
+	[BZ #22685]
+	* sysdeps/powerpc/powerpc32/sysdep.h (ABORT_TRANSACTION_IMPL): Renamed
+	from ABORT_TRANSACTION.
+	(ABORT_TRANSACTION): Redirect to ABORT_TRANSACTION_IMPL.
+	* sysdeps/powerpc/powerpc64/sysdep.h (ABORT_TRANSACTION,
+	ABORT_TRANSACTION_IMPL): Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/not-errno.h: New file.  Reuse
+	Linux code, but remove the code that aborts transactions.
+
+2018-01-19  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+	* sysdeps/generic/netinet/if_ether.h: Include <stdint.h>.
+
+2018-01-19  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	* localedata/locales/gu_IN (LC_IDENTIFICATION): Fix an obvious typo
+	in date: "2004-14-09" should be "2004-09-14".
+	* localedata/locales/lo_LA: Fix an obvious typo in date in the header:
+	"2003-15-09" should be "2003-09-15".
+
+2018-01-18  Arjun Shankar  <arjun@redhat.com>
+
+	[BZ #22343]
+	* malloc/malloc.c (checked_request2size): call REQUEST_OUT_OF_RANGE
+	after padding.
+	(_int_memalign): check for integer overflow before calling
+	_int_malloc.
+	* malloc/tst-malloc-too-large.c: New test.
+	* malloc/Makefile: Add tst-malloc-too-large.
+
+2018-01-18  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	* localedata/locales/bho_NP (LC_IDENTIFICATION): Fix an obvious typo
+	in date: "2017-24-07" should be "2017-07-24".
+	* localedata/locales/mai_IN: Likewise.
+	* localedata/locales/mai_NP: Likewise.
+
+2018-01-17  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* po/ru.po: Update translations.
+
+2018-01-17  Joseph Myers  <joseph@codesourcery.com>
+
+	[BZ #22719]
+	* sysdeps/hppa/backtrace.c: New file.
+
+2018-01-17  H.J. Lu  <hongjiu.lu@intel.com>
+
+	[BZ #22715]
+	* sysdeps/x86_64/dl-trampoline.h (_dl_runtime_profile): Properly
+	align La_x86_64_retval to VEC_SIZE.
+
+2018-01-16  Joseph Myers  <joseph@codesourcery.com>
+
+	* sysdeps/x86_64/backtrace.c: Include <gnu/lib-names.h>.
+	(init): Use LIBGCC_S_SO not hardcoded "libgcc_s.so.1".
+
+2018-01-16  Florian Weimer  <fweimer@redhat.com>
+
+	* nptl/Makefile [$(have-cxx-thread_local)] (tests-unsupported):
+	Move tst-thread-exit-clobber ...
+	[$(CXX)] (tests-unsupported): ... to here.
+
+2018-01-16  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* sysdeps/unix/sysv/linux/aarch64/bits/hwcap.h (HWCAP_SHA3): Define.
+	(HWCAP_SM3, HWCAP_SM4, HWCAP_ASIMDDP, HWCAP_SHA512, HWCAP_SVE): Define.
+	* sysdeps/unix/sysv/linux/aarch64/dl-procinfo.c
+	(_dl_aarch64_cap_flags): Update.
+	(_DL_HWCAP_COUNT): Update.
+
+2018-01-16  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* sysdeps/unix/sysv/linux/aarch64/dl-procinfo.h
+	(_DL_HWCAP_LAST): Remove.
+	(_DL_HWCAP_COUNT): Move to ...
+	* sysdeps/unix/sysv/linux/aarch64/dl-procinfo.c
+	(_DL_HWCAP_COUNT): ... here.
+
+2018-01-16  Florian Weimer  <fweimer@redhat.com>
+
+	* nptl/Makefile (CFLAGS-tst-minstack-throw.o): Compile in C++11
+	mode with GNU extensions.
+
+2018-01-15  Alan Hayward  <alan.hayward@arm.com>
+
+	* elf/elf.h (NT_ARM_SVE): Define.
+
+2018-01-15  Florian Weimer  <fweimer@redhat.com>
+
+	[BZ #22636]
+	* nptl/tst-minstack-throw.cc: New file.
+	* nptl/Makefile (tests): Add tst-minstack-throw.
+	(LDLIBS-tst-minstack-throw): Link with libstdc++.
+	[!CXX] (tests-unsupported): Add tst-minstack-throw.
+
+2018-01-15  Joseph Myers  <joseph@codesourcery.com>
+
+	* scripts/build-many-glibcs.py (Context.checkout): Default
+	binutils version to 2.30 branch, MPFR version to 4.0.0 and MPC
+	version to 1.1.0.
+
+2018-01-13  Carlos O'Donell  <carlos@redhat.com>
+
+	[BZ #22707]
+	* elf/elf.h (DF_1_STUB): Define.
+	(DF_1_PIE): Define.
+
+2018-01-12  Tulio Magno Quites Machado Filho  <tuliom@linux.vnet.ibm.com>
+
+	[BZ #22697]
+	* sysdeps/powerpc/powerpc32/power4/fpu/s_llround.S (__llround):
+	Do not add 0.5 to integer or out-of-range arguments.
+
+2018-01-12  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* po/bg.po: Update translations.
+	* po/cs.po: Likewise.
+	* po/de.po: Likewise.
+	* po/ko.po: Likewise.
+	* po/pl.po: Likewise.
+	* po/sv.po: Likewise.
+	* po/uk.po: Likewise.
+	* po/vi.po: Likewise.
+
+2018-01-12  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* aarch64/start.S (_start): Use __wrap_main.
+	(__wrap_main): New local symbol.
+
+2018-01-12  Dmitry V. Levin  <ldv@altlinux.org>
+
+	[BZ #22679]
+	CVE-2018-1000001
+	* sysdeps/unix/sysv/linux/getcwd.c (__getcwd): Fall back to
+	generic_getcwd if the path returned by getcwd syscall is not absolute.
+	* io/tst-getcwd-abspath.c: New test.
+	* io/Makefile (tests): Add tst-getcwd-abspath.
+
+2018-01-12  Istvan Kurucsai  <pistukem@gmail.com>
+
+	* malloc/malloc.c (malloc_consolidate): Add size check.
+
+2018-01-12  Florian Weimer  <fweimer@redhat.com>
+
+	* support/write_message.c (write_message): Preserve errno.
+	* support/check.c (print_failure): Likewise.
+	* support/support_test_verify_impl.c (support_test_verify_impl):
+	Likewise.
+	* support/support_test_compare_failure.c
+	(support_test_compare_failure): Likewise.
+
+2018-01-12  Florian Weimer  <fweimer@redhat.com>
+
+	[BZ #22701]
+	* nis/Makefile (install-lib-ldscripts, $(inst_libdir)/libnsl.so):
+	Prevent installation of libnsl.so.
+	(libnsl-inhibit-o): Do not build (or install) static libraries.
+
+2018-01-12  Egmont Koblinger  <egmont@gmail.com>
+
+	[BZ #22657]
+	* localedata/locales/hu_HU (d_t_fmt): Avoid a leading space
+	before the day number which may produce a double space.
+	(date_fmt): Likewise.
+
+2018-01-12  Joseph Myers  <joseph@codesourcery.com>
+
+	* sysdeps/s390/fpu/feholdexcpt.c (__feholdexcept): Call __fegetenv
+	instead of fegetenv.
+
+2018-01-11  Joseph Myers  <joseph@codesourcery.com>
+
+	[BZ #22702]
+	* sysdeps/generic/math_private.h (libc_feresetround_noex): Update
+	comment to say exceptions are discarded.
+	(libc_feholdsetround_noex_ctx): Use __feholdexcept instead of
+	__fegetenv.
+	(SET_RESTORE_ROUND_NOEX): Update comment to say non-stop mode must
+	be enabled.
+
+2018-01-11  Florian Weimer  <fweimer@redhat.com>
+
+	* sysdeps/gnu/unwind-resume.c (__libgcc_s_init): Update comment
+	and error message.
+
+2018-01-11  Florian Weimer  <fweimer@redhat.com>
+
+	[BZ #22636]
+	* nptl/Makefile (tests): Add tst-minstack-cancel, tst-minstack-exit.
+	* nptl/tst-minstack-cancel.c, nptl/tst-minstack-exit.c: New files.
+
+2018-01-10  Joseph Myers  <joseph@codesourcery.com>
+
+	[BZ #22693]
+	* sysdeps/ieee754/ldbl-128ibm/s_log1pl.c (__log1pl): Handle
+	negative arguments in test for NaN or infinity argument.
+
+2018-01-10  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* po/libc.pot: Regenerate.
+
+2018-01-10  Florian Weimer  <fweimer@redhat.com>
+
+	[BZ #22636]
+	* sysdeps/nptl/unwind-forcedunwind.c (pthread_cancel_init): Open
+	libgcc.so with RTLD_NOW, to avoid lazy binding during unwind.
+
+2018-01-10  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+	* hurd/hurd/fd.h: Include <fcntl.h>
+	(__hurd_at_flags): New function.
+	* hurd/lookup-at.c (__file_name_lookup_at): Replace flag computation
+	with call to __hurd_at_flags.
+	* include/unistd.h (__faccessat, __faccessat_noerrno): Add declaration.
+	* sysdeps/mach/hurd/access.c (access_common): Move implementation to
+	__faccessat
+	(hurd_fail_seterrno, hurd_fail_noerrno): Move to sysdeps/mach/hurd/faccessat.c.
+	(__access_noerrno): Use __faccessat_common instead of access_common.
+	(__access): Likewise.
+	* sysdeps/mach/hurd/euidaccess.c (__euidaccess): Replace implementation
+	with a call to __faccessat.
+	* sysdeps/mach/hurd/faccessat.c (faccessat): Rename into...
+	(__faccessat_common): ... this. Move implementation of __access into it when
+	AT_FLAGS does not contain AT_EACCESS. Make it call __hurd_at_flags, add
+	reauthenticate_cwdir_at helper to implement AT mechanism.
+	(__faccessat_noerrno): New function, just calls __faccessat_common.
+	(__faccessat): New function, just calls __faccessat_common.
+	(faccessat): Define weak alias.
+
+2018-01-10  Joseph Myers  <joseph@codesourcery.com>
+
+	[BZ #22691]
+	* sysdeps/powerpc/nofpu/Makefile [$(subdir) = math]
+	(CFLAGS-s_fmaxmagl.c): New variable.
+	[$(subdir) = math] (CFLAGS-s_fminmagl.c: Likewise.
+
+	[BZ #22690]
+	* sysdeps/ieee754/ldbl-128ibm/s_lrintl.c (__lrintl): Use unsigned
+	long int for arguments of possibly overflowing addition or
+	subtraction.
+	* sysdeps/ieee754/ldbl-128ibm/s_lroundl.c (__lroundl): Likewise.
+
+2018-01-09  Joseph Myers  <joseph@codesourcery.com>
+
+	[BZ #22688]
+	* sysdeps/powerpc/nofpu/Makefile [$(subdir) = math]
+	(CFLAGS-e_remainderl.c): New variable.
+
+	[BZ #22687]
+	* sysdeps/powerpc/nofpu/Makefile (CFLAGS-s_cacosl.c): New
+	variable.
+	(CFLAGS-s_cacoshl.c): Likewise.
+	(CFLAGS-s_casinhl.c): Likewise.
+	(CFLAGS-s_catanl.c): Likewise.
+	(CFLAGS-s_catanhl.c): Likewise.
+	(CFLAGS-s_cexpl.c): Likewise.
+	(CFLAGS-s_ccoshl.c): Add -fsignaling-nans.
+	(CFLAGS-s_csinhl.c): Likewise.
+	(CFLAGS-s_clogl.c): Likewise.
+	(CFLAGS-s_clog10l.c): Likewise.
+	(CFLAGS-s_csinl.c): Likewise.
+	(CFLAGS-s_csqrtl.c): Likewise.
+
+2010-08-04  Emilio Pozuelo Monfort  <pochu27@gmail.com>
+2017-09-26  Svante Signell  <svante.signell@gmail.com>
+
+	* hurd/hurdexec.c (_hurd_exec): Deprecate function.
+	(_hurd_exec_paths): New function.
+	* hurd/hurd.h (_hurd_exec): Deprecate function.
+	(_hurd_exec_paths): Declare function.
+	* hurd/Versions: Export _hurd_exec_paths.
+	* sysdeps/mach/hurd/execve.c: Include <stdlib.h> and <stdio.h>
+	(__execve): Use __getcwd to build absolute path, and use
+	_hurd_exec_paths instead of _hurd_exec.
+	* sysdeps/mach/hurd/spawni.c: Likewise.
+	* sysdeps/mach/hurd/fexecve.c: Use _hurd_exec_paths instead of
+	_hurd_exec.
+
+2018-01-08  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* sysdeps/unix/sysv/linux/tst-ttyname.c (do_in_chroot_1): Skip the
+	test instead of failing in case of ENOENT returned by posix_openpt.
+
 2018-01-08  Florian Weimer  <fweimer@redhat.com>
 
 	resolv: Support binary labels in test framework.
@@ -11525,6 +12048,7 @@
 
 2017-09-01  Florian Weimer  <fweimer@redhat.com>
 
+	[BZ #20532]
 	* sysdeps/posix/getaddrinfo.c (gaih_inet): Make reporting of NSS
 	function lookup failures more reliable.
 

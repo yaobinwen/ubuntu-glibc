@@ -11,12 +11,13 @@ Major new features:
 
 * The GNU C Library can now be compiled with support for building static
   PIE executables (See --enable-static-pie in INSTALL).  These static PIE
-  exectuables are like static executables but can be loaded at any address
+  executables are like static executables but can be loaded at any address
   and provide additional security hardening benefits at the cost of some
   memory and performance.  When the library is built with --enable-static-pie
   the resulting libc.a is usable with GCC 8 and above to create static PIE
   executables using the GCC option '-static-pie'.  This feature is currently
-  supported on i386, x86_64, x32 and aarch64.
+  supported on i386, x86_64 and x32 with binutils 2.29 or later, and on
+  aarch64 with binutils 2.30 or later.
 
 * Optimized x86-64 asin, atan2, exp, expf, log, pow, atan, sin, cosf,
   sinf, sincosf and tan with FMA, contributed by Arjan van de Ven and
@@ -69,7 +70,46 @@ Major new features:
   collation ordering.  Previous glibc versions used locale-specific
   ordering, the change might break systems that relied on that.
 
+* Support for two grammatical forms of month names has been added.
+  In a call to strftime, the "%B" and "%b" format specifiers will now
+  produce the grammatical form required when the month is used as part
+  of a complete date.  New "%OB" and "%Ob" specifiers produce the form
+  required when the month is named by itself.  For instance, in Greek
+  and in many Slavic and Baltic languages, "%B" will produce the month
+  in genitive case, and "%OB" will produce the month in nominative case.
+
+  In a call to strptime, "%B", "%b", "%h", "%OB", "%Ob", and "%Oh"
+  are all valid and will all accept any known form of month
+  name---standalone or complete, abbreviated or full.  In a call to
+  nl_langinfo, the query constants MON_1..12 and ABMON_1..12 return
+  the strings used by "%B" and "%b", respectively.  New query
+  constants ALTMON_1..12 and _NL_ABALTMON_1..12 return the strings
+  used by "%OB" and "%Ob", respectively.
+
+  In a locale definition file, use "alt_mon" and "ab_alt_mon" to
+  define the strings for %OB and %Ob, respectively; these have the
+  same syntax as "mon" and "ab_mon".
+
+  This feature is currently a GNU extension, but it is expected to
+  be added to the next revision of POSIX, and it is also already
+  available on some BSD-derived operating systems.
+
+  This feature will cause existing statically compiled applications
+  to fail to load locales and fall back to the builtin C/POSIX locales.
+  See notes below for other changes affecting compatibility.
+
 Deprecated and removed features, and other changes affecting compatibility:
+
+* Statically compiled applications attempting to load locales compiled for the
+  GNU C Library version 2.27 will fail and fall back to the builtin C/POSIX
+  locale.  The reason for this is that the addition of the new "%OB" and "%Ob",
+  support for two grammatical forms of the month names, also extends the locale
+  data binary format.  Static applications needing locale support must be
+  recompiled to match the runtime and data they are deployed with. In some
+  distributions there is an upgrade window where dynamically linked applications
+  may use a new library but the old locale data and also fall back to the
+  builtin C/POSIX locales; restarting the application process is sufficient to
+  fix this.
 
 * Support for statically linked applications which call dlopen is deprecated
   and will be removed in a future version of glibc.  Applications which call
@@ -198,6 +238,10 @@ Security related changes:
   CVE-2017-16997: Incorrect handling of RPATH or RUNPATH containing $ORIGIN
   for AT_SECURE or SUID binaries could be used to load libraries from the
   current directory.
+
+  CVE-2018-1000001: Buffer underflow in realpath function when getcwd function
+  succeeds without returning an absolute path due to unexpected behaviour
+  of the Linux kernel getcwd syscall.  Reported by halfdog.
 
 The following bugs are resolved with this release:
 
