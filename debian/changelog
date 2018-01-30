@@ -1,3 +1,15 @@
+glibc (2.26-0ubuntu4) bionic; urgency=medium
+
+  * Merge from glibc-2.26-6:
+    - debian/patches/git-updates.diff: update from upstream stable branch:
+      - Fix build with binutils 2.30 on arm64.  Closes: #888477.
+    - debian/testsuite-xfail-debian.mk: Update with changes from Debian.
+  * Revert the previous upload, all applied upstream.
+  * Stop applying the local-libgcc-compat-{abilists,main,ports} patches.
+  * Build using GCC 7.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 30 Jan 2018 16:58:16 +0100
+
 glibc (2.26-0ubuntu3) bionic; urgency=medium
 
   * SECURITY UPDATE: Memory leak in dynamic loader (ld.so)

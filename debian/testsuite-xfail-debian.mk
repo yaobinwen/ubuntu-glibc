@@ -116,6 +116,7 @@ test-xfail-tst-backtrace4 = yes
 test-xfail-tst-backtrace5 = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-cleanupx4 = yes
+test-xfail-tst-create-detached = yes
 test-xfail-tst-makecontext = yes
 test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
@@ -732,6 +733,32 @@ test-xfail-tst-env-setuid-tunables = yes
 test-xfail-test-ildouble = yes
 test-xfail-test-ldouble = yes
 test-xfail-test-ldouble-finite = yes
+
+# new in 2.26
+test-xfail-tst-malloc-usable-static-tunables = yes
+test-xfail-tst-malloc-usable-static = yes
+test-xfail-tst-malloc-tcache-leak = yes
+test-xfail-tst-dynarray-fail-mem = yes
+test-xfail-test-errno = yes
+
+test-xfail-UNIX98/arpa/inet.h/conform = yes
+test-xfail-UNIX98/netdb.h/conform = yes
+test-xfail-UNIX98/netinet/in.h/conform = yes
+test-xfail-POSIX2008/arpa/inet.h/conform = yes
+test-xfail-POSIX2008/netdb.h/conform = yes
+test-xfail-POSIX2008/netinet/in.h/conform = yes
+test-xfail-XPG42/arpa/inet.h/conform = yes
+test-xfail-XPG42/fcntl.h/conform = yes
+test-xfail-XPG42/netdb.h/conform = yes
+test-xfail-XPG42/netinet/in.h/conform = yes
+test-xfail-XPG42/sys/ipc.h/conform = yes
+test-xfail-XPG42/sys/msg.h/conform = yes
+test-xfail-XPG42/sys/resource.h/conform = yes
+test-xfail-XPG42/sys/shm.h/conform = yes
+test-xfail-XPG42/sys/stat.h/conform = yes
+test-xfail-XPG42/sys/statvfs.h/conform = yes
+test-xfail-XPG42/sys/un.h/conform = yes
+test-xfail-XPG42/termios.h/conform = yes
 endif
 
 
@@ -1227,6 +1254,11 @@ test-xfail-tst-cond16 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-stack4 = yes
 test-xfail-tst-waitid = yes
+
+# These failures are due to a bug in the Loongson 3A FPU
+test-xfail-test-double-lround = yes
+test-xfail-test-double-finite-lround = yes
+test-xfail-test-idouble-lround = yes
 endif
 
 
