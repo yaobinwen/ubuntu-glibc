@@ -1,3 +1,49 @@
+glibc (2.27-0experimental0) experimental; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-abilist.diff: Add ABI list.
+  * debian/patches/hurd-i386/cvs-libpthread.abilist.diff: Add libpthread ABI
+  list.
+  * debian/patches/hurd-i386/libpthread_version.diff: Add compatibility ABI
+  list.
+  * debian/patches/hurd-i386/local-exec_filename.diff: Add compatibility ABI
+  list.
+  * debian/patches/hurd-i386/local-hurdsig-global-dispositions-version.diff:
+  Add additional ABI list.
+  * debian/patches/hurd-i386/local-mach_print.diff: Add local ABI list.
+  * debian/patches/hurd-i386/local-usr.diff: Fix local ABI list.
+  * debian/patches/hurd-i386/tg-gsync-libc.diff: Update ABI list.
+  * debian/patches/hurd-i386/tg-extern_inline.diff: Update ABI list.
+  * debian/patches/hurd-i386/local-versions.diff: Remove, merged upstream.
+  * debian/testsuite-xfail-debian.mk: Remove ABI list blacklist.
+
+  [ Aurelien Jarno ]
+  * New upstream version:
+    - debian/control: regenerate.
+    - debian/symbols.wildcards: update for 2.27.
+    - debian/patches/hurd-i386/tg-tls-threadvar.diff: refreshed.
+    - debian/patches/hurd-i386/tg-tlsdesc.sym.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-no-hp-timing.diff: upstreamed.
+    - debian/patches/hurd-i386/local-hurdsig-global-dispositions-version.diff:
+      refreshed.
+    - debian/patches/hurd-i386/unsubmitted-gnumach.defs.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-sigstate_thread_reference.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-allocalim.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-extern_inline.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-gsync-libc.diff: upstreamed.
+    - debian/patches/hurd-i386/tg2.26-sigsetops.h.diff: upstreamed.
+    - debian/patches/hurd-i386/submitted-net.diff: refreshed.
+    - debian/patches/hurd-i386/local-clock_gettime_MONOTONIC.diff: refreshed.
+    - debian/patches/hurd-i386/tg-fcntl-internal.h.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-pagesize.diff: refreshed.
+  * debian/rules: tweak GCC garbage collector on 32-bit MIPS builders.
+  * debian/rules.d/tarball.mk: do a local bare clone before using git archive
+    as it doesn't support https.
+  * debian/control.in/main, debian/sysdeps/{amd64,i386,x32}.mk: enable support
+    for building static PIE.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 03 Feb 2018 16:31:03 +0100
+
 glibc (2.26.9000+20180127.7e23a7dd-0experimental0) experimental; urgency=medium
 
   [ Samuel Thibault ]

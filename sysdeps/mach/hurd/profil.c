@@ -138,6 +138,8 @@ __profil (u_short *sample_buffer, size_t size, size_t offset, u_int scale)
 }
 weak_alias (__profil, profil)
 
+static volatile error_t special_profil_failure;
+
 /* Fetch PC samples.  This function must be very careful not to depend
    on Hurd threadvar variables.  We arrange that by using a special
    stub arranged for at the end of this file. */
@@ -154,14 +156,13 @@ fetch_samples (void)
 				     pc_samples, &nsamples);
   if (err)
     {
-      static error_t special_profil_failure;
-      static volatile int a, b, c;
+      static volatile int a, b;
 
       special_profil_failure = err;
       a = 1;
       b = 0;
       while (1)
-	c = a / b;
+	a = a / b;
     }
 
   for (i = 0; i < nsamples; ++i)

@@ -1,3 +1,453 @@
+2018-02-01  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* version.h (RELEASE): Set to "stable".
+	(VERSION): Set to "2.27".
+	* include/features.h (__GLIBC_MINOR__): Set to 2.27.
+
+	* NEWS: Add the list of bugs fixed in 2.27.
+
+2018-02-01  Adhemerval Zanella  <adhemerval.zanella@linaro.org>
+
+	* stdlib/test-atexit-race-common.c (do_test): Check stack size
+	against PTHREAD_STACK_MIN.
+
+2018-02-01  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* manual/contrib.texi (Palmer Dabbelt, Arjun Shankar, Florian Weimer):
+	New entries.
+	(Rafal Luzynski, Andreas Schwab): Update.
+
+2018-02-01  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* NEWS: List the languages which actually use the alternative
+	months feature in this release.  Also explain that "alt_mon" and
+	"ab_alt_mon" are optional.
+
+2018-01-31  Il'ya Malakhov  <ilmalakhov@yandex.ru>
+
+	[BZ #22765]
+	* crypt/badsalttest.c (do_test): Set cd.initialized to 0.
+
+2018-01-31  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* manual/install.texi (Tools for Compilation): Update the newest
+	versions of gcc, binutils, texinfo, gawk, bison, and sed.
+	* INSTALL: Regenerated.
+
+2018-01-30  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+	* sysdeps/pthread/allocalim.h (__libc_use_alloca): Use __glibc_likely
+	instead of __builtin_expect.
+
+2018-01-30  Florian Weimer  <fweimer@redhat.com>
+
+	* nss/bug17079.c (do_test): Use nss_files only for reading passwd
+	data.
+	* nss/tst-nss-getpwent.c (do_test): Likewise.
+
+2018-01-30  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* localedata/locales/hr_HR (mon): Rename to...
+	(alt_mon): This.
+	(mon): Import from CLDR (genitive case).
+	(d_t_fmt): Update the comment.
+
+2018-01-29  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* sysdeps/posix/fpathconf.c (__fpathconf): Verify the values of
+	_POSIX_CHOWN_RESTRICTED, _POSIX_NO_TRUNC, _POSIX_VDISABLE.
+	* sysdeps/posix/pathconf.c (__pathconf): Likewise.
+
+2018-01-29  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+	* mach/Versions: Fix version when __mach_host_self_ was added.
+	* hurd/Versions: Fix version when _hurd_exec_paths was added.
+	* sysdeps/mach/hurd/i386/ld.abilist: New file.
+	* sysdeps/mach/hurd/i386/libBrokenLocale.abilist: New file.
+	* sysdeps/mach/hurd/i386/libanl.abilist: New file.
+	* sysdeps/mach/hurd/i386/libc.abilist: New file.
+	* sysdeps/mach/hurd/i386/libcrypt.abilist: New file.
+	* sysdeps/mach/hurd/i386/libdl.abilist: New file.
+	* sysdeps/mach/hurd/i386/libm.abilist: New file.
+	* sysdeps/mach/hurd/i386/libnsl.abilist: New file.
+	* sysdeps/mach/hurd/i386/libresolv.abilist: New file.
+	* sysdeps/mach/hurd/i386/librt.abilist: New file.
+	* sysdeps/mach/hurd/i386/libutil.abilist: New file.
+	* sysdeps/pthread/allocalim.h (__libc_use_alloca): Commute operands of
+	|| to respect codestyle.
+	* libio/tst-memstream3.c (_FWRITE): Rename to FWRITE_FUNC.
+	(do_test_bz20181): Rename accordingly.
+	* malloc/malloc.c: Include <assert.h>.
+	(assert): Do not define.
+	[!defined NDEBUG] (__assert_fail): Define to __malloc_assert.
+	* bits/fcntl.h: Fix comment for FREAD and FWRITE.
+	* sysdeps/mach/hurd/bits/fcntl.h: Likewise.
+	* sysdeps/mach/hurd/hp-timing.h: New file.
+	* sysdeps/mach/hurd/i386/tlsdesc.sym: New file.
+
+2018-01-29  Darius Rad  <darius@bluespec.com>
+
+	* sysdeps/unix/sysv/linux/riscv/ipc_priv.h: New file.
+
+2018-01-29  Palmer Dabbelt  <palmer@sifive.com>
+
+	* sysdeps/init_array/crti.S (.section .init_array): Add
+	PREINIT_FUNCTION when defined.
+	* manual/math.texi: RISC-V supports _Float128 and _Float64x.
+	* config.h.in: Regenerate.
+	* manual/platform.texi: Add RISC-V documenation for
+	__riscv_flush_icache.
+	* sysdeps/riscv/__longjmp.S: New file.
+	* sysdeps/riscv/backtrace.c: Likewise.
+	* sysdeps/riscv/bits/endian.h: Likewise.
+	* sysdeps/riscv/bits/setjmp.h: Likewise.
+	* sysdeps/riscv/bits/wordsize.h: Likewise.
+	* sysdeps/riscv/bsd-_setjmp.c: Likewise.
+	* sysdeps/riscv/bsd-setjmp.c: Likewise.
+	* sysdeps/riscv/dl-trampoline.S: Likewise.
+	* sysdeps/riscv/gccframe.h: Likewise.
+	* sysdeps/riscv/jmpbuf-offsets.h: Likewise.
+	* sysdeps/riscv/jmpbuf-unwind.h: Likewise.
+	* sysdeps/riscv/machine-gmon.h: Likewise.
+	* sysdeps/riscv/memusage.h: Likewise.
+	* sysdeps/riscv/setjmp.S: Likewise.
+	* sysdeps/riscv/sys/asm.h: Likewise.
+	* sysdeps/riscv/tls-macros.h: Likewise.
+	* sysdeps/riscv/dl-tls.h: New file.
+	* sysdeps/riscv/libc-tls.c: Likewise.
+	* sysdeps/riscv/nptl/tcb-offsets.sym: Likewise.
+	* sysdeps/riscv/nptl/tls.h: Likewise.
+	* sysdeps/riscv/stackinfo.h: Likewise.
+	* sysdeps/riscv/bits/fenv.h: New file.
+	* sysdeps/riscv/e_sqrtl.c: Likewise.
+	* sysdeps/riscv/fpu_control.h: Likewise.
+	* sysdeps/riscv/math-tests.h: Likewise.
+	* sysdeps/riscv/nofpu/Implies: Likewise.
+	* sysdeps/riscv/sfp-machine.h: Likewise.
+	* sysdeps/riscv/tininess.h: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_ceil.c: New file.
+	* sysdeps/riscv/rv64/rvd/s_floor.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_llrint.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_llround.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_lrint.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_lround.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_nearbyint.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_rint.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_round.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_roundeven.c: Likewise.
+	* sysdeps/riscv/rv64/rvd/s_trunc.c: Likewise.
+	* sysdeps/riscv/rv64/rvf/s_llrintf.c: Likewise.
+	* sysdeps/riscv/rv64/rvf/s_llroundf.c: Likewise.
+	* sysdeps/riscv/rv64/rvf/s_lrintf.c: Likewise.
+	* sysdeps/riscv/rv64/rvf/s_lroundf.c: Likewise.
+	* sysdeps/riscv/rvd/e_sqrt.c: Likewise.
+	* sysdeps/riscv/rvd/s_copysign.c: Likewise.
+	* sysdeps/riscv/rvd/s_finite.c: Likewise.
+	* sysdeps/riscv/rvd/s_fma.c: Likewise.
+	* sysdeps/riscv/rvd/s_fmax.c: Likewise.
+	* sysdeps/riscv/rvd/s_fmin.c: Likewise.
+	* sysdeps/riscv/rvd/s_fpclassify.c: Likewise.
+	* sysdeps/riscv/rvd/s_isinf.c: Likewise.
+	* sysdeps/riscv/rvd/s_isnan.c: Likewise.
+	* sysdeps/riscv/rvd/s_issignaling.c: Likewise.
+	* sysdeps/riscv/rvf/e_sqrtf.c: Likewise.
+	* sysdeps/riscv/rvf/fclrexcpt.c: Likewise.
+	* sysdeps/riscv/rvf/fegetenv.c: Likewise.
+	* sysdeps/riscv/rvf/fegetmode.c: Likewise.
+	* sysdeps/riscv/rvf/fegetround.c: Likewise.
+	* sysdeps/riscv/rvf/feholdexcpt.c: Likewise.
+	* sysdeps/riscv/rvf/fesetenv.c: Likewise.
+	* sysdeps/riscv/rvf/fesetexcept.c: Likewise.
+	* sysdeps/riscv/rvf/fesetmode.c: Likewise.
+	* sysdeps/riscv/rvf/fesetround.c: Likewise.
+	* sysdeps/riscv/rvf/feupdateenv.c: Likewise.
+	* sysdeps/riscv/rvf/fgetexcptflg.c: Likewise.
+	* sysdeps/riscv/rvf/fraiseexcpt.c: Likewise.
+	* sysdeps/riscv/rvf/fsetexcptflg.c: Likewise.
+	* sysdeps/riscv/rvf/ftestexcept.c: Likewise.
+	* sysdeps/riscv/rvf/get-rounding-mode.h: Likewise.
+	* sysdeps/riscv/rvf/math_private.h: Likewise.
+	* sysdeps/riscv/rvf/s_ceilf.c: Likewise.
+	* sysdeps/riscv/rvf/s_copysignf.c: Likewise.
+	* sysdeps/riscv/rvf/s_finitef.c: Likewise.
+	* sysdeps/riscv/rvf/s_floorf.c: Likewise.
+	* sysdeps/riscv/rvf/s_fmaf.c: Likewise.
+	* sysdeps/riscv/rvf/s_fmaxf.c: Likewise.
+	* sysdeps/riscv/rvf/s_fminf.c: Likewise.
+	* sysdeps/riscv/rvf/s_fpclassifyf.c: Likewise.
+	* sysdeps/riscv/rvf/s_isinff.c: Likewise.
+	* sysdeps/riscv/rvf/s_isnanf.c: Likewise.
+	* sysdeps/riscv/rvf/s_issignalingf.c: Likewise.
+	* sysdeps/riscv/rvf/s_nearbyintf.c: Likewise.
+	* sysdeps/riscv/rvf/s_rintf.c: Likewise.
+	* sysdeps/riscv/rvf/s_roundevenf.c: Likewise.
+	* sysdeps/riscv/rvf/s_roundf.c: Likewise.
+	* sysdeps/riscv/rvf/s_truncf.c: Likewise.
+	* sysdeps/riscv/nptl/bits/pthreadtypes-arch.h: New file.
+	* sysdeps/riscv/nptl/bits/semaphore.h: Likewise.
+	* sysdeps/riscv/nptl/libc-lowlevellock.c: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/atomic-machine.h: Likewise.
+	* sysdeps/riscv/nptl/nptl-sysdep.S: New file.
+	* sysdeps/unix/sysv/linux/riscv/arch-fork.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/clone.S: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/profil-counter.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/pt-vfork.S: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/syscall.c: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/sysdep.S: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/sysdep.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/vfork.S: Likewise.
+	* sysdeps/riscv/nptl/pthread-offsets.h: New file.
+	* sysdeps/riscv/nptl/pthreaddef.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/bits/fcntl.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/bits/mman.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/bits/sigcontext.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/dl-cache.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/flush-icache.c: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/getcontext.S: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/init-first.c: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/libc-vdso.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/makecontext.c: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/readelflib.c: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/register-dump.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/setcontext.S: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/sigcontextinfo.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/swapcontext.S: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/sys/cachectl.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/sys/procfs.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/sys/ucontext.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/sys/user.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/ucontext-macros.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/ucontext_i.sym: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/dl-static.c: New file.
+	* sysdeps/unix/sysv/linux/riscv/ldconfig.h: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/ldsodefs.h: Likewise.
+	* sysdeps/riscv/nofpu/libm-test-ulps: New file.
+	* sysdeps/riscv/nofpu/libm-test-ulps-name: Likewise.
+	* sysdeps/riscv/rv64/rvd/libm-test-ulps: Likewise.
+	* sysdeps/riscv/rv64/rvd/libm-test-ulps-name: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/localplt.data: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/c++-types.data: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/libanl.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/libdl.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/libm.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/libnsl.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/librt.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/libutil.abilist: Likewise.
+	* sysdeps/riscv/Implies: New file.
+	* sysdeps/riscv/Makefile: Likewise.
+	* sysdeps/riscv/configure: Likewise.
+	* sysdeps/riscv/configure.ac: Likewise.
+	* sysdeps/riscv/nptl/Makefile: Likewise.
+	* sysdeps/riscv/preconfigure: Likewise.
+	* sysdeps/riscv/rv64/Implies-after: Likewise.
+	* sysdeps/riscv/rv64/rvd/Implies: Likewise.
+	* sysdeps/riscv/rv64/rvf/Implies: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/Implies: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/Makefile: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/Versions: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/configure: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/configure.ac: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/ldd-rewrite.sed: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/Implies: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/Makefile: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/shlib-versions: Likewise.
+	* scripts/build-many-glibcs.py (Context): Add RISC-V targets.
+	(Config): Likewise.
+
+2018-01-29  Florian Weimer  <fweimer@redhat.com>
+
+	[BZ #22701]
+	* include/rpcsvc/nislib.h (__nis_default_ttl): Add
+	libnsl_hidden_proto.
+	* include/rpcsvc/yp.h (yp_xdrall): Declare with
+	libnsl_hidden_proto.
+	* include/rpcsvc/ypclnt.h (yp_maplist): Likewise.
+	* nis/Makefile (libnsl-routines): Add nss-default only for
+	build-obsolete-nsl.
+	* nis/nis_defaults.c (__nis_default_ttl): Add
+	libnsl_hidden_nolink_def.
+	* nis/rpcsvc/ypclnt.h (yp_maplist): Remove #ifdef'ed-out
+	declaration.
+	* nis/yp_xdr.c (xdr_ypall): Add libnsl_hidden_nolink_def.
+	* nis/ypclnt.c (yp_maplist): Likewise.
+
+2018-01-29  Romain Naour  <romain.naour@gmail.com>  (tiny change)
+
+	* sysdeps/unix/sysv/linux/microblaze/kernel-features.h
+	(__ASSUME_COPY_FILE_RANGE) [__LINUX_KERNEL_VERSION < 0x040A00]: Undef.
+
+2018-01-29  Joseph Myers  <joseph@codesourcery.com>
+
+	* scripts/build-many-glibcs.py (Context.git_checkout): Use git
+	clean -dxfq for git updates when replacing sources.
+
+	* scripts/build-many-glibcs.py (Config.build_gcc): Use
+	--disable-libcilkrts unconditionally, not just for the final GCC
+	build for Hurd.
+
+	* scripts/build-many-glibcs.py (Context.checkout): Default Linux
+	version to 4.15.
+
+2018-01-29  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* localedata/locales/lt_LT (alt_mon): Import from CLDR (nominative
+	case).
+
+2018-01-29  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* localedata/locales/be_BY (mon): Rename to...
+	(alt_mon): This, then synchronize with CLDR (nominative case).
+	(abmon): Rename to...
+	(ab_alt_mon): This, then synchronize with CLDR (nominative case).
+	(mon): Import from CLDR (genitive case).
+	(abmon): Likewise.
+	* localedata/locales/be_BY@latin (mon): Rename to...
+	(alt_mon): This.
+	(mon): Add, proper genitive forms provided by Viktar Siarheichyk.
+
+	* localedata/locales/be_BY@latin (lang_name): Reworded to
+	"biełaruskaja mova".
+
+2018-01-29  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* localedata/locales/el_CY (mon): Renamed to...
+	(alt_mon): This.
+	(mon): Import from CLDR (genitive case).
+	* localedata/locales/el_GR: Likewise.
+
+2018-01-29  Rafal Luzynski  <digitalfreak@lingonborough.com>
+
+	[BZ #10871]
+	* localedata/locales/ru_RU (mon): Rename to...
+	(alt_mon): This.
+	(abmon): Rename to...
+	(ab_alt_mon): This.
+	(mon): Import from CLDR (genitive case).
+	(abmon): Copy from the old content except the 5th month which is
+	now in the genitive case, even when abbreviated.
+	* localedata/locales/ru_UA: Likewise.
+	* time/tst-strptime.c (day_tests): Add an actual example of
+	a difference between %b and %Ob in Russian.
+
+2018-01-27  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+	* sysdeps/mach/hurd/xmknodat.c: Include <sys/sysmacros.h>.
+	* sysdeps/mach/hurd/profil.c: Reuse `a' variable instead of introducing
+	a `c' variable.
+	* resolv/res-close.c: Include <stdlib.h>.
+	* sysdeps/generic/not-cancel.h: Include <fcntl.h>, <unistd.h>,
+	<sys/wait.h>, <time.h>, <sys/uio.h>.
+	(NOT_CANCEL_H): Add inclusion guard.
+	* sysdeps/generic/sigset-cvt-mask.h: Include <sigsetops.h>.
+	* sysdeps/generic/sigsetops.h (__sigemptyset, __sigfillset,
+	__sigandset, __sigorset, __sigaddset, __sigdelset): Make them really
+	return 0.
+	* sysdeps/mach/hurd/dl-sysdep.c (_dl_sysdep_start): Cast
+	vm_address_t * to ElfW(Addr) * for dl_main parameter.
+	* sysdeps/pthread/posix-timer.h (timer_ptr2id): Cast to timer_t
+	instead of void *.
+	* sysdeps/pthread/timer_create.c (timer_create): Do not use
+	timer_ptr2id to cast struct timer_node * to void *.
+	* scripts/build-many-glibcs.py [os == gnu] (build_gcc): Pass
+	--disable-libcilkrts to gcc configure.
+	(checkout_vcs): Add mig and gnumach repository URLs, run autoreconf,
+	and make them the default for now.
+	* sysdeps/mach/hurd/Makefile [$(subdir)==nis]: Add
+	-DUSE_BINDINGDIR=1 to CFLAGS-ypclnt.c.
+	* mach/Machrules (MIGFLAGS): Do not set -DMACH_IPC_COMPAT=0.
+	* mach/mach/mach_traps.h: Drop comment about MACH_IPC_COMPAT.
+	* sysdeps/mach/hurd/fork.c (__fork): Drop special casing
+	MACH_IPC_COMPAT.
+	* sysdeps/mach/hurd/dl-sysdep.c (_exit): Call LOSE and abort() if
+	__task_terminate would ever return successfully.
+	* sysdeps/mach/hurd/profil.c (special_profil_failure): Move variable
+	to global scope.
+	* sysdeps/mach/pagecopy.h (PAGE_THRESHOLD): Rename to
+	PAGE_COPY_THRESHOLD and set to benchmarked 16384.
+	* sysdeps/mach/hurd/getresgid.c (__getresgid): Set result from
+	critical section to make code simpler and avoid warning.
+	* sysdeps/mach/hurd/getresuid.c (__getresuid): Set result from
+	critical section to make code simpler and avoid warning.
+	* sysdeps/mach/hurd/spawni.c (__spawni): Make relpath and abspath
+	const char * instead of char *.
+	* hurd/hurd/lookup.h (__hurd_file_name_lookup, hurd_file_name_lookup,
+	__hurd_file_name_split, hurd_file_name_split,
+	__hurd_directory_name_split, hurd_directory_name_split,
+	__hurd_file_name_lookup_retry, hurd_file_name_lookup_retry,
+	hurd_file_name_path_lookup): Make lookup function parameter take a
+	const char *name instead of char *name.
+	* hurd/hurdlookup.c (__hurd_file_name_lookup, __hurd_file_name_split,
+	__hurd_directory_name_split): Likewise.
+	* hurd/lookup-retry.c (__hurd_file_name_lookup_retry): Likewise.
+	* hurd/path-lookup.c (hurd_file_name_path_lookup): Likewise.
+	* sysdeps/mach/hurd/check_native.c: New file.
+	* sysdeps/mach/hurd/check_pf.c: New file.
+	* nscd/gai.c (__getifaddrs): Define macro to getifaddrs.
+	(__freeifaddrs): Define macro to freeifaddrs.
+	* sysdeps/mach/hurd/libhurduser.abilist: New file.
+	* sysdeps/mach/libmachuser.abilist: New file.
+	* libio/tst-memstream3.c (FWRITE): Rename to _FWRITE.
+	(do_test_bz20181): Rename accordingly.
+	* libio/tst-wmemstream3.c (FWRITE): Rename accordingly.
+	* io/tst-copy_file_range.c [!defined CLONE_NEWNS]: Do not include
+	<sys/mount.h>.
+	* hurd/hurd.h (__hurd_fail): Always declare function, and provide inline
+	version only if __USE_EXTERN_INLINES is defined.
+	* hurd/hurd/fd.h (_hurd_fd_error_signal, _hurd_fd_error, __hurd_dfail,
+	__hurd_sockfail): Likewise.
+	(_hurd_fd_get): Always declare functions, and provide inline versions
+	only if __USE_EXTERN_INLINES and _LIBC are defined and IS_IN(libc).
+	* hurd/hurd/port.h (_hurd_port_init, _hurd_port_locked_get,
+	_hurd_port_get, _hurd_port_free, _hurd_port_locked_set,
+	_hurd_port_set): Always declare functions, and provide inline versions
+	only if __USE_EXTERN_INLINES and _LIBC are defined and
+	IS_IN(libc).
+	* hurd/hurd/signal.h (_hurd_self_sigstate, _hurd_critical_section_lock,
+	_hurd_critical_section_unlock): Likewise.
+	* hurd/hurd/threadvar.h (__hurd_threadvar_location_from_sp,
+	* __hurd_threadvar_location): Likewise.
+	* hurd/hurd/userlink.h (_hurd_userlink_link, _hurd_userlink_unlink,
+	_hurd_userlink_clear): Likewise.
+	* mach/lock-intern.h (__spin_lock_init, __spin_lock, __mutex_lock,
+	__mutex_unlock, __mutex_trylock): Always declare functions, and provide
+	inline versions only if __USE_EXTERN_INLINES and _LIBC are defined.
+	* mach/mach/mig_support.h (__mig_strncpy): Likewise.
+	* sysdeps/generic/machine-lock.h (__spin_unlock, __spin_try_lock,
+	__spin_lock_locked): Likewise.
+	* sysdeps/mach/i386/machine-lock.h (__spin_unlock, __spin_try_lock,
+	__spin_lock_locked): Likewise.
+	* mach/spin-lock.c (__USE_EXTERN_INLINES): Define to 1.
+	* hurd/Versions (libc: GLIBC_2.27): Add _hurd_fd_error_signal,
+	_hurd_fd_error, __hurd_dfail, __hurd_sockfail, _hurd_port_locked_set,
+	__hurd_threadvar_location_from_sp, __hurd_threadvar_location,
+	_hurd_userlink_link, _hurd_userlink_unlink, _hurd_userlink_clear.
+	* sysdeps/mach/hurd/bits/posix_opt.h (_POSIX_CHOWN_RESTRICTED,
+	_POSIX_NO_TRUNC): Define to 0.
+	* sysdeps/pthread/allocalim.h [!defined PTHREAD_STACK_MIN]: Do not
+	check size against PTHREAD_STACK_MIN.
+	* hurd/hurd/signal.h [__USE_EXTERN_INLINES][_LIBC][IS_IN(libc) ||
+	IS_IN(libpthread)]: Include <sigsetops.h>.
+	* mach/Makefile (user-interfaces): Add mach/gnumach.
+	* sysdeps/mach/configure.ac (mach_interface_list): Add gnumach.
+	* sysdeps/mach/configure (mach_interface_list): Regenerate.
+	* sysdeps/mach/hurd/bits/posix_opt.h (_POSIX_VDISABLE): Set to '\0'
+	instead of invalid -1.
+	* sysdeps/mach/hurd/net/ethernet.h: Include <stdint.h>.
+	* sysdeps/mach/hurd/net/if_arp.h: Include <stdint.h>.
+	* sysdeps/mach/hurd/net/if_ppp.h: Do not include non-existing
+	<net/ppp_defs.h>.
+
+2018-01-27  Thomas Schwinge  <tschwinge@gnu.org>
+
+	* hurd/fcntl-internal.h: New file.
+
 2018-01-27  James Clarke  <jrtc27@jrtc27.com>
 
 	* sysdeps/hppa/fpu/libm-test-ulps: Update.
@@ -260,6 +710,7 @@
 2018-01-18  Arjun Shankar  <arjun@redhat.com>
 
 	[BZ #22343]
+	CVE-2018-6485
 	* malloc/malloc.c (checked_request2size): call REQUEST_OUT_OF_RANGE
 	after padding.
 	(_int_memalign): check for integer overflow before calling
@@ -501,8 +952,8 @@
 	(CFLAGS-s_csinl.c): Likewise.
 	(CFLAGS-s_csqrtl.c): Likewise.
 
-2010-08-04  Emilio Pozuelo Monfort  <pochu27@gmail.com>
-2017-09-26  Svante Signell  <svante.signell@gmail.com>
+2017-01-09  Emilio Pozuelo Monfort  <pochu27@gmail.com>
+2017-01-09  Svante Signell  <svante.signell@gmail.com>
 
 	* hurd/hurdexec.c (_hurd_exec): Deprecate function.
 	(_hurd_exec_paths): New function.
@@ -751,7 +1202,7 @@
 
 	* misc/tst-pselect.c: Add copyright header.
 
-2018-01-02  Aurelien Jarno <aurelien@aurel32.net>
+2018-01-02  Aurelien Jarno  <aurelien@aurel32.net>
 
 	* sysdeps/unix/sysv/linux/alpha/getrlimit64.c: Fix a typo in the
 	comment.
@@ -948,7 +1399,7 @@
 	* stdlib/getrandom.c (getrandom): Fix comment.
 	* sysdeps/unix/sysv/linux/getrandom.c (getrandom): Likewise.
 
-2017-12-23  Aurelien Jarno <aurelien@aurel32.net>
+2017-12-23  Aurelien Jarno  <aurelien@aurel32.net>
 
 	[BZ #21161]
 	* manual/arith.texi (strtoul): Fix a typo.
@@ -1445,7 +1896,7 @@
 	* sysdeps/ieee754/flt-32/s_sincosf.h:
 	New file.
 
-2017-12-12  Carlos O'Donell <carlos@redhat.com>
+2017-12-12  Carlos O'Donell  <carlos@redhat.com>
 
 	[BZ #14681]
 	* elf/tst-leaks1.c (do_test): Call one dlopen with $ORIGIN expansion
@@ -1663,7 +2114,7 @@
 	* sysdeps/aarch64/strcmp.S (misaligned8): Compare dword at a
 	time whenever possible.
 
-2017-12-12  Carlos O'Donell <carlos@redhat.com>
+2017-12-12  Carlos O'Donell  <carlos@redhat.com>
 
 	* elf/Makefile [$(nss-crypt)$(static-nss-crypt) == yesno]
 	(CFLAGS-tst-linkall-static.c): Undefine USE_CRYPT first.
@@ -1736,7 +2187,7 @@
 
 	* sysdeps/ia64/fpu/libm-test-ulps: Update.
 
-2017-12-12  James Clarke <jrtc27@jrtc27.com>
+2017-12-12  James Clarke  <jrtc27@jrtc27.com>
 
 	* sysdeps/unix/sysv/linux/ia64/ipc_priv.h: New file defining
 	__IPC_64 to 0 to avoid IPC_64 being set.
@@ -1769,7 +2220,7 @@
 
 	* manual/locale.texi (nl_langinfo): Fix a typo.
 
-2017-12-12  Aurelien Jarno <aurelien@aurel32.net>
+2017-12-12  Aurelien Jarno  <aurelien@aurel32.net>
 
 	[BZ #22588]
 	* manual/conf.texi (SC_SSIZE_MAX): Rename into _SC_SSIZE_MAX.
@@ -2309,7 +2760,7 @@
 	* sysdeps/s390/s390-32/dl-trampoline.h (_dl_runtime_resolve):
 	Likewise.
 
-2017-12-10  Aurelien Jarno <aurelien@aurel32.net>
+2017-12-10  Aurelien Jarno  <aurelien@aurel32.net>
 
 	[BZ #22577]
 	* elf/rtld.c (init_tls): Add missing new line to the _dl_fatal_printf
@@ -2603,8 +3054,8 @@
 	[__HAVE_FLOAT64 && !__GNUC_PREREQ (7, 0) && __NO_LONG_DOUBLE_MATH]
 	(__builtin_nansf64): Use __builtin_nansl.
 
-2017-12-05  Rogerio A. Cardoso  <rcardoso@linux.vnet.ibm.com>,
-	    Paul E. Murphy  <murphyp@linux.vnet.ibm.com>,
+2017-12-05  Rogerio A. Cardoso  <rcardoso@linux.vnet.ibm.com>
+	    Paul E. Murphy  <murphyp@linux.vnet.ibm.com>
 	    Carlos O'Donnell <carlos@redhat.com>
 
 	* elf/dl-tunables.list: Add elision parameters.
@@ -3618,13 +4069,13 @@
 
 	* stdlib/tst-strfmon_l.c: Fix testcase. Needed because of [BZ #10580]
 
-2017-11-30  Dragan Stanojević - Nevidljivi <invisible@hidden-city.net>
+2017-11-30  Dragan Stanojević - Nevidljivi  <invisible@hidden-city.net>
 
 	* localedata/Makefile: Add hr_HR.UTF-8 to test-input and to
 	the list of locales to built for testing.
 	* localedata/hr_HR.UTF-8.in: New file.
 
-2017-11-30  Dragan Stanojević - Nevidljivi <invisible@hidden-city.net>
+2017-11-30  Dragan Stanojević - Nevidljivi  <invisible@hidden-city.net>
 
 	[BZ #10580]
 	* localedata/locales/hr_HR (LC_COLLATE): Base collation rules on
@@ -4077,7 +4528,8 @@
 	[BUILD_LGAMMA && !USE_AS_COMPAT] (lgammaf): Likewise.
 	* sysdeps/ia64/fpu/w_tgammaf_compat.S (tgammaf): Likewise.
 
-2017-11-28  Mike FABIAN  <mfabian@redhat.com>, Alexandre Oliva <aoliva@redhat.com>
+2017-11-28  Mike FABIAN  <mfabian@redhat.com>
+	    Alexandre Oliva  <aoliva@redhat.com>
 
 	[BZ #17750]
 	* Makefile: add fr_CA.UTF-8 to test-input and LOCALES.
@@ -5079,7 +5531,7 @@
 	pwritev, pwritev64, preadv2, preadv64v2, pwritev2, pwritev64v2 ...
 	(Scatter-Gather): ... to here.  Remove misleading comment.
 
-2017-11-18  Christian Brauner <christian.brauner@ubuntu.com>
+2017-11-18  Christian Brauner  <christian.brauner@ubuntu.com>
 
 	* support/support_become_root.c (setup_uid_gid_mapping): Fix comment
 	style.
@@ -5404,7 +5856,7 @@
 	* string/bug-strncat1.c: Include <libc-diag.h>.
 	(main): Disable -Wstringop-truncation for strncat call for GCC 8.
 
-2017-11-13  Claude Paroz <claude@2xlibre.net>
+2017-11-13  Claude Paroz  <claude@2xlibre.net>
 
 	[BZ #22387]
 	* localedata/locales/aa_DJ: Improved readibility by replacing
@@ -5956,7 +6408,7 @@
 	* localedata/locales/miq_NI (LC_TIME): Fix wrong d_fmt, / needs
 	to be escaped.
 
-2017-11-07  Claude Paroz <claude@2xlibre.net>
+2017-11-07  Claude Paroz  <claude@2xlibre.net>
 
 	[BZ #22403]
 	* localedata/locales/an_ES (LC_TIME): Fix wrong d_fmt, / needs
@@ -6770,7 +7222,7 @@
 	* posix/tst-gnuglob64.c: Likewise.
 	* posix/Makefile (tests): Add tst-gnuglob64.
 
-2017-10-30  Michal Ostrowski <ostrowski.michal@gmail.com>
+2017-10-30  Michal Ostrowski  <ostrowski.michal@gmail.com>
 
 	[BZ #19485]
 	* localedata/locales/csb_PL (LC_TIME): Fix “abmon” for March
@@ -6841,7 +7293,7 @@
 	fil but not for tl. As tl and fil are very similar, using fil
 	is probably better than using English.
 
-2017-10-27  Thierry Vignaud <thierry.vignaud@gmail.com>
+2017-10-27  Thierry Vignaud  <thierry.vignaud@gmail.com>
 
 	[BZ #21706]
 	* localedata/locales/br_FR (LC_MESSAGES): Use all lowercase
@@ -6875,13 +7327,13 @@
 	[__HAVE_FLOAT128X && __GLIBC_USE (IEC_60559_TYPES_EXT)]
 	(HUGE_VAL_F128X): Likewise.
 
-2017-10-26  Thierry Vignaud <thierry.vignaud@gmail.com>
+2017-10-26  Thierry Vignaud  <thierry.vignaud@gmail.com>
 
 	* localedata/locales/br_FR (LC_IDENTIFICATON): Add
 	Thierry Vignaud <thierry.vignaud@gmail.com> as the contact
 	for the br_FR locale.
 
-2017-10-26  Thierry Vignaud <thierry.vignaud@gmail.com>
+2017-10-26  Thierry Vignaud  <thierry.vignaud@gmail.com>
 
 	[BZ #21706]
 	* localedata/locales/br_FR (LC_MESSAGES): Fix nostr.
@@ -7515,7 +7967,7 @@
 	(__expf): New.
 	Include <sysdeps/ieee754/flt-32/e_expf.c>.
 
-2017-10-22  Paul Eggert <eggert@cs.ucla.edu>
+2017-10-22  Paul Eggert  <eggert@cs.ucla.edu>
 
 	[BZ #22332]
 	* posix/glob.c (__glob): Fix buffer overflow during GLOB_TILDE
@@ -7617,7 +8069,7 @@
 	(_dl_runtime_resolve_xsave): Likewise.
 	(_dl_runtime_resolve_xsavec): Likewise.
 
-2017-10-20  Paul Eggert <eggert@cs.ucla.edu>
+2017-10-20  Paul Eggert  <eggert@cs.ucla.edu>
 
 	[BZ #22320]
 	CVE-2017-15670
@@ -7685,7 +8137,7 @@
 
 	* malloc/malloc.c (_int_free): Fix deadlock bug in consistency check.
 
-2017-10-19  Valery Reznic <valery_reznic@yahoo.com>
+2017-10-19  Valery Reznic  <valery_reznic@yahoo.com>
 	    H.J. Lu  <hongjiu.lu@intel.com>
 
 	[BZ #22299]

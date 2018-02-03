@@ -260,21 +260,9 @@ test-xfail-tst-pselect = yes
 test-xfail-tst-ptrguard1-static = yes
 test-xfail-tst-ptrguard1 = yes
 
-# We don't provide ABI reference yet
-test-xfail-check-abi-libcrypt = yes
-test-xfail-check-abi-libdl = yes
-test-xfail-check-abi-ld = yes
-test-xfail-check-abi-libc = yes
+# We don't provide ABI reference for these
 test-xfail-check-abi-libhurduser = yes
-test-xfail-check-abi-libpthread = yes
-test-xfail-check-abi-libBrokenLocale = yes
-test-xfail-check-abi-libutil = yes
 test-xfail-check-abi-libmachuser = yes
-test-xfail-check-abi-libm = yes
-test-xfail-check-abi-libnsl = yes
-test-xfail-check-abi-libanl = yes
-test-xfail-check-abi-libresolv = yes
-test-xfail-check-abi-librt = yes
 
 # Overzealous test
 test-xfail-tst-pathconf = yes
@@ -466,6 +454,7 @@ test-xfail-tst-gmon-static-gprof = yes
 test-xfail-tst-tls1-static-non-pie = yes
 test-xfail-tst-libc_dlvsym-static = yes
 test-xfail-tst-libc_dlvsym = yes
+test-xfail-tst-malloc-too-large = yes
 
 # Tests failing to build
 tests-unsupported += tst-copy_file_range
