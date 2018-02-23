@@ -33,6 +33,13 @@ $(patsubst %,$(stamp)binaryinst_%,$(DEB_ARCH_REGULAR_PACKAGES) $(DEB_INDEP_REGUL
 	dh_link -p$(curpass)
 	dh_bugfiles -p$(curpass)
 
+	if test "$(curpass)" = "libc-bin"; then			\
+	  mv debian/$(curpass)/sbin/ldconfig			\
+	    debian/$(curpass)/sbin/ldconfig.real;		\
+	  install -m755 -o0 -g0 debian/local/sbin/ldconfig	\
+	    debian/$(curpass)/sbin/ldconfig;			\
+	fi
+
 	# when you want to install extra packages, use extra_pkg_install.
 	$(call xx,extra_pkg_install)
 
@@ -44,7 +51,7 @@ ifeq ($(filter nostrip,$(DEB_BUILD_OPTIONS)),)
 	# work even without that package installed.
 	if test "$(NOSTRIP_$(curpass))" != 1; then					\
 	  if test "$(DEBUG_$(curpass))" = 1; then					\
-	    dh_strip -p$(curpass) -Xlibpthread $(DH_STRIP_DEBUG_PACKAGE);		\
+	    DH_COMPAT=8 dh_strip -p$(curpass) -Xlibpthread $(DH_STRIP_DEBUG_PACKAGE);	\
 	    for f in $$(find debian/$(curpass) -name libpthread-\*.so) ; do		\
 	      dbgfile=$$(LC_ALL=C readelf -n $$f | sed -e '/Build ID:/!d'		\
 	        -e "s#^.*Build ID: \([0-9a-f]\{2\}\)\([0-9a-f]\+\)#\1/\2.debug#") ;	\
@@ -56,7 +63,7 @@ ifeq ($(filter nostrip,$(DEB_BUILD_OPTIONS)),)
 	                                 --remove-section=.note $$f ;			\
 	    done ;									\
 	  else										\
-	    dh_strip -p$(curpass) -Xlibpthread;						\
+	    DH_COMPAT=8 dh_strip -p$(curpass) -Xlibpthread;				\
 	  fi ;										\
 	  for f in $$(find debian/$(curpass) -name \*crt\*.o) ; do			\
 	    $(DEB_HOST_GNU_TYPE)-strip --strip-debug --remove-section=.comment		\
@@ -67,6 +74,9 @@ endif
 
 	dh_compress -p$(curpass)
 	dh_fixperms -p$(curpass) -Xpt_chown
+	if [ $(curpass) = locales ] ; then \
+		chmod +x debian/$(curpass)/usr/share/locales/*-language-pack ; \
+	fi
 	# Use this instead of -X to dh_fixperms so that we can use
 	# an unescaped regular expression.  ld.so must be executable;
 	# libc.so and NPTL's libpthread.so print useful version
@@ -106,7 +116,7 @@ $(patsubst %,$(stamp)binaryinst_%,$(DEB_UDEB_PACKAGES)): debhelper $(patsubst %,
 	dh_testroot
 	dh_installdirs -p$(curpass)
 	dh_install -p$(curpass)
-	dh_strip -p$(curpass)
+	DH_COMPAT=8 dh_strip -p$(curpass)
 	
 	# when you want to install extra packages, use extra_pkg_install.
 	$(call xx,extra_pkg_install)
@@ -158,17 +168,6 @@ endif
 ifeq ($(filter stage2,$(DEB_BUILD_PROFILES)),)
 	echo 'libgcc:Depends=libgcc1 [!hppa !m68k], libgcc2 [m68k], libgcc4 [hppa]' >> tmp.substvars
 endif
-ifeq ($(DEB_HOST_ARCH_OS),linux)
-	# cross-toolchain-base builds both linux-libc-dev and libc-dev package in one step,
-	# not using an installed linux-libc-dev package.  Injecting the dependency by the env.
-	if [ -n "$$CTB_LIBC_DEV_DEPENDS" ]; then \
-	  depends=$$CTB_LIBC_DEV_DEPENDS; \
-	else \
-	  depends=$$(dpkg-query -f '$${binary:Package} (>= $${source:Upstream-Version}) ' -W linux-libc-dev:$(DEB_HOST_ARCH) | sed -e 's/:\S\+//' -e 's/(>= \([^.]\+\.[^.]\+\).*)/(>= \1)/'); \
-	fi; \
-	echo "libc-dev:Depends=$$depends" >> tmp.substvars
-endif
-
 	for pkg in $(DEB_ARCH_REGULAR_PACKAGES) $(DEB_INDEP_REGULAR_PACKAGES) $(DEB_UDEB_PACKAGES); do \
 	  cp tmp.substvars debian/$$pkg.substvars; \
 	done

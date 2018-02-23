@@ -135,6 +135,10 @@ test-xfail-tst-writev = yes
 # There is not support for protection key on Alpha yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -169,6 +173,10 @@ test-xfail-basic-test = yes
 # There is not support for protection key on ARM64 yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -179,8 +187,13 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabi)
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-makecontext = yes
 test-xfail-tst-mqueue5 = yes
+test-xfail-tst-signal6 = yes
 test-xfail-tst-stack4 = yes
 test-xfail-tst-waitid = yes
+
+# This test is currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend it fails on ARM:
+test-xfail-tst-ttyname = yes
 
 # There is not support for protection key on Alpha yet, and there is a
 # disagreement between kernel and glibc how to report that.
@@ -195,9 +208,14 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabihf)
 test-xfail-test-fenv = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-makecontext = yes
+test-xfail-tst-signal6 = yes
 test-xfail-tst-stack4 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-waitid = yes
+
+# This test is currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend it fails on ARM:
+test-xfail-tst-ttyname = yes
 
 # There is not support for protection key on Alpha yet, and there is a
 # disagreement between kernel and glibc how to report that.
@@ -931,6 +949,16 @@ endif
 
 
 ######################################################################
+# 64-bit mips*
+######################################################################
+ifneq (,$(filter $(config-machine)-$(config-os), mips64-linux-gnuabi64 mips64el-linux-gnuabi64))
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
+endif
+
+
+######################################################################
 # ppc64el
 ######################################################################
 ifeq ($(config-machine)-$(config-os),powerpc64le-linux-gnu)
@@ -938,6 +966,10 @@ test-xfail-tst-cancel17 = yes
 test-xfail-tst-cancelx17 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-waitid = yes
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -953,6 +985,10 @@ test-xfail-tst-waitid = yes
 # Known failure not a regression, see https://sourceware.org/bugzilla/show_bug.cgi?id=6527
 test-xfail-tst-malloc-thread-exit = yes
 test-xfail-tst-malloc-thread-fail = yes
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -1018,6 +1054,10 @@ test-xfail-tst-cancelx17 = yes
 test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
 test-xfail-tst-waitid = yes
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -1064,6 +1104,10 @@ test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
 test-xfail-tst-realloc = yes
 test-xfail-tst-waitid = yes
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
