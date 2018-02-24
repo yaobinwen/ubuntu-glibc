@@ -1,3 +1,32 @@
+glibc (2.27-0experimental1) experimental; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-test-atexit-race-common.diff: New patch,
+    fixes hurd-i386 build.
+
+  [ Aurelien Jarno ]
+  * debian/patches/any/local-ldconfig-ignore-ld.so.diff: add riscv64 program
+    interpreters.
+  * debian/libc6.symbols.riscv64: add riscv64 symbols file.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/testsuite-xfail-debian.mk: Allow tst-malloc-usable-tunables to fail
+    on alpha, arm64, mips64el, ppc64el, ppc64, s390x and sparc64. The failure
+    is due to a kernel bug.
+  * debian/control: Update Vcs-Git and Vcs-Browser fields following the move
+    to Salsa.
+  * debian/control.in/main: do not build-depends on g++-7-multilib for the
+    nobiarch build profile.  Closes: #890131.
+  * debian/rules.d/build.mk: use the just built iconvconfig if not
+    cross-compiling.  Closes: #890132.
+  * debian/patches/any/local-ldconfig.diff: fix a typo.
+  * debian/patches/hurd-i386/submitted-bind_umask2.diff: fix a typo.
+  * debian/patches/hurd-i386/tg-hurdsig-global-dispositions.diff: fix a typo.
+  * debian/control.in/libc, debian/rules.d/debhelper.mk: drop the version
+    from the linux-libc-dev dependency, as the <bits/syscall.h> file is not
+    generated anymore from the installed kernel headers.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 24 Feb 2018 23:49:00 +0100
+
 glibc (2.27-0experimental0) experimental; urgency=medium
 
   [ Samuel Thibault ]
@@ -194,6 +223,14 @@ glibc (2.26.9000+20180105.a6d0afb5-0experimental0) experimental; urgency=medium
     wired.
 
  -- Aurelien Jarno <aurel32@debian.org>  Fri, 05 Jan 2018 22:08:07 +0100
+
+glibc (2.26-7) UNRELEASED; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/tg-grantpt.diff: Update patch.
+  * debian/patches/hurd-i386/git-libpthread-trylock.diff: New patch.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 17 Feb 2018 23:20:49 +0100
 
 glibc (2.26-6) unstable; urgency=medium
 
