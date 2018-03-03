@@ -26,6 +26,7 @@ alpha/local-gcc4.1.diff
 alpha/submitted-dl-support.diff
 alpha/local-string-functions.diff
 alpha/submitted-fts64.diff
+alpha/submitted-makecontext.diff
 
 arm/local-sigaction.diff
 arm/unsubmitted-ldconfig-cache-abi.diff
@@ -143,6 +144,7 @@ powerpc/local-powerpc8xx-dcbz.diff
 sh4/local-fpscr_values.diff
 
 sparc/submitted-sparc64-socketcall.diff
+sparc/submitted-sparc32-makecontext.diff
 
 all/local-alias-et_EE.diff
 all/local-remove-manual.diff
