@@ -1,3 +1,25 @@
+glibc (2.27-2) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-UTIME.diff: New patch.
+  * debian/control: Bump hurd build dep accordingly.
+  * debian/libc0.3.symbols.hurd-i386: Update accordingly.
+
+  [ Aurelien Jarno ]
+  * debian/control.in/main: drop the branch from Vcs-Git.
+  * debian/patches/any/local-bootstrap-headers.diff: update to install
+    gnu/lib-names-$abi.h.  Closes: #892126.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix FTBFS on powerpcspe.
+    - debian/patches/sparc/submitted-sparc32-makecontext.diff: upstreamed.
+
+  [ Helmut Grohne ]
+  * debian/rules: drop DEB_STAGE and DEB_BUILD_PROFILE support.
+  * debian/rules: disable tests for stage1.
+  * debian/control.in/*: drop libc*-dev -> libc* dependencies in stage1.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri, 09 Mar 2018 21:48:04 +0100
+
 glibc (2.27-1) unstable; urgency=medium
 
   [ Aurelien Jarno ]
