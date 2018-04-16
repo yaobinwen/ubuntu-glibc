@@ -187,8 +187,13 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabi)
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-makecontext = yes
 test-xfail-tst-mqueue5 = yes
+test-xfail-tst-signal6 = yes
 test-xfail-tst-stack4 = yes
 test-xfail-tst-waitid = yes
+
+# This test is currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend it fails on ARM:
+test-xfail-tst-ttyname = yes
 
 # There is not support for protection key on Alpha yet, and there is a
 # disagreement between kernel and glibc how to report that.
@@ -203,9 +208,14 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabihf)
 test-xfail-test-fenv = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-makecontext = yes
+test-xfail-tst-signal6 = yes
 test-xfail-tst-stack4 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-waitid = yes
+
+# This test is currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend it fails on ARM:
+test-xfail-tst-ttyname = yes
 
 # There is not support for protection key on Alpha yet, and there is a
 # disagreement between kernel and glibc how to report that.
@@ -1032,6 +1042,23 @@ test-xfail-tst-cancelx5 = yes
 test-xfail-tst-key1 = yes
 test-xfail-tst-key4 = yes
 test-xfail-tst-setcontext-fpscr = yes
+endif
+
+
+######################################################################
+# s390
+######################################################################
+ifeq ($(config-machine)-$(config-os),s390-linux-gnu)
+# https://sourceware.org/bugzilla/show_bug.cgi?id=22916
+test-xfail-tst-backtrace4 = yes
+test-xfail-tst-backtrace5 = yes
+# https://sourceware.org/bugzilla/show_bug.cgi?id=22917
+test-xfail-tst-cancelx20 = yes
+test-xfail-tst-cancelx21 = yes
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
