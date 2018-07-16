@@ -1,3 +1,19 @@
+glibc (2.27-5) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/any/git-abilist-ignore-absolute.diff: backport support
+    for binutils 2.31 from upstream.
+  * debian/rules.d/control.mk: Add support for riscv64.  Closes: #888793.
+  * debian/testsuite-xfail-debian.mk: add reference testsuite results for
+    riscv64.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update hurd-i386 result to new upstream
+    stable branch.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 16 Jul 2018 22:23:13 +0200
+
 glibc (2.27-4) unstable; urgency=medium
 
   [ Samuel Thibault ]
