@@ -698,22 +698,6 @@ size_t   __malloc_usable_size(void*);
 void     __malloc_stats(void);
 
 /*
-  malloc_get_state(void);
-
-  Returns the state of all malloc variables in an opaque data
-  structure.
-*/
-void*  __malloc_get_state(void);
-
-/*
-  malloc_set_state(void* state);
-
-  Restore the state of all malloc variables from data obtained with
-  malloc_get_state().
-*/
-int      __malloc_set_state(void*);
-
-/*
   posix_memalign(void **memptr, size_t alignment, size_t size);
 
   POSIX wrapper like memalign(), checking for validity of size.
@@ -1287,13 +1271,13 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /* Ptr to next physical malloc_chunk. */
 #define next_chunk(p) ((mchunkptr) (((char *) (p)) + chunksize (p)))
 
-/* Size of the chunk below P.  Only valid if prev_inuse (P).  */
+/* Size of the chunk below P.  Only valid if !prev_inuse (P).  */
 #define prev_size(p) ((p)->mchunk_prev_size)
 
-/* Set the size of the chunk below P.  Only valid if prev_inuse (P).  */
+/* Set the size of the chunk below P.  Only valid if !prev_inuse (P).  */
 #define set_prev_size(p, sz) ((p)->mchunk_prev_size = (sz))
 
-/* Ptr to previous physical malloc_chunk.  Only valid if prev_inuse (P).  */
+/* Ptr to previous physical malloc_chunk.  Only valid if !prev_inuse (P).  */
 #define prev_chunk(p) ((mchunkptr) (((char *) (p)) - prev_size (p)))
 
 /* Treat space at ptr + offset as a chunk */
@@ -3775,6 +3759,8 @@ _int_malloc (mstate av, size_t bytes)
             }
 
           /* remove from unsorted list */
+          if (__glibc_unlikely (bck->fd != victim))
+            malloc_printerr ("malloc(): corrupted unsorted chunks 3");
           unsorted_chunks (av)->bk = bck;
           bck->fd = unsorted_chunks (av);
 
@@ -4980,8 +4966,8 @@ __malloc_stats (void)
   if (__malloc_initialized < 0)
     ptmalloc_init ();
   _IO_flockfile (stderr);
-  int old_flags2 = ((_IO_FILE *) stderr)->_flags2;
-  ((_IO_FILE *) stderr)->_flags2 |= _IO_FLAGS2_NOTCANCEL;
+  int old_flags2 = stderr->_flags2;
+  stderr->_flags2 |= _IO_FLAGS2_NOTCANCEL;
   for (i = 0, ar_ptr = &main_arena;; i++)
     {
       struct mallinfo mi;
@@ -5009,7 +4995,7 @@ __malloc_stats (void)
   fprintf (stderr, "max mmap regions = %10u\n", (unsigned int) mp_.max_n_mmaps);
   fprintf (stderr, "max mmap bytes   = %10lu\n",
            (unsigned long) mp_.max_mmapped_mem);
-  ((_IO_FILE *) stderr)->_flags2 |= old_flags2;
+  stderr->_flags2 = old_flags2;
   _IO_funlockfile (stderr);
 }
 

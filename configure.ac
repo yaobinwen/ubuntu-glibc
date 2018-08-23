@@ -302,11 +302,22 @@ AC_ARG_ENABLE([experimental-malloc],
 	      [experimental_malloc=yes])
 AC_SUBST(experimental_malloc)
 
+AC_ARG_ENABLE([crypt],
+              AC_HELP_STRING([--disable-crypt],
+                             [do not build nor install the passphrase hashing library, libcrypt]),
+              [build_crypt=$enableval],
+              [build_crypt=yes])
+AC_SUBST(build_crypt)
+
 AC_ARG_ENABLE([nss-crypt],
 	      AC_HELP_STRING([--enable-nss-crypt],
 			     [enable libcrypt to use nss]),
 	      [nss_crypt=$enableval],
 	      [nss_crypt=no])
+if test x$build_libcrypt = xno && test x$nss_crypt = xyes; then
+  AC_MSG_WARN([--enable-nss-crypt has no effect when libcrypt is disabled])
+  nss_crypt=no
+fi
 if test x$nss_crypt = xyes; then
   nss_includes=-I$(nss-config --includedir 2>/dev/null)
   if test $? -ne 0; then
@@ -452,6 +463,12 @@ AC_ARG_ENABLE([mathvec],
 	      [Enable building and installing mathvec @<:@default depends on architecture@:>@])],
 	      [build_mathvec=$enableval],
 	      [build_mathvec=notset])
+
+AC_ARG_ENABLE([cet],
+	      AC_HELP_STRING([--enable-cet],
+			     [enable Intel Control-flow Enforcement Technology (CET), x86 only]),
+	      [enable_cet=$enableval],
+	      [enable_cet=no])
 
 # We keep the original values in `$config_*' and never modify them, so we
 # can write them unchanged into config.make.  Everything else uses
@@ -934,7 +951,7 @@ fi
 AC_CHECK_TOOL_PREFIX
 AC_CHECK_PROG_VER(MAKE, gnumake gmake make, --version,
   [GNU Make[^0-9]*\([0-9][0-9.]*\)],
-  [3.79* | 3.[89]* | [4-9].* | [1-9][0-9]*], critic_missing="$critic_missing make")
+  [[4-9].* | [1-9][0-9]*], critic_missing="$critic_missing make")
 
 AC_CHECK_PROG_VER(MSGFMT, gnumsgfmt gmsgfmt msgfmt, --version,
   [GNU gettext.* \([0-9]*\.[0-9.]*\)],

@@ -1,3 +1,147 @@
+glibc (2.28-0ubuntu1) cosmic; urgency=medium
+
+  * Merge with current 2.28 from Debian experimental git, remaining changes:
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386 flavour with -mno-tls-direct-seg-refs for Xen.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+    - Revert dropping the ldconfig wrapper, xenial still has a lot of
+      packages that don't ship a trigger but instead call in postinst.
+    - Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    - Mangle locales package to support Ubuntu language packs seamlessly.
+    - Let tst-ttyname fail on armhf and armel, as it currently fails in lxc.
+  * Revert XFAIL of tst-backtrace{4,5} and tst-cancelx{20,21} on 31-bit s390.
+  * Drop debian/patches/ubuntu/localedata/git-pt-fmt.diff: Included upstream.
+  * Allow tst-setcontext9 to fail on PPC; it's a new test, not a regression.
+  * debian/patches/ubuntu/localedata/eo_US.diff: Update for upstream changes.
+  * Allow test-i?ldouble-fma to fail on PPC while upstream considers patches.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 23 Aug 2018 13:52:35 -0600
+
+glibc (2.28-0experimental0) UNRELEASED; urgency=medium
+
+  [ Aurelien Jarno ]
+  * New upstream release:
+    - Fix undefined behaviour in regexec.  Closes: #292550.
+    - debian/control: regenerate.
+    - debian/symbols.wildcard: update for 2.28.
+    - debian/debhelper.in/libc-dev{,-alt}.install: do not install
+      libpthread_nonshared.a.
+    - debian/patches/git-updates.diff: update from upstream stable branch.
+    - debian/patches/localedata/locale-ku_TR.diff: rebased.
+    - debian/patches/localedata/locale-csb_PL.diff: dropped, obsolete.
+    - debian/patches/localedata/locale-se_NO.diff: dropped, obsolete.
+    - debian/patches/localedata/tailor-iso14651_t1.diff: rebased.
+    - debian/patches/arm/local-sigaction.diff: rebased.
+    - debian/patches/hurd-i386/tg-context_functions.diff: rebased.
+    - debian/patches/hurd-i386/git-tls.diff: upstreamed.
+    - debian/patches/hurd-i386/git-tls-threadvar.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-sysvshm.diff: rebased.
+    - debian/patches/hurd-i386/git-_dl_random.diff: upstreamed.
+    - debian/patches/hurd-i386/git-grantpt.diff: upstreamed.
+    - debian/patches/hurd-i386/git-posix_thread.diff: upstreamed.
+    - debian/patches/hurd-i386/git-gai_misc.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-hurdsig-fixes.diff: rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-global-dispositions.diff: rebased.
+    - debian/patches/hurd-i386/local-hurdsig-global-dispositions-version.diff:
+      rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: rebased.
+    - debian/patches/hurd-i386/cvs-libpthread.diff: upstreamed.
+    - debian/patches/hurd-i386/cvs-libpthread.abilist.diff: upstreamed.
+    - debian/patches/hurd-i386/libpthread_build.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-libpthread_depends.diff: upstreamed.
+    - debian/patches/hurd-i386/libpthread_version.diff: rebased.
+    - debian/patches/hurd-i386/tg-remap_getcwd.diff: rebased.
+    - debian/patches/hurd-i386/git-exec-static.diff: upstreamed.
+    - debian/patches/hurd-i386/git-socket_flags.diff: upstreamed.
+    - debian/patches/hurd-i386/git-socketpair_flags.diff: upstreamed.
+    - debian/patches/hurd-i386/git-pipe2.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-libc_getspecific.diff: dropped, obsolete.
+    - debian/patches/hurd-i386/git-futimens.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-sigstate_thread_reference.diff: rebased.
+    - debian/patches/hurd-i386/git-tls_thread_leak.diff: upstreamed.
+    - debian/patches/hurd-i386/git-libpthread-stacksize.diff: upstreamed.
+    - debian/patches/hurd-i386/git-reboot-startup.diff: upstreamed.
+    - debian/patches/hurd-i386/cvs-revert-gnu-gnu-cleanup.diff: upstreamed.
+    - debian/patches/hurd-i386/git-gsync-libc.diff: upstreamed.
+    - debian/patches/hurd-i386/git-pthread_deps.diff: upstreamed.
+    - debian/patches/hurd-i386/git-libpthread-gsync-spin.diff: upstreamed.
+    - debian/patches/hurd-i386/git-libpthread-gsync-mutex.diff: upstreamed.
+    - debian/patches/hurd-i386/git-NOFOLLOW.diff: upstreamed.
+    - debian/patches/hurd-i386/git-NOFOLLOW-DIRECTORY.diff: upstreamed.
+    - debian/patches/hurd-i386/git-mlockall.diff: upstreamed.
+    - debian/patches/hurd-i386/git2.25-tls.diff: upstreamed.
+    - debian/patches/hurd-i386/local-nocheck-installed-headers.diff: rebased.
+    - debian/patches/hurd-i386/git-libpthread-2.26.diff: upstreamed.
+    - debian/patches/hurd-i386/git-thread-linkspace.diff: upstreamed.
+    - debian/patches/hurd-i386/libpthread_includes.diff: dropped, obsolete.
+    - debian/patches/hurd-i386/local-exec_filename.diff: rebased.
+    - debian/patches/hurd-i386/git-libpthread-trylock.diff: upstreamed.
+    - debian/patches/hurd-i386/git-test-atexit-race-common.diff: upstreamed.
+    - debian/patches/hurd-i386/git-UTIME.diff: upstreamed.
+    - debian/patches/hurd-i386/git-timer_create_sigmask.diff: upstreamed.
+    - debian/patches/hurd-i386/git-pthread_deps.diff: upstreamed.
+    - debian/patches/kfreebsd/local-fbtl-depends.diff: rebased.
+    - debian/patches/any/local-ldconfig-fsync.diff: dropped, obsolete.
+    - debian/patches/any/submitted-bits-fcntl_h-at.diff: rebased.
+    - debian/patches/any/submitted-intl-tstgettext.diff: upstreamed.
+    - debian/patches/any/git-abilist-ignore-absolute.diff: upstreamed.
+    - debian/debhelper.in/libc{-alt,-otherbuild,}.lintian-overrides: drop
+      libcidn.so override.
+    - debian/libc6.symbols.{common,hppa,sparc}, debian/libc6.1.symbols.alpha,
+      debian/libc0.1.symbols.common, debian/libc0.3.symbols.hurd-i386: drop
+      libcidn.so.
+  * debian/control.in/main: bump binutils build-dependency to 2.29 on all
+    architectures.
+  * debian/control.in/main, debian/rules: build with GCC 8.
+  * debian/control.in/main: build-depends on libidn2-0 for the tests.
+  * debian/control.in/libc: recommends libidn2-0 to support IDN domain
+    names in getaddrinfo and getnameinfo.
+  * debian/testsuite-xfail-debian.mk: mark libidn2 test as XFAIL until we can
+    get libidn2 >= 2.0.5 in the archive.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-gscope.diff: upstreamed.
+  * debian/patches/hurd-i386/git-hurd-abilist.diff: Remove patch, now useless.
+  * debian/patches/hurd-i386/git-pagesize.diff: upstreamed.
+  * debian/patches/hurd-i386/git-timer_routines.diff: upstreamed.
+  * debian/patches/hurd-i386/submitted-net.diff: rebased.
+  * debian/patches/hurd-i386/tg-context_functions.diff: update.
+  * debian/patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: update.
+  * debian/patches/hurd-i386/tg-sysvshm.diff: update.
+  * debian/patches/hurd-i386/tg-verify.h.diff: remove, now useless.
+  * debian/patches/hurd-i386/tg2.26-sched_param.diff: upstreamed.
+  * debian/patches/hurd-i386/libpthread_version.diff: Remove now-useless part.
+  * debian/patches/hurd-i386/local-hurdsig-global-dispositions-version.diff:
+    Likewise.
+  * debian/patches/hurd-i386/tg-ifaddrs_v6.diff: Fix PLT.
+  * debian/patches/hurd-i386/local-hurd_sigstate-PLT.diff: New patch to fix
+    PLTs.
+  * debian/testsuite-xfail-debian.mk: Update.
+
+  [ Adam Conrad ]
+  * debian/patches/localedata/tailor-iso14651_t1.diff: Build without errors.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 04 Aug 2018 20:13:33 +0200
+
+glibc (2.27-6) UNRELEASED; urgency=medium
+
+  * patches/hurd-i386/tg-socket_flags.diff: Rename to git-socket_flags.diff.
+  * patches/hurd-i386/tg-socketpair_flags.diff: Rename to
+    git-socketpair_flags.diff.
+  * patches/hurd-i386/tg-pipe2.diff: Rename to git-pipe2.diff.
+  * patches/hurd-i386/tg-posix_thread.diff: Rename to git-posix_thread.diff.
+  * patches/hurd-i386/tg-pthread_deps.diff: Rename to git-pthread_deps.diff.
+  * patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: Fix standardization of
+    exposition of sigaction
+
+ -- Samuel Thibault <sthibault@debian.org>  Fri, 20 Jul 2018 01:26:25 +0200
+
 glibc (2.27-5ubuntu1) cosmic; urgency=medium
 
   * Merge with Debian (fixing test failures misc/tst-preadvwrite{,64}v2.

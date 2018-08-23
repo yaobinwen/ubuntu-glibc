@@ -20,10 +20,6 @@
 
 #define	_HURD_SIGNAL_H	1
 #include <features.h>
-/* Make sure <signal.h> is going to define NSIG.  */
-#ifndef __USE_GNU
-#error "Must have `_GNU_SOURCE' feature test macro to use this file"
-#endif
 
 #define __need_size_t
 #define __need_NULL
@@ -35,12 +31,15 @@
 #include <hurd/hurd_types.h>
 #include <signal.h>
 #include <errno.h>
+#include <bits/types/error_t.h>
+#include <bits/types/stack_t.h>
+#include <bits/types/sigset_t.h>
+#include <bits/sigaction.h>
 #include <hurd/msg.h>
 
 #include <cthreads.h>		/* For `struct mutex'.  */
 #include <setjmp.h>		/* For `jmp_buf'.  */
 #include <spin-lock.h>
-#include <hurd/threadvar.h>	/* We cache sigstate in a threadvar.  */
 struct hurd_signal_preemptor;	/* <hurd/sigpreempt.h> */
 #if defined __USE_EXTERN_INLINES && defined _LIBC
 # if IS_IN (libc) || IS_IN (libpthread)
@@ -74,7 +73,7 @@ struct hurd_sigstate
 
     sigset_t blocked;		/* What signals are blocked.  */
     sigset_t pending;		/* Pending signals, possibly blocked.  */
-    struct sigaction actions[NSIG];
+    struct sigaction actions[_NSIG];
     stack_t sigaltstack;
 
     /* Chain of thread-local signal preemptors; see <hurd/sigpreempt.h>.
@@ -84,7 +83,7 @@ struct hurd_sigstate
     struct hurd_signal_preemptor *preemptors;
 
     /* For each signal that may be pending, the details to deliver it with.  */
-    struct hurd_signal_detail pending_data[NSIG];
+    struct hurd_signal_detail pending_data[_NSIG];
 
     /* If `suspended' is set when this thread gets a signal,
        the signal thread sends an empty message to it.  */
@@ -139,11 +138,9 @@ extern struct hurd_sigstate *_hurd_self_sigstate (void)
 _HURD_SIGNAL_H_EXTERN_INLINE struct hurd_sigstate *
 _hurd_self_sigstate (void)
 {
-  struct hurd_sigstate **location = (struct hurd_sigstate **)
-    (void *) __hurd_threadvar_location (_HURD_THREADVAR_SIGSTATE);
-  if (*location == NULL)
-    *location = _hurd_thread_sigstate (__mach_thread_self ());
-  return *location;
+  if (THREAD_SELF->_hurd_sigstate == NULL)
+    THREAD_SELF->_hurd_sigstate = _hurd_thread_sigstate (__mach_thread_self ());
+  return THREAD_SELF->_hurd_sigstate;
 }
 # endif
 #endif
@@ -180,16 +177,22 @@ extern void *_hurd_critical_section_lock (void);
 _HURD_SIGNAL_H_EXTERN_INLINE void *
 _hurd_critical_section_lock (void)
 {
-  struct hurd_sigstate **location = (struct hurd_sigstate **)
-    (void *) __hurd_threadvar_location (_HURD_THREADVAR_SIGSTATE);
-  struct hurd_sigstate *ss = *location;
+  struct hurd_sigstate *ss;
+
+#ifdef __LIBC_NO_TLS
+  if (__LIBC_NO_TLS ())
+    /* TLS is currently initializing, no need to enter critical section.  */
+    return NULL;
+#endif
+
+  ss = THREAD_SELF->_hurd_sigstate;
   if (ss == NULL)
     {
       /* The thread variable is unset; this must be the first time we've
 	 asked for it.  In this case, the critical section flag cannot
 	 possible already be set.  Look up our sigstate structure the slow
 	 way.  */
-      ss = *location = _hurd_thread_sigstate (__mach_thread_self ());
+      ss = THREAD_SELF->_hurd_sigstate = _hurd_thread_sigstate (__mach_thread_self ());
     }
 
   if (! __spin_try_lock (&ss->critical_section_lock))

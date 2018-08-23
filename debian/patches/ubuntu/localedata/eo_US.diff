@@ -4,7 +4,7 @@ Index: langpack-locales/locales/eo_US
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
 +++ b/localedata/locales/eo_US	2011-11-16 08:42:33.089335550 +0100
-@@ -0,0 +1,239 @@
+@@ -0,0 +1,227 @@
 +comment_char %
 +escape_char /
 +
@@ -55,43 +55,31 @@ Index: langpack-locales/locales/eo_US
 +collating-symbol <scirc>
 +collating-symbol <ubreve>
 +
-+reorder-after <c>
++reorder-after <AFTER-C>
 +<ccirc>
-+reorder-after <g>
++reorder-after <AFTER-G>
 +<gcirc>
-+reorder-after <h>
++reorder-after <AFTER-H>
 +<hcirc>
-+reorder-after <j>
++reorder-after <AFTER-J>
 +<jcirc>
-+reorder-after <s>
++reorder-after <AFTER-S>
 +<scirc>
-+reorder-after <u>
++reorder-after <AFTER-U>
 +<ubreve>
 +
-+reorder-after <U0043>
-+<U0108> <ccirc>;<CIR>;<CAP>;IGNORE % Ĉ
-+reorder-after <U0063>
-+<U0109> <ccirc>;<CIR>;<MIN>;IGNORE % ĉ
-+reorder-after <U0047>
-+<U011C> <gcirc>;<CIR>;<CAP>;IGNORE % Ĝ
-+reorder-after <U0067>
-+<U011D> <gcirc>;<CIR>;<MIN>;IGNORE % ĝ
-+reorder-after <U0048>
-+<U0124> <hcirc>;<CIR>;<CAP>;IGNORE % Ĥ
-+reorder-after <U0068>
-+<U0125> <hcirc>;<CIR>;<MIN>;IGNORE % ĥ
-+reorder-after <U004A>
-+<U0134> <jcirc>;<CIR>;<CAP>;IGNORE % Ĵ
-+reorder-after <U006A>
-+<U0135> <jcirc>;<CIR>;<MIN>;IGNORE % ĵ
-+reorder-after <U0053>
-+<U015C> <scirc>;<CIR>;<CAP>;IGNORE % Ŝ
-+reorder-after <U0073>
-+<U015D> <scirc>;<CIR>;<MIN>;IGNORE % ŝ
-+reorder-after <U0055>
-+<U016C> <ubreve>;<BRE>;<CAP>;IGNORE % Ŭ
-+reorder-after <U0075>
-+<U016D> <ubreve>;<BRE>;<MIN>;IGNORE % ŭ
++<U0108> <ccirc>;<BASE>;<CAP>;IGNORE
++<U0109> <ccirc>;<BASE>;<MIN>;IGNORE
++<U011C> <gcirc>;<BASE>;<CAP>;IGNORE
++<U011D> <gcirc>;<BASE>;<MIN>;IGNORE
++<U0124> <hcirc>;<BASE>;<CAP>;IGNORE
++<U0125> <hcirc>;<BASE>;<MIN>;IGNORE
++<U0134> <jcirc>;<BASE>;<CAP>;IGNORE
++<U0135> <jcirc>;<BASE>;<MIN>;IGNORE
++<U015C> <scirc>;<BASE>;<CAP>;IGNORE
++<U015D> <scirc>;<BASE>;<MIN>;IGNORE
++<U016C> <ubreve>;<BASE>;<CAP>;IGNORE
++<U016D> <ubreve>;<BASE>;<MIN>;IGNORE
 +
 +reorder-end
 +

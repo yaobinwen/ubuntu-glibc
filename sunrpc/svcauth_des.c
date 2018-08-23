@@ -72,13 +72,8 @@ struct cache_entry
     struct rpc_timeval laststamp;	/* detect replays of creds */
     char *localcred;		/* generic local credential */
   };
-#ifdef _RPC_THREAD_SAFE_
 #define authdes_cache RPC_THREAD_VARIABLE(authdes_cache_s)
 #define authdes_lru RPC_THREAD_VARIABLE(authdes_lru_s)
-#else
-static struct cache_entry *authdes_cache;
-static int *authdes_lru;
-#endif
 
 static void cache_init (void); /* initialize the cache */
 static short cache_spot (des_block *, char *, struct rpc_timeval *);
@@ -87,16 +82,21 @@ static void cache_ref (uint32_t sid); /* note that sid was ref'd */
 
 static void invalidate (char *cred); /* invalidate entry in cache */
 
-/*
- * cache statistics
- */
+/* Cache statistics.  Accidental historic export without a matching
+   declaration in any header file.  */
+#ifndef SHARED
+static
+#endif
 struct
   {
     u_long ncachehits;		/* times cache hit, and is not replay */
     u_long ncachereplays;	/* times cache hit, and is replay */
     u_long ncachemisses;	/* times cache missed */
   }
-svcauthdes_stats;
+svcauthdes_stats __attribute__ ((nocommon));
+#ifdef SHARED
+compat_symbol (libc, svcauthdes_stats, svcauthdes_stats, GLIBC_2_0);
+#endif
 
 /*
  * Service side authenticator for AUTH_DES
