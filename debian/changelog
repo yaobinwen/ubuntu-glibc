@@ -1,3 +1,12 @@
+glibc (2.23-0ubuntu11) xenial; urgency=medium
+
+  * debian/patches/ubuntu/xsave-part1.diff and
+    debian/patches/ubuntu/xsave-part2.diff: Fix a serious performance
+    regression when mixing SSE and AVX code on certain processors.
+    The patches are from the upstream 2.23 stable branch. (LP: #1663280)
+
+ -- Daniel Axtens <daniel.axtens@canonical.com>  Thu, 04 Oct 2018 10:29:55 +1000
+
 glibc (2.23-0ubuntu10) xenial-security; urgency=medium
 
   * SECURITY UPDATE: Memory leak in dynamic loader (ld.so)
