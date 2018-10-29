@@ -68,7 +68,7 @@ __realpath (const char *name, char *resolved)
 #ifdef PATH_MAX
   path_max = PATH_MAX;
 #else
-  path_max = pathconf (name, _PC_PATH_MAX);
+  path_max = __pathconf (name, _PC_PATH_MAX);
   if (path_max <= 0)
     path_max = 1024;
 #endif
@@ -181,7 +181,7 @@ __realpath (const char *name, char *resolved)
 		extra_buf = __alloca (path_max);
 
 	      len = strlen (end);
-	      if ((long int) (n + len) >= path_max)
+	      if (path_max - n <= len)
 		{
 		  __set_errno (ENAMETOOLONG);
 		  goto error;

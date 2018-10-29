@@ -255,4 +255,9 @@ extern int fchflags (int __fd, unsigned long int __flags) __THROW;
 __END_DECLS
 #endif
 
+#ifdef __USE_ATFILE
+# define UTIME_NOW  -1 /* corresponds to the current time */
+# define UTIME_OMIT -2 /* target time is omitted */
+#endif
+
 #endif	/* bits/stat.h */

@@ -30,45 +30,6 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "dynamic-link.h"
-#include <abi-tag.h>
-#include <stackinfo.h>
-#include <caller.h>
-#include <sysdep.h>
-#include <stap-probe.h>
-#include <libc-pointer-arith.h>
-#include <array_length.h>
-
-#include <dl-dst.h>
-#include <dl-load.h>
-#include <dl-map-segments.h>
-#include <dl-unmap-segments.h>
-#include <dl-machine-reject-phdr.h>
-#include <dl-sysdep-open.h>
-
-
-#include <endian.h>
-#if BYTE_ORDER == BIG_ENDIAN
-# define byteorder ELFDATA2MSB
-#elif BYTE_ORDER == LITTLE_ENDIAN
-# define byteorder ELFDATA2LSB
-#else
-# error "Unknown BYTE_ORDER " BYTE_ORDER
-# define byteorder ELFDATANONE
-#endif
-
-#define STRING(x) __STRING (x)
-
-
-int __stack_prot attribute_hidden attribute_relro
-#if _STACK_GROWS_DOWN && defined PROT_GROWSDOWN
-  = PROT_GROWSDOWN;
-#elif _STACK_GROWS_UP && defined PROT_GROWSUP
-  = PROT_GROWSUP;
-#else
-  = 0;
-#endif
-
 
 /* Type for the buffer we put the ELF header and hopefully the program
    header.  This buffer does not really have to be too large.  In most
@@ -94,6 +55,46 @@ struct filebuf
 #endif
   char buf[FILEBUF_SIZE] __attribute__ ((aligned (__alignof (ElfW(Ehdr)))));
 };
+
+#include "dynamic-link.h"
+#include <abi-tag.h>
+#include <stackinfo.h>
+#include <sysdep.h>
+#include <stap-probe.h>
+#include <libc-pointer-arith.h>
+#include <array_length.h>
+
+#include <dl-dst.h>
+#include <dl-load.h>
+#include <dl-map-segments.h>
+#include <dl-unmap-segments.h>
+#include <dl-machine-reject-phdr.h>
+#include <dl-sysdep-open.h>
+#include <dl-prop.h>
+#include <not-cancel.h>
+
+#include <endian.h>
+#if BYTE_ORDER == BIG_ENDIAN
+# define byteorder ELFDATA2MSB
+#elif BYTE_ORDER == LITTLE_ENDIAN
+# define byteorder ELFDATA2LSB
+#else
+# error "Unknown BYTE_ORDER " BYTE_ORDER
+# define byteorder ELFDATANONE
+#endif
+
+#define STRING(x) __STRING (x)
+
+
+int __stack_prot attribute_hidden attribute_relro
+#if _STACK_GROWS_DOWN && defined PROT_GROWSDOWN
+  = PROT_GROWSDOWN;
+#elif _STACK_GROWS_UP && defined PROT_GROWSUP
+  = PROT_GROWSUP;
+#else
+  = 0;
+#endif
+
 
 /* This is the decomposed LD_LIBRARY_PATH search path.  */
 static struct r_search_path_struct env_path_list attribute_relro;
@@ -121,12 +122,6 @@ is_trusted_path_normalize (const char *path, size_t len)
 {
   if (len == 0)
     return false;
-
-  if (*path == ':')
-    {
-      ++path;
-      --len;
-    }
 
   char *npath = (char *) alloca (len + 2);
   char *wnp = npath;
@@ -178,114 +173,167 @@ is_trusted_path_normalize (const char *path, size_t len)
   return false;
 }
 
+/* Given a substring starting at INPUT, just after the DST '$' start
+   token, determine if INPUT contains DST token REF, following the
+   ELF gABI rules for DSTs:
 
+   * Longest possible sequence using the rules (greedy).
+
+   * Must start with a $ (enforced by caller).
+
+   * Must follow $ with one underscore or ASCII [A-Za-z] (caller
+     follows these rules for REF) or '{' (start curly quoted name).
+
+   * Must follow first two characters with zero or more [A-Za-z0-9_]
+     (enforced by caller) or '}' (end curly quoted name).
+
+   If the sequence is a DST matching REF then the length of the DST
+   (excluding the $ sign but including curly braces, if any) is
+   returned, otherwise 0.  */
 static size_t
-is_dst (const char *start, const char *name, const char *str, int secure)
+is_dst (const char *input, const char *ref)
 {
-  size_t len;
   bool is_curly = false;
 
-  if (name[0] == '{')
+  /* Is a ${...} input sequence?  */
+  if (input[0] == '{')
     {
       is_curly = true;
-      ++name;
+      ++input;
     }
 
-  len = 0;
-  while (name[len] == str[len] && name[len] != '\0')
-    ++len;
+  /* Check for matching name, following closing curly brace (if
+     required), or trailing characters which are part of an
+     identifier.  */
+  size_t rlen = strlen (ref);
+  if (strncmp (input, ref, rlen) != 0
+      || (is_curly && input[rlen] != '}')
+      || ((input[rlen] >= 'A' && input[rlen] <= 'Z')
+	  || (input[rlen] >= 'a' && input[rlen] <= 'z')
+	  || (input[rlen] >= '0' && input[rlen] <= '9')
+	  || (input[rlen] == '_')))
+    return 0;
 
   if (is_curly)
-    {
-      if (name[len] != '}')
-	return 0;
-
-      /* Point again at the beginning of the name.  */
-      --name;
-      /* Skip over closing curly brace and adjust for the --name.  */
-      len += 2;
-    }
-  else if (name[len] != '\0' && name[len] != '/')
-    return 0;
-
-  if (__glibc_unlikely (secure)
-      && ((name[len] != '\0' && name[len] != '/')
-	  || (name != start + 1)))
-    return 0;
-
-  return len;
+    /* Count the two curly braces.  */
+    return rlen + 2;
+  else
+    return rlen;
 }
 
-
+/* INPUT should be the start of a path e.g DT_RPATH or name e.g.
+   DT_NEEDED.  The return value is the number of known DSTs found.  We
+   count all known DSTs regardless of __libc_enable_secure; the caller
+   is responsible for enforcing the security of the substitution rules
+   (usually _dl_dst_substitute).  */
 size_t
-_dl_dst_count (const char *name)
+_dl_dst_count (const char *input)
 {
-  const char *const start = name;
   size_t cnt = 0;
+
+  input = strchr (input, '$');
+
+  /* Most likely there is no DST.  */
+  if (__glibc_likely (input == NULL))
+    return 0;
 
   do
     {
       size_t len;
 
-      /* $ORIGIN is not expanded for SUID/GUID programs (except if it
-	 is $ORIGIN alone) and it must always appear first in path.  */
-      ++name;
-      if ((len = is_dst (start, name, "ORIGIN", __libc_enable_secure)) != 0
-	  || (len = is_dst (start, name, "PLATFORM", 0)) != 0
-	  || (len = is_dst (start, name, "LIB", 0)) != 0)
+      ++input;
+      /* All DSTs must follow ELF gABI rules, see is_dst ().  */
+      if ((len = is_dst (input, "ORIGIN")) != 0
+	  || (len = is_dst (input, "PLATFORM")) != 0
+	  || (len = is_dst (input, "LIB")) != 0)
 	++cnt;
 
-      name = strchr (name + len, '$');
+      /* There may be more than one DST in the input.  */
+      input = strchr (input + len, '$');
     }
-  while (name != NULL);
+  while (input != NULL);
 
   return cnt;
 }
 
-
+/* Process INPUT for DSTs and store in RESULT using the information
+   from link map L to resolve the DSTs. This function only handles one
+   path at a time and does not handle colon-separated path lists (see
+   fillin_rpath ()).  Lastly the size of result in bytes should be at
+   least equal to the value returned by DL_DST_REQUIRED.  Note that it
+   is possible for a DT_NEEDED, DT_AUXILIARY, and DT_FILTER entries to
+   have colons, but we treat those as literal colons here, not as path
+   list delimeters.  */
 char *
-_dl_dst_substitute (struct link_map *l, const char *name, char *result)
+_dl_dst_substitute (struct link_map *l, const char *input, char *result)
 {
-  const char *const start = name;
-
-  /* Now fill the result path.  While copying over the string we keep
-     track of the start of the last path element.  When we come across
-     a DST we copy over the value or (if the value is not available)
-     leave the entire path element out.  */
+  /* Copy character-by-character from input into the working pointer
+     looking for any DSTs.  We track the start of input and if we are
+     going to check for trusted paths, all of which are part of $ORIGIN
+     handling in SUID/SGID cases (see below).  In some cases, like when
+     a DST cannot be replaced, we may set result to an empty string and
+     return.  */
   char *wp = result;
-  char *last_elem = result;
+  const char *start = input;
   bool check_for_trusted = false;
 
   do
     {
-      if (__glibc_unlikely (*name == '$'))
+      if (__glibc_unlikely (*input == '$'))
 	{
 	  const char *repl = NULL;
 	  size_t len;
 
-	  ++name;
-	  if ((len = is_dst (start, name, "ORIGIN", __libc_enable_secure)) != 0)
+	  ++input;
+	  if ((len = is_dst (input, "ORIGIN")) != 0)
 	    {
-	      repl = l->l_origin;
+	      /* For SUID/GUID programs we normally ignore the path with
+		 $ORIGIN in DT_RUNPATH, or DT_RPATH.  However, there is
+		 one exception to this rule, and it is:
+
+		   * $ORIGIN appears as the first path element, and is
+		     the only string in the path or is immediately
+		     followed by a path separator and the rest of the
+		     path,
+
+		   and ...
+
+		   * The path is rooted in a trusted directory.
+
+		 This exception allows such programs to reference
+		 shared libraries in subdirectories of trusted
+		 directories.  The use case is one of general
+		 organization and deployment flexibility.
+		 Trusted directories are usually such paths as "/lib64"
+		 or "/usr/lib64", and the usual RPATHs take the form of
+		 [$ORIGIN/../$LIB/somedir].  */
+	      if (__glibc_unlikely (__libc_enable_secure)
+		  && !(input == start + 1
+		       && (input[len] == '\0' || input[len] == '/')))
+		repl = (const char *) -1;
+	      else
+	        repl = l->l_origin;
+
 	      check_for_trusted = (__libc_enable_secure
 				   && l->l_type == lt_executable);
 	    }
-	  else if ((len = is_dst (start, name, "PLATFORM", 0)) != 0)
+	  else if ((len = is_dst (input, "PLATFORM")) != 0)
 	    repl = GLRO(dl_platform);
-	  else if ((len = is_dst (start, name, "LIB", 0)) != 0)
+	  else if ((len = is_dst (input, "LIB")) != 0)
 	    repl = DL_DST_LIB;
 
 	  if (repl != NULL && repl != (const char *) -1)
 	    {
 	      wp = __stpcpy (wp, repl);
-	      name += len;
+	      input += len;
 	    }
-	  else if (len > 1)
+	  else if (len != 0)
 	    {
-	      /* We cannot use this path element, the value of the
-		 replacement is unknown.  */
-	      wp = last_elem;
-	      break;
+	      /* We found a valid DST that we know about, but we could
+	         not find a replacement value for it, therefore we
+		 cannot use this path and discard it.  */
+	      *result = '\0';
+	      return result;
 	    }
 	  else
 	    /* No DST we recognize.  */
@@ -293,16 +341,26 @@ _dl_dst_substitute (struct link_map *l, const char *name, char *result)
 	}
       else
 	{
-	  *wp++ = *name++;
+	  *wp++ = *input++;
 	}
     }
-  while (*name != '\0');
+  while (*input != '\0');
 
   /* In SUID/SGID programs, after $ORIGIN expansion the normalized
-     path must be rooted in one of the trusted directories.  */
+     path must be rooted in one of the trusted directories.  The $LIB
+     and $PLATFORM DST cannot in any way be manipulated by the caller
+     because they are fixed values that are set by the dynamic loader
+     and therefore any paths using just $LIB or $PLATFORM need not be
+     checked for trust, the authors of the binaries themselves are
+     trusted to have designed this correctly.  Only $ORIGIN is tested in
+     this way because it may be manipulated in some ways with hard
+     links.  */
   if (__glibc_unlikely (check_for_trusted)
-      && !is_trusted_path_normalize (last_elem, wp - last_elem))
-    wp = last_elem;
+      && !is_trusted_path_normalize (result, wp - result))
+    {
+      *result = '\0';
+      return result;
+    }
 
   *wp = '\0';
 
@@ -310,13 +368,13 @@ _dl_dst_substitute (struct link_map *l, const char *name, char *result)
 }
 
 
-/* Return copy of argument with all recognized dynamic string tokens
-   ($ORIGIN and $PLATFORM for now) replaced.  On some platforms it
-   might not be possible to determine the path from which the object
-   belonging to the map is loaded.  In this case the path element
-   containing $ORIGIN is left out.  */
+/* Return a malloc allocated copy of INPUT with all recognized DSTs
+   replaced. On some platforms it might not be possible to determine the
+   path from which the object belonging to the map is loaded.  In this
+   case the path containing the DST is left out.  On error NULL
+   is returned.  */
 static char *
-expand_dynamic_string_token (struct link_map *l, const char *s)
+expand_dynamic_string_token (struct link_map *l, const char *input)
 {
   /* We make two runs over the string.  First we determine how large the
      resulting string is and then we copy it over.  Since this is no
@@ -326,22 +384,22 @@ expand_dynamic_string_token (struct link_map *l, const char *s)
   size_t total;
   char *result;
 
-  /* Determine the number of DST elements.  */
-  cnt = DL_DST_COUNT (s);
+  /* Determine the number of DSTs.  */
+  cnt = _dl_dst_count (input);
 
   /* If we do not have to replace anything simply copy the string.  */
   if (__glibc_likely (cnt == 0))
-    return __strdup (s);
+    return __strdup (input);
 
   /* Determine the length of the substituted string.  */
-  total = DL_DST_REQUIRED (l, s, strlen (s), cnt);
+  total = DL_DST_REQUIRED (l, input, strlen (input), cnt);
 
   /* Allocate the necessary memory.  */
   result = (char *) malloc (total + 1);
   if (result == NULL)
     return NULL;
 
-  return _dl_dst_substitute (l, s, result);
+  return _dl_dst_substitute (l, input, result);
 }
 
 
@@ -777,7 +835,7 @@ lose (int code, int fd, const char *name, char *realname, struct link_map *l,
 {
   /* The file might already be closed.  */
   if (fd != -1)
-    (void) __close (fd);
+    (void) __close_nocancel (fd);
   if (l != NULL && l->l_origin != (char *) -1l)
     free ((char *) l->l_origin);
   free (l);
@@ -836,7 +894,7 @@ _dl_map_object_from_fd (const char *name, const char *origname, int fd,
       {
 	/* The object is already loaded.
 	   Just bump its reference count and return it.  */
-	__close (fd);
+	__close_nocancel (fd);
 
 	/* If the name is not in the list of names for this object add
 	   it.  */
@@ -864,7 +922,7 @@ _dl_map_object_from_fd (const char *name, const char *origname, int fd,
 
       /* No need to bump the refcount of the real object, ld.so will
 	 never be unloaded.  */
-      __close (fd);
+      __close_nocancel (fd);
 
       /* Add the map for the mirrored object to the object list.  */
       _dl_add_to_namespace_list (l, nsid);
@@ -878,7 +936,7 @@ _dl_map_object_from_fd (const char *name, const char *origname, int fd,
       /* We are not supposed to load the object unless it is already
 	 loaded.  So return now.  */
       free (realname);
-      __close (fd);
+      __close_nocancel (fd);
       return NULL;
     }
 
@@ -897,7 +955,7 @@ _dl_map_object_from_fd (const char *name, const char *origname, int fd,
       if (_dl_zerofd == -1)
 	{
 	  free (realname);
-	  __close (fd);
+	  __close_nocancel (fd);
 	  _dl_signal_error (errno, NULL, NULL,
 			    N_("cannot open zero fill device"));
 	}
@@ -963,7 +1021,7 @@ _dl_map_object_from_fd (const char *name, const char *origname, int fd,
     {
       phdr = alloca (maplength);
       __lseek (fd, header->e_phoff, SEEK_SET);
-      if ((size_t) __libc_read (fd, (void *) phdr, maplength) != maplength)
+      if ((size_t) __read_nocancel (fd, (void *) phdr, maplength) != maplength)
 	{
 	  errstring = N_("cannot read file data");
 	  goto call_lose_errno;
@@ -1096,6 +1154,14 @@ _dl_map_object_from_fd (const char *name, const char *origname, int fd,
 	  l->l_relro_addr = ph->p_vaddr;
 	  l->l_relro_size = ph->p_memsz;
 	  break;
+
+	case PT_NOTE:
+	  if (_dl_process_pt_note (l, ph, fd, fbp))
+	    {
+	      errstring = N_("cannot process note segment");
+	      goto call_lose;
+	    }
+	  break;
 	}
 
     if (__glibc_unlikely (nloadcmds == 0))
@@ -1183,12 +1249,6 @@ _dl_map_object_from_fd (const char *name, const char *origname, int fd,
 
   if (__glibc_unlikely ((stack_flags &~ GL(dl_stack_flags)) & PF_X))
     {
-      if (__glibc_unlikely (__check_caller (RETURN_ADDRESS (0), allow_ldso) != 0))
-	{
-	  errstring = N_("invalid caller");
-	  goto call_lose;
-	}
-
       /* The stack is presently not executable, but this module
 	 requires that it be executable.  We must change the
 	 protection of the variable which contains the flags used in
@@ -1239,7 +1299,7 @@ cannot enable executable stack as shared object requires");
     l->l_tls_initimage = (char *) l->l_tls_initimage + l->l_addr;
 
   /* We are done mapping in the file.  We no longer need the descriptor.  */
-  if (__glibc_unlikely (__close (fd) != 0))
+  if (__glibc_unlikely (__close_nocancel (fd) != 0))
     {
       errstring = N_("cannot close file descriptor");
       goto call_lose_errno;
@@ -1454,7 +1514,7 @@ open_verify (const char *name, int fd,
         {
           /* An audit library changed what we're supposed to open,
              so FD no longer matches it.  */
-          __close (fd);
+          __close_nocancel (fd);
           fd = -1;
         }
     }
@@ -1462,13 +1522,14 @@ open_verify (const char *name, int fd,
 
   if (fd == -1)
     /* Open the file.  We always open files read-only.  */
-    fd = __open (name, O_RDONLY | O_CLOEXEC);
+    fd = __open64_nocancel (name, O_RDONLY | O_CLOEXEC);
 
   if (fd != -1)
     {
       ElfW(Ehdr) *ehdr;
       ElfW(Phdr) *phdr, *ph;
       ElfW(Word) *abi_note;
+      ElfW(Word) *abi_note_malloced = NULL;
       unsigned int osversion;
       size_t maplength;
 
@@ -1480,8 +1541,8 @@ open_verify (const char *name, int fd,
       /* Read in the header.  */
       do
 	{
-	  ssize_t retlen = __libc_read (fd, fbp->buf + fbp->len,
-					sizeof (fbp->buf) - fbp->len);
+	  ssize_t retlen = __read_nocancel (fd, fbp->buf + fbp->len,
+					    sizeof (fbp->buf) - fbp->len);
 	  if (retlen <= 0)
 	    break;
 	  fbp->len += retlen;
@@ -1604,7 +1665,8 @@ open_verify (const char *name, int fd,
 	{
 	  phdr = alloca (maplength);
 	  __lseek (fd, ehdr->e_phoff, SEEK_SET);
-	  if ((size_t) __libc_read (fd, (void *) phdr, maplength) != maplength)
+	  if ((size_t) __read_nocancel (fd, (void *) phdr, maplength)
+	      != maplength)
 	    {
 	    read_error:
 	      errval = errno;
@@ -1640,10 +1702,25 @@ open_verify (const char *name, int fd,
 	      abi_note = (void *) (fbp->buf + ph->p_offset);
 	    else
 	      {
-		abi_note = alloca (size);
+		/* Note: __libc_use_alloca is not usable here, because
+		   thread info may not have been set up yet.  */
+		if (size < __MAX_ALLOCA_CUTOFF)
+		  abi_note = alloca (size);
+		else
+		  {
+		    /* There could be multiple PT_NOTEs.  */
+		    abi_note_malloced = realloc (abi_note_malloced, size);
+		    if (abi_note_malloced == NULL)
+		      goto read_error;
+
+		    abi_note = abi_note_malloced;
+		  }
 		__lseek (fd, ph->p_offset, SEEK_SET);
-		if (__libc_read (fd, (void *) abi_note, size) != size)
-		  goto read_error;
+		if (__read_nocancel (fd, (void *) abi_note, size) != size)
+		  {
+		    free (abi_note_malloced);
+		    goto read_error;
+		  }
 	      }
 
 	    while (memcmp (abi_note, &expected_note, sizeof (expected_note)))
@@ -1671,13 +1748,14 @@ open_verify (const char *name, int fd,
 		|| (GLRO(dl_osversion) && GLRO(dl_osversion) < osversion))
 	      {
 	      close_and_out:
-		__close (fd);
+		__close_nocancel (fd);
 		__set_errno (ENOENT);
 		fd = -1;
 	      }
 
 	    break;
 	  }
+      free (abi_note_malloced);
     }
 
   return fd;
@@ -1787,7 +1865,7 @@ open_path (const char *name, size_t namelen, int mode,
 		  /* The shared object cannot be tested for being SUID
 		     or this bit is not set.  In this case we must not
 		     use this object.  */
-		  __close (fd);
+		  __close_nocancel (fd);
 		  fd = -1;
 		  /* We simply ignore the file, signal this by setting
 		     the error value which would have been set by `open'.  */
@@ -1808,7 +1886,7 @@ open_path (const char *name, size_t namelen, int mode,
 	    {
 	      /* No memory for the name, we certainly won't be able
 		 to load and link it.  */
-	      __close (fd);
+	      __close_nocancel (fd);
 	      return -1;
 	    }
 	}
