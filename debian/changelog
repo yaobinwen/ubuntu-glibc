@@ -1,3 +1,17 @@
+glibc (2.28-1) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/git-fcntl64.diff: Fix tst-utmp* tests.
+  * debian/patches/hurd-i386/tg-WRLCK-upgrade.diff: Refresh.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix a file descriptor leak in if_nametoindex() (CVE-2018-19591).
+      Closes: #914837.
+  * debian/control.in/main: Update Vcs-Git to point to the default branch.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 28 Nov 2018 23:42:08 +0100
+
 glibc (2.28-0experimental1) experimental; urgency=medium
 
   [ Aurelien Jarno ]
@@ -145,6 +159,8 @@ glibc (2.27-9) UNRELEASED; urgency=medium
   * libc0.3.symbols.hurd-i386: Update symbols accordingly.
   * patches/hurd-i386/git-spawn-open.diff: Fix crash on spawn with open
     operation.
+  * patches/hurd-i386/git-lockf-0.diff: Support lockf at offset 0 with size 0 or
+    1.
 
  -- Samuel Thibault <sthibault@debian.org>  Sat, 03 Nov 2018 22:50:40 +0100
 
