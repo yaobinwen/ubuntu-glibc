@@ -893,6 +893,10 @@ test-xfail-tst-malloc-usable-tunables = yes
 # Known failure not a regression, see https://sourceware.org/bugzilla/show_bug.cgi?id=23584
 test-xfail-test-ildouble-fma = yes
 test-xfail-test-ldouble-fma = yes
+
+# The glibc implementation of pkey_get and pkey_set are the stub
+# implementations.
+test-xfail-tst-pkey = yes
 endif
 
 
@@ -912,6 +916,10 @@ test-xfail-tst-malloc-usable-tunables = yes
 # Known failure not a regression, see https://sourceware.org/bugzilla/show_bug.cgi?id=23584
 test-xfail-test-ildouble-fma = yes
 test-xfail-test-ldouble-fma = yes
+
+# The glibc implementation of pkey_get and pkey_set are the stub
+# implementations.
+test-xfail-tst-pkey = yes
 endif
 
 
@@ -927,6 +935,10 @@ test-xfail-tst-waitid = yes
 # Known failure not a regression, see https://sourceware.org/bugzilla/show_bug.cgi?id=23584
 test-xfail-test-ildouble-fma = yes
 test-xfail-test-ldouble-fma = yes
+
+# The glibc implementation of pkey_get and pkey_set are the stub
+# implementations.
+test-xfail-tst-pkey = yes
 endif
 
 
@@ -955,6 +967,10 @@ test-xfail-tst-cancelx5 = yes
 test-xfail-tst-key1 = yes
 test-xfail-tst-key4 = yes
 test-xfail-tst-setcontext-fpscr = yes
+
+# The glibc implementation of pkey_get and pkey_set are the stub
+# implementations.
+test-xfail-tst-pkey = yes
 endif
 
 
@@ -986,6 +1002,7 @@ test-xfail-tst-cond-except = yes
 test-xfail-tst-cond24 = yes
 test-xfail-tst-cond25 = yes
 test-xfail-tst-execstack = yes
+test-xfail-tst-execstack-needed = yes
 test-xfail-tst-malloc-usable-tunables = yes
 test-xfail-tst-resolv-res_init = yes
 test-xfail-tst-resolv-res_init-thread = yes
@@ -1080,4 +1097,8 @@ test-xfail-tst-backtrace6 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-platform-1 = yes
 test-xfail-tst-waitid = yes
+
+# This looks like a kernel bug in the compat layer
+test-xfail-tst-preadvwritev2 = yes
+test-xfail-tst-preadvwritev64v2 = yes
 endif
