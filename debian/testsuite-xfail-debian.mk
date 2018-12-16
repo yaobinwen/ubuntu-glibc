@@ -229,9 +229,12 @@ test-xfail-tst-backtrace5 = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-cleanupx4 = yes
 test-xfail-tst-makecontext = yes
+test-xfail-tst-preadvwritev2 = yes
+test-xfail-tst-preadvwritev64v2 = yes
 test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
 test-xfail-tst-setcontext2 = yes
+test-xfail-tst-setcontext7 = yes
 test-xfail-tst-stack4 = yes
 # The following tests sometimes fail due to timeouts.
 test-xfail-tst-barrier5 = yes
@@ -1020,6 +1023,13 @@ test-xfail-tst-robust9 = yes
 test-xfail-tst-strfrom = yes
 test-xfail-tst-strfrom-locale = yes
 test-xfail-tst-tls12 = yes
+
+# Those tests fail due to a kernel bug. See:
+# http://lists.infradead.org/pipermail/linux-riscv/2018-December/002512.html
+test-xfail-test-fpucw = yes
+test-xfail-test-fpucw-ieee = yes
+test-xfail-test-fpucw-ieee-static = yes
+test-xfail-test-fpucw-static = yes
 endif
 
 
@@ -1082,6 +1092,7 @@ test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
 test-xfail-tst-realloc = yes
 test-xfail-tst-waitid = yes
+test-xfail-test-float64x-float128-mul=yes
 
 # In some conditions the kernel might not provide a heap, causing
 # some tests to fail. See bug#889817 for details.
@@ -1098,7 +1109,8 @@ test-xfail-tst-mqueue5 = yes
 test-xfail-tst-platform-1 = yes
 test-xfail-tst-waitid = yes
 
-# This looks like a kernel bug in the compat layer
+# This is a kernel bug in the compat layer. See:
+# https://patchwork.kernel.org/patch/10716699
 test-xfail-tst-preadvwritev2 = yes
 test-xfail-tst-preadvwritev64v2 = yes
 endif

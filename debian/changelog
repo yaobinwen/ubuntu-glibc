@@ -1,3 +1,30 @@
+glibc (2.28-3) unstable; urgency=medium
+
+  [ John David Anglin ]
+  * debian/testsuite-xfail-debian.mk: whitelist misc/tst-preadvwritev2,
+    misc/tst-preadvwritev64v2 and test-xfail-tst-setcontext7 on hppa.  Closes:
+    #915676.
+
+  [ Aurelien Jarno ]
+  * debian/testsuite-xfail-debian.mk: whitelist math/test-float64x-float128-mul
+    on sparc64.  Closes: #916124.
+  * debian/control.in/libc: add a Breaks: nocache (<< 1.0-1 ) to
+    @libc@ as it doesn't work with glibc 2.28.
+  * debian/testsuite-xfail-debian.mk: whitelist math/test-fpucw,
+    math/test-fpucw-ieee, math/test-fpucw-ieee-static and
+    math/test-fpucw-static on riscv64. Thoses failures are due to a kernel
+    bug.
+  * debian/sysdeps/riscv64.mk: increase TIMEOUTFACTOR to 50 on riscv64.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - debian/patches/riscv64/submitted-start-cfi.diff: upstreamed.
+  * debian/patches/submitted-sigaction-sa-restorer.diff: fix a regression in
+    sigaction on m68k.  Closes: #915958.
+  * debian/script.in/nsscheck.sh: drop direct support for file-rc and always
+    run invoke-rc.d instead. invoke-rc.d in stretch has support for file-rc.
+    Closes: #916588.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 16 Dec 2018 18:25:59 +0100
+
 glibc (2.28-2) unstable; urgency=medium
 
   [ Samuel Thibault ]
