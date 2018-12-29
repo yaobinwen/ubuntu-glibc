@@ -33,6 +33,7 @@ arm/local-soname-hack.diff
 arm/local-vfp-sysdeps.diff
 arm/unsubmitted-ldso-multilib.diff
 arm/local-arm-futex.diff
+arm/submitted-gcc-8-kernel-assisted-atomics.diff
 
 hppa/local-inlining.diff
 
@@ -76,7 +77,7 @@ hurd-i386/local-mach_print.diff
 hurd-i386/tg-eintr.diff
 hurd-i386/tg-ONSTACK.diff
 hurd-i386/tg-libc_rwlock_recursive.diff
-hurd-i386/tg-magic-pid.diff
+hurd-i386/git-magic-pid.diff
 hurd-i386/local-no_unsupported_ioctls.diff
 hurd-i386/local-exec_filename.diff
 #hurd-i386/libpthread_sigs.diff
@@ -113,6 +114,8 @@ m68k/submitted-gcc34-seccomment.diff
 mips/submitted-rld_map.diff
 
 powerpc/local-powerpc8xx-dcbz.diff
+
+riscv64/git-thread-debugging.diff
 
 sh4/local-fpscr_values.diff
 
@@ -152,4 +155,4 @@ any/local-libpic.diff
 any/local-bootstrap-headers.diff
 any/submitted-resolv-unaligned.diff
 any/local-cudacc-float128.diff
-any/submitted-sigaction-sa-restorer.diff
+any/submitted-workaround-math-errno-gcc-bug.diff

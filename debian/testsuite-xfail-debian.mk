@@ -404,6 +404,8 @@ test-xfail-tst-fgetc-after-eof = yes
 test-xfail-tst-fgetwc-after-eof = yes
 test-xfail-test-as-const-jmp_buf-ssp = yes
 test-xfail-tst-malloc-stats-cancellation = yes
+test-xfail-tst-if_index-long = yes
+test-xfail-tst-support_descriptors = yes
 
 # This redirects realloc with dlsym
 # Problem is: that creates a loop: realloc() calls dlsym() which calls
@@ -1026,10 +1028,18 @@ test-xfail-tst-tls12 = yes
 
 # Those tests fail due to a kernel bug. See:
 # http://lists.infradead.org/pipermail/linux-riscv/2018-December/002512.html
+test-xfail-test-fenv = yes
 test-xfail-test-fpucw = yes
 test-xfail-test-fpucw-ieee = yes
 test-xfail-test-fpucw-ieee-static = yes
 test-xfail-test-fpucw-static = yes
+
+# Those tests sometimes fail in a QEMU VM, but not on a HiFive Unleashed board
+test-xfail-test-at_quick_exit-race = yes
+test-xfail-test-on_exit-race = yes
+test-xfail-tst-cond16 = yes
+test-xfail-tst-malloc-thread-fail = yes
+test-xfail-tst-stack4 = yes
 endif
 
 
