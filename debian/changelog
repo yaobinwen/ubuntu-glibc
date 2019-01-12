@@ -1,3 +1,25 @@
+glibc (2.28-5) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/script.in/nsscheck.sh: fix a typo s/samaba/samba/. Closes:
+    #909047.
+  * debian/debhelper.in/libc.postrm: suidmanager is long gone, remove support
+    for it.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - debian/patches/arm/submitted-gcc-8-kernel-assisted-atomics.diff:
+      upstreamed.
+    - any/submitted-workaround-math-errno-gcc-bug.diff: upstreamed.
+  * debian/control.in/libc: fix nocache Breaks, set it to (<< 1.1-1~). Closes:
+    #918583.
+  * debian/patches/localedata/git-en_US-date_fmt.diff: backport from upstream
+    support for date_fmt for the en_US locale. Closes: #877900.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-libpthread_setpshared.diff: New patch to
+    avoid letting packages use setpshared.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 12 Jan 2019 18:50:25 +0100
+
 glibc (2.28-4) unstable; urgency=medium
 
   [ Aurelien Jarno ]
