@@ -190,6 +190,25 @@ test-xfail-tst-waitid = yes
 # There is not support for protection key on ARM yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# This test is currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend it fails on ARM:
+test-xfail-tst-ttyname = yes
+
+# This test fails due to a kernel bug when building armhf on an ARM64
+# machine. See bug #904385.
+test-xfail-tst-signal6 = yes
+
+# This test has regressed with recent kernels
+test-xfail-tst-thread-exit-clobber = yes
+
+# These (new in 2.29) tests appear to fail when building armhf on aarch64
+test-xfail-tst-minsigstksz-1 = yes
+test-xfail-tst-minsigstksz-2 = yes
+test-xfail-tst-minsigstksz-3 = yes
+test-xfail-tst-minsigstksz-3a = yes
+test-xfail-tst-minsigstksz-4 = yes
+test-xfail-tst-xsigstack = yes
 endif
 
 
@@ -208,9 +227,24 @@ test-xfail-tst-waitid = yes
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
 
+# This test is currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend it fails on ARM:
+test-xfail-tst-ttyname = yes
+
 # This test fails due to a kernel bug when building armhf on an ARM64
 # machine. See bug #904385.
 test-xfail-tst-signal6 = yes
+
+# This test has regressed with recent kernels
+test-xfail-tst-thread-exit-clobber = yes
+
+# These (new in 2.29) tests appear to fail when building armhf on aarch64
+test-xfail-tst-minsigstksz-1 = yes
+test-xfail-tst-minsigstksz-2 = yes
+test-xfail-tst-minsigstksz-3 = yes
+test-xfail-tst-minsigstksz-3a = yes
+test-xfail-tst-minsigstksz-4 = yes
+test-xfail-tst-xsigstack = yes
 endif
 
 
@@ -1040,6 +1074,16 @@ test-xfail-test-on_exit-race = yes
 test-xfail-tst-cond16 = yes
 test-xfail-tst-malloc-thread-fail = yes
 test-xfail-tst-stack4 = yes
+endif
+
+######################################################################
+# s390
+######################################################################
+ifeq ($(config-machine)-$(config-os),s390-linux-gnu)
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 

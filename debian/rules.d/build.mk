@@ -89,8 +89,8 @@ $(stamp)configure_%: $(stamp)config_sub_guess $(stamp)patch $(KERNEL_HEADER_DIR)
 		--enable-stack-protector=strong \
 		--enable-obsolete-rpc \
 		--enable-obsolete-nsl \
-		--with-pkgversion="Debian GLIBC $(DEB_VERSION)" \
-		--with-bugurl="http://www.debian.org/Bugs/" \
+		--with-pkgversion="Ubuntu GLIBC $(DEB_VERSION)" \
+		--with-bugurl="https://bugs.launchpad.net/ubuntu/+source/glibc/+bugs" \
 		$(if $(filter $(pt_chown),yes),--enable-pt_chown) \
 		$(if $(filter $(threads),no),--disable-nscd) \
 		$(if $(filter $(call xx,mvec),no),--disable-mathvec) \
@@ -329,7 +329,7 @@ $(stamp)build_locales-all: $(stamp)/build_libc
 	$(MAKE) -C $(DEB_BUILDDIRLIBC) $(NJOBS) \
 		objdir=$(DEB_BUILDDIRLIBC) \
 		install_root=$(CURDIR)/build-tree/locales-all \
-		localedata/install-locales LOCALEDEF="$(LOCALEDEF)"
+		localedata/install-locale-files LOCALEDEF="$(LOCALEDEF)"
 	rdfind -outputname /dev/null -makesymlinks true -removeidentinode false \
 		$(CURDIR)/build-tree/locales-all/usr/lib/locale
 	symlinks -r -s -c $(CURDIR)/build-tree/locales-all/usr/lib/locale

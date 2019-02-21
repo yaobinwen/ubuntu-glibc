@@ -1,5 +1,5 @@
 # Makefile for support library, used only at build and test time
-# Copyright (C) 2016-2018 Free Software Foundation, Inc.
+# Copyright (C) 2016-2019 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@ extra-libs-others = $(extra-libs)
 extra-libs-noinstall := $(extra-libs)
 
 libsupport-routines = \
+  blob_repeat \
   check \
   check_addrinfo \
   check_dns_packet \
@@ -43,6 +44,9 @@ libsupport-routines = \
   support_capture_subprocess \
   support_capture_subprocess_check \
   support_chroot \
+  support_copy_file_range \
+  support_descriptor_supports_holes \
+  support_descriptors \
   support_enter_mount_namespace \
   support_enter_network_namespace \
   support_format_address_family \
@@ -53,12 +57,15 @@ libsupport-routines = \
   support_format_netent \
   support_isolate_in_subprocess \
   support_openpty \
+  support_paths \
   support_quote_blob \
+  support_quote_string \
   support_record_failure \
   support_run_diff \
   support_shared_allocate \
   support_test_compare_blob \
   support_test_compare_failure \
+  support_test_compare_string \
   support_write_file_string \
   support_test_main \
   support_test_verify_impl \
@@ -72,6 +79,7 @@ libsupport-routines = \
   xchroot \
   xclose \
   xconnect \
+  xcopy_file_range \
   xdlfcn \
   xdup2 \
   xfclose \
@@ -84,6 +92,7 @@ libsupport-routines = \
   xmalloc \
   xmemstream \
   xmkdir \
+  xmkdirp \
   xmmap \
   xmprotect \
   xmunmap \
@@ -136,9 +145,11 @@ libsupport-routines = \
   xsetsockopt \
   xsigaction \
   xsignal \
+  xsigstack \
   xsocket \
   xstrdup \
   xstrndup \
+  xsymlink \
   xsysconf \
   xunlink \
   xwaitpid \
@@ -151,16 +162,51 @@ ifeq ($(build-shared),yes)
 libsupport-inhibit-o += .o
 endif
 
+CFLAGS-support_paths.c = \
+		-DSRCDIR_PATH=\"`cd .. ; pwd`\" \
+		-DOBJDIR_PATH=\"`cd $(objpfx)/..; pwd`\" \
+		-DOBJDIR_ELF_LDSO_PATH=\"`cd $(objpfx)/..; pwd`/elf/$(rtld-installed-name)\" \
+		-DINSTDIR_PATH=\"$(prefix)\" \
+		-DLIBDIR_PATH=\"$(libdir)\"
+
+ifeq (,$(CXX))
+LINKS_DSO_PROGRAM = links-dso-program-c
+else
+LINKS_DSO_PROGRAM = links-dso-program
+LDLIBS-links-dso-program = -lstdc++ -lgcc -lgcc_s $(libunwind)
+endif
+
+LDLIBS-test-container = $(libsupport)
+
+others += test-container
+others-noinstall += test-container
+
+others += shell-container echo-container true-container
+others-noinstall += shell-container echo-container true-container
+
+others += $(LINKS_DSO_PROGRAM)
+others-noinstall += $(LINKS_DSO_PROGRAM)
+
+$(objpfx)test-container : $(libsupport)
+$(objpfx)shell-container : $(libsupport)
+$(objpfx)echo-container : $(libsupport)
+$(objpfx)true-container : $(libsupport)
+
 tests = \
   README-testing \
   tst-support-namespace \
+  tst-support_blob_repeat \
   tst-support_capture_subprocess \
+  tst-support_descriptors \
   tst-support_format_dns_packet \
   tst-support_quote_blob \
+  tst-support_quote_string \
   tst-support_record_failure \
   tst-test_compare \
   tst-test_compare_blob \
+  tst-test_compare_string \
   tst-xreadlink \
+  tst-xsigstack \
 
 ifeq ($(run-built-tests),yes)
 tests-special = \

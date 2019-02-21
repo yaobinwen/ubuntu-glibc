@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2018 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Martin Schwidefsky <schwidefsky@de.ibm.com>, 2003.
 
@@ -516,7 +516,7 @@ __pthread_cond_wait_common (pthread_cond_t *cond, pthread_mutex_t *mutex,
 		  struct timespec rt;
 		  if (__clock_gettime (CLOCK_MONOTONIC, &rt) != 0)
 		    __libc_fatal ("clock_gettime does not support "
-				  "CLOCK_MONOTONIC");
+				  "CLOCK_MONOTONIC\n");
 		  /* Convert the absolute timeout value to a relative
 		     timeout.  */
 		  rt.tv_sec = abstime->tv_sec - rt.tv_sec;

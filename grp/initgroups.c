@@ -1,4 +1,4 @@
-/* Copyright (C) 1989, 1991-2018 Free Software Foundation, Inc.
+/* Copyright (C) 1989, 1991-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -128,7 +128,7 @@ internal_getgrouplist (const char *user, gid_t group, long int *size,
 
       /* This is really only for debugging.  */
       if (NSS_STATUS_TRYAGAIN > status || status > NSS_STATUS_RETURN)
-	__libc_fatal ("illegal status in internal_getgrouplist");
+	__libc_fatal ("Illegal status in internal_getgrouplist.\n");
 
       /* For compatibility reason we will continue to look for more
 	 entries using the next service even though data has already

@@ -1,5 +1,5 @@
 /* Implementation of the internal dcigettext function.
-   Copyright (C) 1995-2018 Free Software Foundation, Inc.
+   Copyright (C) 1995-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -631,7 +631,7 @@ DCIGETTEXT (const char *domainname, const char *msgid1, const char *msgid2,
 	  int ret = __asprintf (&xdirname, "%s/%s", cwd, dirname);
 	  free (cwd);
 	  if (ret < 0)
-	      return NULL;
+	    goto return_untranslated;
 	  dirname = xdirname;
 	}
 #ifndef IN_LIBGLOCALE

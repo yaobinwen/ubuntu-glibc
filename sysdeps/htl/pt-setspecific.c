@@ -1,5 +1,5 @@
 /* pthread_setspecific.  Generic version.
-   Copyright (C) 2002-2018 Free Software Foundation, Inc.
+   Copyright (C) 2002-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -48,3 +48,4 @@ __pthread_setspecific (pthread_key_t key, const void *value)
   return 0;
 }
 strong_alias (__pthread_setspecific, pthread_setspecific);
+hidden_def (__pthread_setspecific)

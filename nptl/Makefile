@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2018 Free Software Foundation, Inc.
+# Copyright (C) 2002-2019 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -145,7 +145,7 @@ libpthread-routines = nptl-init nptlfreeres vars events version pt-interp \
 		      mtx_destroy mtx_init mtx_lock mtx_timedlock \
 		      mtx_trylock mtx_unlock call_once cnd_broadcast \
 		      cnd_destroy cnd_init cnd_signal cnd_timedwait cnd_wait \
-		      tss_create tss_delete tss_get tss_set
+		      tss_create tss_delete tss_get tss_set pthread_mutex_conf
 #		      pthread_setuid pthread_seteuid pthread_setreuid \
 #		      pthread_setresuid \
 #		      pthread_setgid pthread_setegid pthread_setregid \
@@ -241,9 +241,9 @@ LDLIBS-tst-minstack-throw = -lstdc++
 
 tests = tst-attr1 tst-attr2 tst-attr3 tst-default-attr \
 	tst-mutex1 tst-mutex2 tst-mutex3 tst-mutex4 tst-mutex5 tst-mutex6 \
-	tst-mutex7 tst-mutex9 tst-mutex5a tst-mutex7a tst-mutex7robust \
-	tst-mutexpi1 tst-mutexpi2 tst-mutexpi3 tst-mutexpi4 tst-mutexpi5 \
-	tst-mutexpi5a tst-mutexpi6 tst-mutexpi7 tst-mutexpi7a \
+	tst-mutex7 tst-mutex9 tst-mutex10 tst-mutex5a tst-mutex7a \
+	tst-mutex7robust tst-mutexpi1 tst-mutexpi2 tst-mutexpi3 tst-mutexpi4 \
+	tst-mutexpi5 tst-mutexpi5a tst-mutexpi6 tst-mutexpi7 tst-mutexpi7a \
 	tst-mutexpi9 \
 	tst-spin1 tst-spin2 tst-spin3 tst-spin4 \
 	tst-cond1 tst-cond2 tst-cond3 tst-cond4 tst-cond5 tst-cond6 tst-cond7 \
@@ -318,7 +318,8 @@ tests = tst-attr1 tst-attr2 tst-attr3 tst-default-attr \
 	tst-minstack-throw \
 	tst-cnd-basic tst-mtx-trylock tst-cnd-broadcast \
 	tst-cnd-timedwait tst-thrd-detach tst-mtx-basic tst-thrd-sleep \
-	tst-mtx-recursive tst-tss-basic tst-call-once tst-mtx-timedlock
+	tst-mtx-recursive tst-tss-basic tst-call-once tst-mtx-timedlock \
+	tst-rwlock-pwn
 
 tests-internal := tst-rwlock19 tst-rwlock20 \
 		  tst-sem11 tst-sem12 tst-sem13 \
@@ -382,7 +383,8 @@ tests += tst-cancelx2 tst-cancelx3 tst-cancelx4 tst-cancelx5 \
 	 tst-cleanupx0 tst-cleanupx1 tst-cleanupx2 tst-cleanupx3 tst-cleanupx4 \
 	 tst-oncex3 tst-oncex4
 ifeq ($(build-shared),yes)
-tests += tst-atfork2 tst-tls4 tst-_res1 tst-fini1 tst-compat-forwarder
+tests += tst-atfork2 tst-tls4 tst-_res1 tst-fini1 tst-compat-forwarder \
+	 tst-audit-threads
 tests-internal += tst-tls3 tst-tls3-malloc tst-tls5 tst-stackguard1
 tests-nolibpthread += tst-fini1
 ifeq ($(have-z-execstack),yes)
@@ -394,7 +396,8 @@ modules-names = tst-atfork2mod tst-tls3mod tst-tls4moda tst-tls4modb \
 		tst-tls5mod tst-tls5moda tst-tls5modb tst-tls5modc \
 		tst-tls5modd tst-tls5mode tst-tls5modf tst-stack4mod \
 		tst-_res1mod1 tst-_res1mod2 tst-execstack-mod tst-fini1mod \
-		tst-join7mod tst-compat-forwarder-mod
+		tst-join7mod tst-compat-forwarder-mod tst-audit-threads-mod1 \
+		tst-audit-threads-mod2
 extra-test-objs += $(addsuffix .os,$(strip $(modules-names))) \
 		   tst-cleanup4aux.o tst-cleanupx4aux.o
 test-extras += tst-cleanup4aux tst-cleanupx4aux
@@ -449,9 +452,10 @@ link-libc-static := $(common-objpfx)libc.a $(static-gnulib) \
 tests-static += tst-locale1 tst-locale2 tst-stackguard1-static \
 		tst-cancel21-static tst-cancel24-static tst-cond8-static \
 		tst-mutex8-static tst-mutexpi8-static tst-sem11-static \
-		tst-sem12-static
+		tst-sem12-static tst-cond11-static
+
 tests += tst-cancel21-static tst-cancel24-static \
-	 tst-cond8-static
+	 tst-cond8-static tst-cond11-static
 tests-internal += tst-sem11-static tst-sem12-static tst-stackguard1-static
 xtests-static += tst-setuid1-static
 
@@ -461,8 +465,7 @@ tests-reverse += tst-cancel5 tst-cancel23 tst-vfork1x tst-vfork2x
 ifeq ($(run-built-tests),yes)
 tests-special += $(objpfx)tst-stack3-mem.out $(objpfx)tst-oddstacklimit.out
 ifeq ($(build-shared),yes)
-tests-special += $(objpfx)tst-tls6.out $(objpfx)tst-cleanup0-cmp.out \
-		 $(objpfx)tst-cancel-wrappers.out
+tests-special += $(objpfx)tst-tls6.out $(objpfx)tst-cleanup0-cmp.out
 endif
 endif
 
@@ -665,8 +668,7 @@ $(objpfx)$(multidir)/crtn.o: $(objpfx)crtn.o $(objpfx)$(multidir)/
 	ln -f $< $@
 endif
 
-generated += multidir.mk tst-atfork2.mtrace tst-cancel-wrappers.out \
-	     tst-tls6.out
+generated += multidir.mk tst-atfork2.mtrace tst-tls6.out
 
 generated += $(objpfx)tst-atfork2.mtrace \
 	     $(addsuffix .so,$(strip $(modules-names)))
@@ -675,18 +677,6 @@ generated += $(objpfx)tst-atfork2.mtrace \
 LDFLAGS-pthread.so += -e __nptl_main
 # pt-interp.c exists just to get the runtime linker path into libpthread.so.
 $(objpfx)pt-interp.os: $(common-objpfx)runtime-linker.h
-endif
-
-ifeq ($(run-built-tests),yes)
-ifeq (yes,$(build-shared))
-$(objpfx)tst-cancel-wrappers.out: tst-cancel-wrappers.sh
-	$(SHELL) $< '$(NM)' \
-		    $(common-objpfx)libc_pic.a \
-		    $(common-objpfx)libc.a \
-		    $(objpfx)libpthread_pic.a \
-		    $(objpfx)libpthread.a > $@; \
-	$(evaluate-test)
-endif
 endif
 
 tst-exec4-ARGS = $(host-test-program-cmd)
@@ -708,6 +698,16 @@ $(objpfx)tst-oddstacklimit.out: $(objpfx)tst-oddstacklimit $(objpfx)tst-basic1
 endif
 
 $(objpfx)tst-compat-forwarder: $(objpfx)tst-compat-forwarder-mod.so
+
+tst-mutex10-ENV = GLIBC_TUNABLES=glibc.elision.enable=1
+
+# Protect against a build using -Wl,-z,now.
+LDFLAGS-tst-audit-threads-mod1.so = -Wl,-z,lazy
+LDFLAGS-tst-audit-threads-mod2.so = -Wl,-z,lazy
+LDFLAGS-tst-audit-threads = -Wl,-z,lazy
+$(objpfx)tst-audit-threads: $(objpfx)tst-audit-threads-mod2.so
+$(objpfx)tst-audit-threads.out: $(objpfx)tst-audit-threads-mod1.so
+tst-audit-threads-ENV = LD_AUDIT=$(objpfx)tst-audit-threads-mod1.so
 
 # The tests here better do not run in parallel
 ifneq ($(filter %tests,$(MAKECMDGOALS)),)

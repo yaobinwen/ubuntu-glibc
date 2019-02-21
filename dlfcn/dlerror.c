@@ -1,5 +1,5 @@
 /* Return error detail for failing <dlfcn.h> functions.
-   Copyright (C) 1995-2018 Free Software Foundation, Inc.
+   Copyright (C) 1995-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -198,7 +198,10 @@ check_free (struct dl_action_result *rec)
       Dl_info info;
       if (_dl_addr (check_free, &info, &map, NULL) != 0 && map->l_ns == 0)
 #endif
-	free ((char *) rec->errstring);
+	{
+	  free ((char *) rec->errstring);
+	  rec->errstring = NULL;
+	}
     }
 }
 

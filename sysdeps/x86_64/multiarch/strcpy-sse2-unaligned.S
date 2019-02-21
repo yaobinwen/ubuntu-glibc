@@ -1,5 +1,5 @@
 /* strcpy with SSE2 and unaligned load
-   Copyright (C) 2011-2018 Free Software Foundation, Inc.
+   Copyright (C) 2011-2019 Free Software Foundation, Inc.
    Contributed by Intel Corporation.
    This file is part of the GNU C Library.
 
@@ -40,8 +40,8 @@
 .text
 ENTRY (STRCPY)
 #  ifdef USE_AS_STRNCPY
-	mov	%rdx, %r8
-	test	%r8, %r8
+	mov	%RDX_LP, %R8_LP
+	test	%R8_LP, %R8_LP
 	jz	L(ExitZero)
 #  endif
 	mov	%rsi, %rcx

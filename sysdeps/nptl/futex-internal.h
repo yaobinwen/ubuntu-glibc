@@ -1,6 +1,6 @@
 /* futex operations for glibc-internal use.  Stub version; do not include
    this file directly.
-   Copyright (C) 2014-2018 Free Software Foundation, Inc.
+   Copyright (C) 2014-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -197,7 +197,7 @@ futex_wake (unsigned int* futex_word, int processes_to_wake, int private);
 static __always_inline __attribute__ ((__noreturn__)) void
 futex_fatal_error (void)
 {
-  __libc_fatal ("The futex facility returned an unexpected error code.");
+  __libc_fatal ("The futex facility returned an unexpected error code.\n");
 }
 
 #endif  /* futex-internal.h */

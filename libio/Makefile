@@ -1,4 +1,4 @@
-# Copyright (C) 1995-2018 Free Software Foundation, Inc.
+# Copyright (C) 1995-2019 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -59,12 +59,13 @@ tests = tst_swprintf tst_wprintf tst_swscanf tst_wscanf tst_getwc tst_putwc   \
 	tst-mmap-eofsync tst-mmap-fflushsync bug-mmap-fflush \
 	tst-mmap2-eofsync tst-mmap-offend bug-fopena+ bug-wfflush \
 	bug-ungetc2 bug-ftell bug-ungetc3 bug-ungetc4 tst-fopenloc2 \
-	tst-memstream1 tst-memstream2 tst-memstream3 \
-	tst-wmemstream1 tst-wmemstream2 tst-wmemstream3 \
+	tst-memstream1 tst-memstream2 tst-memstream3 tst-memstream4 \
+	tst-wmemstream1 tst-wmemstream2 tst-wmemstream3 tst-wmemstream4 \
 	bug-memstream1 bug-wmemstream1 \
 	tst-setvbuf1 tst-popen1 tst-fgetwc bug-wsetpos tst-fseek \
 	tst-fwrite-error tst-ftell-partial-wide tst-ftell-active-handler \
-	tst-ftell-append tst-fputws tst-bz22415 tst-fgetc-after-eof
+	tst-ftell-append tst-fputws tst-bz22415 tst-fgetc-after-eof \
+	tst-sprintf-ub tst-sprintf-chk-ub
 
 tests-internal = tst-vtables tst-vtables-interposed tst-readline
 
@@ -151,6 +152,10 @@ CFLAGS-oldtmpfile.c += -fexceptions
 # XXX Do we need filedoalloc and wfiledoalloc?  Others?
 
 CFLAGS-tst_putwc.c += -DOBJPFX=\"$(objpfx)\"
+
+# These test cases intentionally use overlapping arguments
+CFLAGS-tst-sprintf-ub.c += -Wno-restrict
+CFLAGS-tst-sprintf-chk-ub.c += -Wno-restrict
 
 tst_wprintf2-ARGS = "Some Text"
 

@@ -1,5 +1,5 @@
 /* pthread_getspecific.  Hurd version.
-   Copyright (C) 2002-2018 Free Software Foundation, Inc.
+   Copyright (C) 2002-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -36,3 +36,4 @@ __pthread_getspecific (pthread_key_t key)
   return self->thread_specifics[key];
 }
 strong_alias (__pthread_getspecific, pthread_getspecific);
+hidden_def (__pthread_getspecific)
