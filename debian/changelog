@@ -1,3 +1,17 @@
+glibc (2.28-8) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * Update Danish debconf translation, by Joe Hansen.  Closes: #923055.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/libpthread_sigs.diff: Enable patch to restore
+    per-thread signal distribution, lost on upgrading to 2.28. Fixes go.
+  * debian/patches/hurd-i386/git-renameat2.diff: New patch, fixes renameat2,
+    now used by coreutils.
+
+ -- Samuel Thibault <sthibault@debian.org>  Wed, 27 Feb 2019 21:56:01 -0800
+
 glibc (2.28-7) unstable; urgency=medium
 
   * debian/patches/hurd-i386/local-no-bootstrap-fs-access.diff: Refresh.
