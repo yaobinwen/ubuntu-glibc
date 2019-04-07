@@ -30,7 +30,7 @@ then
     if [ -n "$preversion" ] && [ -x "$(which ischroot)" ] && ! ischroot; then
 	if dpkg --compare-versions "$preversion" lt GLIBC_VERSION; then
 	    check=""
-	    [ -f /var/run/services.need_restart ] && check=$(cat /var/run/services.need_restart 2>/dev/null)
+	    [ -f /var/run/services.need_restart ] && check=$(sort -u /var/run/services.need_restart 2>/dev/null)
 	    # Change service names back into package names, so that we can
 	    # double-check package installation.
 	    check=$(echo "$check" | \
@@ -54,7 +54,7 @@ then
 	    # If there are services that we *stopped* in the preinst, don't
 	    # forget to restart them now
 	    if [ -e /var/run/services.need_start ]; then
-		services="$(cat /var/run/services.need_start) $services"
+		services="$(sort -u /var/run/services.need_start) $services"
 	    fi
 	    if [ -n "$services" ]; then
 		echo "Restarting services possibly affected by the upgrade:"
