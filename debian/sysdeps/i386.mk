@@ -1,5 +1,5 @@
 # configuration options for all flavours
-extra_config_options = --enable-multi-arch --enable-static-pie
+extra_config_options = --enable-multi-arch --enable-static-pie --enable-cet
 libc_extra_cflags = -mno-tls-direct-seg-refs
 
 # multilib flavours

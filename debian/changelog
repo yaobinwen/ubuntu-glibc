@@ -1,3 +1,10 @@
+glibc (2.29-0ubuntu3) eoan; urgency=medium
+
+  * debian/sysdeps/{amd64/i386/x32}.mk: Enable Intel Control Flow
+    Integrity to fix FTFBS since this is now default in gcc. LP: #1833067.
+
+ -- Alex Murray <alex.murray@canonical.com>  Mon, 03 Jun 2019 21:55:06 +0930
+
 glibc (2.29-0ubuntu2) disco; urgency=medium
 
   * debian/patches/git-updates.diff: Update from upstream stable branch,
