@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2018 Free Software Foundation, Inc.
+# Copyright (C) 1991-2019 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@ aux := check_pf check_native ifreq
 tests := htontest test_ifindex tst-ntoa tst-ether_aton tst-network \
 	 tst-gethnm test-ifaddrs bug-if1 test-inet6_opt tst-ether_line \
 	 tst-getni1 tst-getni2 tst-inet6_rth tst-checks tst-checks-posix \
-	 tst-sockaddr test-hnto-types
+	 tst-sockaddr test-hnto-types tst-if_index-long
 
 # tst-deadline must be linked statically so that we can access
 # internal functions.

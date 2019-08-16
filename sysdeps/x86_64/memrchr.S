@@ -1,6 +1,6 @@
 /* fast SSE2 memrchr with 64 byte loop and pmaxub instruction using
 
-   Copyright (C) 2011-2018 Free Software Foundation, Inc.
+   Copyright (C) 2011-2019 Free Software Foundation, Inc.
    Contributed by Intel Corporation.
    This file is part of the GNU C Library.
 
@@ -24,13 +24,13 @@
 ENTRY (__memrchr)
 	movd	%esi, %xmm1
 
-	sub	$16, %rdx
+	sub	$16, %RDX_LP
 	jbe	L(length_less16)
 
 	punpcklbw	%xmm1, %xmm1
 	punpcklbw	%xmm1, %xmm1
 
-	add	%rdx, %rdi
+	add	%RDX_LP, %RDI_LP
 	pshufd	$0, %xmm1, %xmm1
 
 	movdqu	(%rdi), %xmm0

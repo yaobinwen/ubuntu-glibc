@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2018 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -261,8 +261,11 @@ __gai_enqueue_request (struct gaicb *gaicbp)
 	      /* We cannot create a thread in the moment and there is
 		 also no thread running.  This is a problem.  `errno' is
 		 set to EAGAIN if this is only a temporary problem.  */
-	      assert (lastp->next == newp);
-	      lastp->next = NULL;
+	      assert (requests == newp || lastp->next == newp);
+	      if (lastp != NULL)
+		lastp->next = NULL;
+	      else
+		requests = NULL;
 	      requests_tail = lastp;
 
 	      newp->next = freelist;

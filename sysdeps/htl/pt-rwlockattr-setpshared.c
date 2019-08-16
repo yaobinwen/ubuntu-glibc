@@ -1,5 +1,5 @@
 /* pthread_rwlockattr_setpshared.  Generic version.
-   Copyright (C) 2002-2018 Free Software Foundation, Inc.
+   Copyright (C) 2002-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -35,3 +35,4 @@ pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared)
       return EINVAL;
     }
 }
+stub_warning (pthread_rwlockattr_setpshared)

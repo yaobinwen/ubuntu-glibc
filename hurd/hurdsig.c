@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2018 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@ unsigned long int __hurd_sigthread_stack_end;
 struct hurd_sigstate *_hurd_sigstates;
 
 /* Timeout for RPC's after interrupt_operation. */
-mach_msg_timeout_t _hurd_interrupted_rpc_timeout = 3000;
+mach_msg_timeout_t _hurd_interrupted_rpc_timeout = 60000;
 
 static void
 default_sigaction (struct sigaction actions[NSIG])
@@ -92,6 +92,7 @@ _hurd_thread_sigstate (thread_t thread)
       __sigemptyset (&ss->blocked);
       __sigemptyset (&ss->pending);
       memset (&ss->sigaltstack, 0, sizeof (ss->sigaltstack));
+      ss->sigaltstack.ss_flags |= SS_DISABLE;
       ss->preemptors = NULL;
       ss->suspended = MACH_PORT_NULL;
       ss->intr_port = MACH_PORT_NULL;
@@ -292,6 +293,7 @@ _hurdsig_abort_rpcs (struct hurd_sigstate *ss, int signo, int sigthread,
 		     struct machine_thread_all_state *state, int *state_change,
 		     void (*reply) (void))
 {
+  extern const void _hurd_intr_rpc_msg_about_to;
   extern const void _hurd_intr_rpc_msg_in_trap;
   mach_port_t rcv_port = MACH_PORT_NULL;
   mach_port_t intr_port;
@@ -307,7 +309,8 @@ _hurdsig_abort_rpcs (struct hurd_sigstate *ss, int signo, int sigthread,
      receive completes immediately or aborts.  */
   abort_thread (ss, state, reply);
 
-  if (state->basic.PC < (natural_t) &_hurd_intr_rpc_msg_in_trap)
+  if (state->basic.PC >= (natural_t) &_hurd_intr_rpc_msg_about_to &&
+      state->basic.PC <  (natural_t) &_hurd_intr_rpc_msg_in_trap)
     {
       /* The thread is about to do the RPC, but hasn't yet entered
 	 mach_msg.  Mutate the thread's state so it knows not to try

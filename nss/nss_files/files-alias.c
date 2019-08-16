@@ -1,5 +1,5 @@
 /* Mail alias file parser in nss_files module.
-   Copyright (C) 1996-2018 Free Software Foundation, Inc.
+   Copyright (C) 1996-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
@@ -221,6 +221,13 @@ get_next_alias (FILE *stream, const char *match, struct aliasent *result,
 			{
 			  while (! feof_unlocked (listfile))
 			    {
+			      if (room_left < 2)
+				{
+				  free (old_line);
+				  fclose (listfile);
+				  goto no_more_room;
+				}
+
 			      first_unused[room_left - 1] = '\xff';
 			      line = fgets_unlocked (first_unused, room_left,
 						     listfile);
@@ -229,6 +236,7 @@ get_next_alias (FILE *stream, const char *match, struct aliasent *result,
 			      if (first_unused[room_left - 1] != '\xff')
 				{
 				  free (old_line);
+				  fclose (listfile);
 				  goto no_more_room;
 				}
 
@@ -256,6 +264,7 @@ get_next_alias (FILE *stream, const char *match, struct aliasent *result,
 						       + __alignof__ (char *)))
 					{
 					  free (old_line);
+					  fclose (listfile);
 					  goto no_more_room;
 					}
 				      room_left -= ((first_unused - cp)

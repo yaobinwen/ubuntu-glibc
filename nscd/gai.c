@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2018 Free Software Foundation, Inc.
+/* Copyright (C) 2004-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 2004.
 
@@ -19,7 +19,6 @@
 
 /* This file uses the getaddrinfo code but it compiles it without NSCD
    support.  We just need a few symbol renames.  */
-#define __inet_aton inet_aton
 #define __ioctl ioctl
 #define __getsockname getsockname
 #define __socket socket

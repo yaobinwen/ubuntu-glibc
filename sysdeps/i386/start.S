@@ -1,5 +1,5 @@
 /* Startup code compliant to the ELF i386 ABI.
-   Copyright (C) 1995-2018 Free Software Foundation, Inc.
+   Copyright (C) 1995-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -52,10 +52,11 @@
 					NULL
 */
 
-	.text
-	.globl _start
-	.type _start,@function
-_start:
+#include <sysdep.h>
+
+ENTRY (_start)
+	/* Clearing frame pointer is insufficient, use CFI.  */
+	cfi_undefined (eip)
 	/* Clear the frame pointer.  The ABI suggests this be done, to mark
 	   the outermost frame obviously.  */
 	xorl %ebp, %ebp
@@ -131,6 +132,7 @@ _start:
 1:	movl	(%esp), %ebx
 	ret
 #endif
+END (_start)
 
 /* To fulfill the System V/i386 ABI we need this symbol.  Yuck, it's so
    meaningless since we don't support machines < 80386.  */

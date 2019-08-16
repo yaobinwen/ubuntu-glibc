@@ -1,5 +1,5 @@
 /* RISC-V instruction cache flushing VDSO calls
-   Copyright (C) 2017-2018 Free Software Foundation, Inc.
+   Copyright (C) 2017-2019 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -21,7 +21,11 @@
 #include <stdlib.h>
 #include <atomic.h>
 #include <sys/cachectl.h>
-#include <asm/syscalls.h>
+#if __has_include__ (<asm/syscalls.h>)
+# include <asm/syscalls.h>
+#else
+# include <asm/unistd.h>
+#endif
 
 typedef int (*func_type) (void *, void *, unsigned long int);
 

@@ -1,5 +1,5 @@
 /* Test capturing output from a subprocess.
-   Copyright (C) 2017-2018 Free Software Foundation, Inc.
+   Copyright (C) 2017-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -168,15 +168,29 @@ do_test (void)
                 = support_capture_subprocess (callback, &test);
               check_stream ("stdout", &result.out, test.out);
               check_stream ("stderr", &result.err, test.err);
+
+              /* Allowed output for support_capture_subprocess_check.  */
+              int check_allow = 0;
+              if (lengths[length_idx_stdout] > 0)
+                check_allow |= sc_allow_stdout;
+              if (lengths[length_idx_stderr] > 0)
+                check_allow |= sc_allow_stderr;
+              if (check_allow == 0)
+                check_allow = sc_allow_none;
+
               if (test.signal != 0)
                 {
                   TEST_VERIFY (WIFSIGNALED (result.status));
                   TEST_VERIFY (WTERMSIG (result.status) == test.signal);
+                  support_capture_subprocess_check (&result, "signal",
+                                                    -SIGTERM, check_allow);
                 }
               else
                 {
                   TEST_VERIFY (WIFEXITED (result.status));
                   TEST_VERIFY (WEXITSTATUS (result.status) == test.status);
+                  support_capture_subprocess_check (&result, "exit",
+                                                    test.status, check_allow);
                 }
               support_capture_subprocess_free (&result);
               free (test.out);

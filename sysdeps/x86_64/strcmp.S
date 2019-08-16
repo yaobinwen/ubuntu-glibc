@@ -1,5 +1,5 @@
 /* Highly optimized version for x86-64.
-   Copyright (C) 1999-2018 Free Software Foundation, Inc.
+   Copyright (C) 1999-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Based on i686 version contributed by Ulrich Drepper
    <drepper@cygnus.com>, 1999.
@@ -135,11 +135,11 @@ ENTRY (STRCMP)
  * This implementation uses SSE to compare up to 16 bytes at a time.
  */
 #if defined USE_AS_STRNCMP || defined USE_AS_STRNCASECMP_L
-	test	%rdx, %rdx
+	test	%RDX_LP, %RDX_LP
 	je	LABEL(strcmp_exitz)
-	cmp	$1, %rdx
+	cmp	$1, %RDX_LP
 	je	LABEL(Byte0)
-	mov	%rdx, %r11
+	mov	%RDX_LP, %R11_LP
 #endif
 	mov	%esi, %ecx
 	mov	%edi, %eax
