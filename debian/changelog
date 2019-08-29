@@ -1,3 +1,53 @@
+glibc (2.30-0ubuntu1) eoan; urgency=medium
+
+  * Merge with current 2.30 in Debian git (LP: #1842024), remaining changes:
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386 flavour with -mno-tls-direct-seg-refs for Xen.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+    - Revert dropping the ldconfig wrapper, as we still have a lot of
+      packages that don't ship a trigger but instead call in postinst.
+    - Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    - Mangle locales package to support Ubuntu language packs seamlessly.
+    - Relax some expected test failures for our infrastructure's quirks.
+  * Let nptl/tst-stack4 fail, as it's been racing on several architectures.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 29 Aug 2019 04:14:59 -0600
+
+glibc (2.30-0experimental0) UNRELEASED; urgency=medium
+
+  [ Adam Conrad ]
+  * New upstream release 2.30, with git updates up to 2019-08-28:
+    - debian/symbols.wildcard: Add 2.30, and debian/control: Regenerate.
+    - debian/patches/any/git-libio-stdout-putc.diff: Upstreamed.
+    - debian/patches/any/git-pexpect-pretty-printers.diff: Upstreamed.
+    - debian/patches/any/git-socket-constants.diff: Upstreamed.
+    - debian/patches/any/local-tst-eintr1-eagain.diff: Obsolete.
+    - debian/patches/hurd-i386/git-renameat2.diff: Upstreamed.
+    - debian/patches/any/submitted-resolv-unaligned.diff: Rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: Rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-fixes-2.diff: Rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-fixes.diff: Rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-global-dispositions.diff: Rebased.
+    - debian/patches/hurd-i386/tg-io_select_timeout.diff: Rebased.
+    - debian/patches/hurd-i386/tg-thread-cancel.diff: Rebased.
+    - debian/patches/kfreebsd/submitted-auxv.diff: Rebased.
+    - debian/patches/locale/locale-print-LANGUAGE.diff: Update for new test.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/local-fix-nss.diff: Rebased.
+  * debian/patches/hurd-i386/{tg-single-select-timeout.diff,tg-setitimer.diff,
+    tg-remap_getcwd.diff,tg-io_select_timeout.diff,tg-poll_errors_fixes.diff,
+    submitted-anon-mmap-shared.diff,tg-ONSTACK.diff}: Rename to git-foo,
+    commited upstream for 2.31.
+
+ -- Adam Conrad <adconrad@0c3.net>  Thu, 29 Aug 2019 01:58:14 -0600
+
 glibc (2.29-0experimental1) experimental; urgency=medium
 
   [ Aurelien Jarno ]
@@ -13,6 +63,49 @@ glibc (2.29-0experimental1) experimental; urgency=medium
     as gcc-9 introduces math errors in the testsuite.
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 21 Aug 2019 11:13:51 +0200
+
+glibc (2.29-0ubuntu3) eoan; urgency=medium
+
+  * debian/sysdeps/{amd64/i386/x32}.mk: Enable Intel Control Flow
+    Integrity to fix FTFBS since this is now default in gcc. LP: #1833067.
+
+ -- Alex Murray <alex.murray@canonical.com>  Mon, 03 Jun 2019 21:55:06 +0930
+
+glibc (2.29-0ubuntu2) disco; urgency=medium
+
+  * debian/patches/git-updates.diff: Update from upstream stable branch,
+    including "S390: Mark vx and vxe as important hwcap" (LP: #1821200)
+  * debian/testsuite-xfail-debian.mk: XFAIL new tst-nss-test3 for disco.
+  * debian/debhelper.in/libc.postinst: Only restart services once each.
+  * debian/patches/arm/unsubmitted-ldso-abi-check.diff: Fix rtld segv in
+    dl_open() introduced via merge with upstream at 2.28 (LP: #1821677)
+  * debian/testsuite-xfail-debian.mk: XFAIL new tst-support_descriptors.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sun, 07 Apr 2019 14:12:24 -0600
+
+glibc (2.29-0ubuntu1) disco; urgency=medium
+
+  * Merge with current 2.29 from Debian experimental git, remaining changes:
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386 flavour with -mno-tls-direct-seg-refs for Xen.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+    - Revert dropping the ldconfig wrapper, xenial still has a lot of
+      packages that don't ship a trigger but instead call in postinst.
+    - Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    - Mangle locales package to support Ubuntu language packs seamlessly.
+    - Let tst-ttyname fail on armhf and armel, as it currently fails in lxc.
+  * debian/patches/ubuntu/submitted-no-sprintf-pre-truncate.diff: Adjust to
+    new upstream code, and mangle the upstream tests to expect our behaviour.
+  * debian/{script.in/nsscheck.sh,debhelper.in/libc.*inst}: Tidy up NSS_CHECK
+    code, fixing handling for GDM and removing file-rc cruft from yesteryear.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 21 Feb 2019 07:19:41 -0700
 
 glibc (2.29-0experimental0) experimental; urgency=medium
 
@@ -101,6 +194,14 @@ glibc (2.29-0experimental0) experimental; urgency=medium
     new format for ld.so.cache.  Closes: #908946.
 
  -- Aurelien Jarno <aurel32@debian.org>  Fri, 16 Aug 2019 12:42:42 +0200
+
+glibc (2.28-11) UNRELEASED; urgency=medium
+
+  * debian/patches/hurd-i386/submitted-anon-mmap-shared.diff: Enable, now that
+    hurd 2017 is behind.
+  * control: Break old version of hurd package accordingly.
+
+ -- Samuel Thibault <sthibault@debian.org>  Fri, 30 Aug 2019 01:30:00 +0200
 
 glibc (2.28-10) unstable; urgency=medium
 
@@ -318,6 +419,31 @@ glibc (2.28-0experimental1) experimental; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 12 Nov 2018 21:54:56 +0100
 
+glibc (2.28-0ubuntu1) cosmic; urgency=medium
+
+  * Merge with current 2.28 from Debian experimental git, remaining changes:
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386 flavour with -mno-tls-direct-seg-refs for Xen.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+    - Revert dropping the ldconfig wrapper, xenial still has a lot of
+      packages that don't ship a trigger but instead call in postinst.
+    - Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    - Mangle locales package to support Ubuntu language packs seamlessly.
+    - Let tst-ttyname fail on armhf and armel, as it currently fails in lxc.
+  * Revert XFAIL of tst-backtrace{4,5} and tst-cancelx{20,21} on 31-bit s390.
+  * Drop debian/patches/ubuntu/localedata/git-pt-fmt.diff: Included upstream.
+  * Allow tst-setcontext9 to fail on PPC; it's a new test, not a regression.
+  * debian/patches/ubuntu/localedata/eo_US.diff: Update for upstream changes.
+  * Allow test-i?ldouble-fma to fail on PPC while upstream considers patches.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 23 Aug 2018 13:52:35 -0600
+
 glibc (2.28-0experimental0) experimental; urgency=medium
 
   [ Aurelien Jarno ]
@@ -488,6 +614,12 @@ glibc (2.27-6) unstable; urgency=medium
 
  -- Samuel Thibault <sthibault@debian.org>  Tue, 04 Sep 2018 21:13:02 +0200
 
+glibc (2.27-5ubuntu1) cosmic; urgency=medium
+
+  * Merge with Debian (fixing test failures misc/tst-preadvwrite{,64}v2.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 14 Aug 2018 17:18:44 +0200
+
 glibc (2.27-5) unstable; urgency=medium
 
   [ Aurelien Jarno ]
@@ -541,6 +673,14 @@ glibc (2.27-4) unstable; urgency=medium
     manpage.  Closes: #902236.
 
  -- Aurelien Jarno <aurel32@debian.org>  Sat, 07 Jul 2018 18:34:34 +0200
+
+glibc (2.27-3ubuntu1) bionic; urgency=medium
+
+  * Merge with Debian, with packaging tweaks and master updated to 2018-03-29.
+  * testsuite-xfail-debian.mk: Allow tst-backtrace{4,5} and tst-cancelx{20,21}
+    to fail on the 31-bit build of glibc on s390 (see upstream bug in comment)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 16 Apr 2018 14:14:20 -0600
 
 glibc (2.27-3) unstable; urgency=medium
 
@@ -617,6 +757,35 @@ glibc (2.27-1) unstable; urgency=medium
     to fix infinite backtrace within a context created by makecontext.
 
  -- Aurelien Jarno <aurel32@debian.org>  Sat, 03 Mar 2018 11:47:56 +0100
+
+glibc (2.27-0ubuntu2) bionic; urgency=medium
+
+  * debian/patches/git-updates.diff: Update to 2.27 master at 2018-02-16.
+  * Replace ubuntu/localedata/pt_BR-d_fmt.diff with new git-pt-fmt.diff.
+  * Drop ubuntu/lddebug-scopes.diff, no longer required with gdb >= 7.12.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 23 Feb 2018 06:01:23 -0700
+
+glibc (2.27-0ubuntu1) bionic; urgency=medium
+
+  * Merge with current 2.27 from Debian experimental git, remaining changes:
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386 flavour with -mno-tls-direct-seg-refs for Xen.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+    - Revert dropping the ldconfig wrapper, xenial still has a lot of
+      packages that don't ship a trigger but instead call in postinst.
+    - Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    - Mangle locales package to support Ubuntu language packs seamlessly.
+  * Drop debian/patches/ubuntu/localedata/bn-language.diff: Fixed upstream.
+  * Allow tst-ttyname to fail on armhf/armel, as it currently fails in lxc.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 22 Feb 2018 03:58:57 -0700
 
 glibc (2.27-0experimental1) experimental; urgency=medium
 
@@ -1005,6 +1174,41 @@ glibc (2.26-0experimental1) experimental; urgency=medium
   * debian/patches/git-updates.diff: update from upstream stable branch.
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 22 Nov 2017 17:46:32 +0100
+
+glibc (2.26-0ubuntu2) artful; urgency=medium
+
+  * Cherry-pick some changes from Debian git for a few pending Ubuntu bugfixes:
+    - Update to master and drop redundant submitted-tst-tlsopt-powerpc.diff.
+    - debian/patches/any/local-cudacc-float128.diff: Local patch to prevent
+      defining __HAVE_FLOAT128 on NVIDIA's CUDA compilers (LP: #1717257)
+    - debian/patches/arm/git-arm64-memcmp.diff: Backport optimized memcmp
+      for AArch64, improving performance from 25% to 500% (LP: #1720832)
+    - debian/patches/amd64/git-x86_64-search.diff: Backport upstream commit
+      to put x86_64 back in the search path, like in 2.25 (LP: #1718928)
+    - debian/rules.d/debhelper.mk: Filter python hooks in stage1 (LP: #1715366)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 11 Oct 2017 14:21:40 -0600
+
+glibc (2.26-0ubuntu1) artful; urgency=medium
+
+  * Merge with current 2.26 from Debian experimental git, remaining changes:
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386 flavour with -mno-tls-direct-seg-refs for Xen.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+    - Revert dropping the ldconfig wrapper, xenial still has a lot of
+      packages that don't ship a trigger but instead call in postinst.
+    - Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    - Mangle locales package to support Ubuntu language packs seamlessly.
+  * debian/rules.d/build.mk: Configure with --enable-obsolete-nsl until we
+    sort out a reasonable nsswitch migration strategy from compat to files.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 04 Sep 2017 01:34:21 -0600
 
 glibc (2.26-0experimental0) experimental; urgency=medium
 
@@ -1566,6 +1770,17 @@ glibc (2.24-13) unstable; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 31 Jul 2017 16:54:16 +0200
 
+glibc (2.24-12ubuntu1) artful; urgency=medium
+
+  * Merge with Debian testing, bringing in packaging and upstream fixes.
+    - any/cvs-resolv-internal-qtype.diff: Revert to avoid an ABI break.
+    - ubuntu/local-disable-ld_audit.diff: Rewrite to apply to new code.
+  * any/cvs-common-symbols.diff: Apply to fix build with newer binutils.
+  * arm/cvs-rtld-startup.diff: Backport fix for rtld startup on arm64.
+  * arm/submitted-strip-bit-0.diff: ML fix to the ld.so crash on armv7t.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sat, 01 Jul 2017 15:13:50 -0600
+
 glibc (2.24-12) unstable; urgency=high
 
   [ Aurelien Jarno ]
@@ -1635,6 +1850,26 @@ glibc (2.24-10) unstable; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 12 Apr 2017 00:13:55 +0200
 
+glibc (2.24-9ubuntu2) zesty; urgency=medium
+
+  * debian/patches/any/cvs-resolv-internal-qtype.diff: Revert to avoid
+    failure in name resolution on upgrades from yakkety (LP: #1674532)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 21 Mar 2017 15:27:15 -0600
+
+glibc (2.24-9ubuntu1) zesty; urgency=medium
+
+  * Merge with Debian testing, bringing in packaging and upstream fixes.
+  * debian/patches/any/cvs-ttyname-namespaces.diff: Pull upstream commit
+    to return ENODEV for ttyname() when /proc/self/fd* point to nonsense
+    in namespaces (LP: #1669578)
+  * debian/patches/any/cvs-pthread-free.diff: Pull an upstream commit to
+    fix use after free in pthread_create() (LP: #1651525)
+  * debian/patches/powerpc/cvs-lock-elision.diff: Pull upstream commit
+    to fix write-after-destroy in lock elision on powerpc (LP: #1640518)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 20 Mar 2017 11:07:30 -0600
+
 glibc (2.24-9) unstable; urgency=medium
 
   [ Samuel Thibault ]
@@ -1686,6 +1921,18 @@ glibc (2.24-8) unstable; urgency=medium
   * hurd-i386/tg-poll_errors_fixes.diff: Fix port leak.
 
  -- Samuel Thibault <sthibault@debian.org>  Sun, 04 Dec 2016 22:49:53 +0100
+
+glibc (2.24-7ubuntu2) zesty; urgency=medium
+
+  * Disable lock-elision on all targets to avoid regressions (LP: #1642390)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 05 Dec 2016 05:36:48 -0700
+
+glibc (2.24-7ubuntu1) zesty; urgency=medium
+
+  * Merge with 2.24 from Debian sid, with upstream and packaging updates.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 30 Nov 2016 10:01:13 -0700
 
 glibc (2.24-7) unstable; urgency=medium
 
@@ -1828,6 +2075,16 @@ glibc (2.24-4) unstable; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 16 Oct 2016 13:06:08 +0200
 
+glibc (2.24-3ubuntu1) yakkety; urgency=medium
+
+  * Merge with 2.24 from Debian sid, bringing in minor packaging changes and
+    upstream updates, including the security fix for CVE-2016-6323 on ARMv7.
+  * debian/patches/ubuntu/local-altlocaledir.diff: Updated to latest version
+    from Martin that limits scope to LC_MESSAGES, fixing segv (LP: #1577460)
+  * debian/testsuite-xfail-debian.mk: Allow nptl/tst-signal6 to fail on ARM.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 05 Oct 2016 14:25:57 -0600
+
 glibc (2.24-3) unstable; urgency=medium
 
   [ Aurelien Jarno ]
@@ -1890,6 +2147,39 @@ glibc (2.24-1) unstable; urgency=medium
     adjtime(..., NULL).
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 31 Aug 2016 17:51:04 +0200
+
+glibc (2.24-0ubuntu1) yakkety; urgency=medium
+
+  * Merge with current 2.24 from Debian experimental git, remaining changes:
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386 flavour with -mno-tls-direct-seg-refs for Xen.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - debian/control.in/libc: Remove a Breaks on s390x against a binary
+      NMU version of check that will never exist in the Ubuntu archive.
+    - Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+    - Revert dropping the ldconfig wrapper, xenial still has a lot of
+      packages that don't ship a trigger but instead call in postinst.
+    - Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    - Mangle locales package to support Ubuntu language packs seamlessly.
+    - Evaluate and merge localedata patches from the old langpack-locales.
+  * debian/sysdeps/{amd64,i386}.mk: Don't build i386 libc with -fno-regmove.
+  * debian/patches/ubuntu/localedata/bn-language.diff: Rebased to 2.24.
+  * debian/patches/ubuntu/localedata/ckb_IQ-new_locale.diff: Rebased to 2.24.
+  * debian/patches/ubuntu/localedata/en_IE-am_pm.diff: Rebased to 2.24.
+  * debian/patches/ubuntu/localedata/eo_US.diff: Rebased to 2.24.
+  * debian/patches/ubuntu/localedata/es_DO-am_pm.diff: Rebased to 2.24.
+  * debian/patches/ubuntu/localedata/ln_CD-new_locale.diff: Applied upstream.
+  * debian/patches/ubuntu/localedata/lv_LV-currency.diff: Rebased to 2.24.
+  * debian/patches/ubuntu/localedata/sd_PK.diff: Rebased to 2.24.
+  * debian/patches/ubuntu/localedata/ug_CN@latin.diff: Rebased to 2.24.
+  * debian/testsuite-xfail-debian.mk: Drop now unnecessary s390x Ubuntu delta.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 10 Aug 2016 15:29:00 -0600
 
 glibc (2.24-0experimental1) experimental; urgency=medium
 
@@ -2102,6 +2392,31 @@ glibc (2.23-2) unstable; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Tue, 19 Jul 2016 20:22:37 +0200
 
+glibc (2.23-1ubuntu1) yakkety; urgency=medium
+
+  * Merge with most recent upload from Debian unstable, remaining changes:
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386/i686 flavour with -mno-tls-direct-seg-refs.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - debian/control.in/libc: Remove a Breaks on s390x against a binary
+      NMU version of check that will never exist in the Ubuntu archive.
+    - Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+    - Adjust XFAIL list to be slightly more lenient for our s390x port.
+    - Revert dropping the ldconfig wrapper, xenial still has a lot of
+      packages that don't ship a trigger but instead call in postinst.
+    - Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    - Mangle locales package to support Ubuntu language packs seamlessly.
+    - Evaluate and merge localedata patches from the old langpack-locales.
+  * Build with -fno-pie and -no-pie everywhere, upstream isn't PIE-ready.
+  * Drop debian/patches/ubuntu/local-warn-bsd-source.diff, no longer needed.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 05 Jul 2016 07:24:27 -0600
+
 glibc (2.23-1) unstable; urgency=medium
 
   [ Aurelien Jarno ]
@@ -2158,6 +2473,20 @@ glibc (2.23-0experimental3) experimental; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Tue, 28 Jun 2016 00:48:51 +0200
 
+glibc (2.23-0ubuntu3) xenial; urgency=medium
+
+  * Merge with 2.23 from experimental, bringing in upstream updates:
+    - Save/restore fprs/vrs while resolving symbols (LP: #1564918)
+    - Fix _nss_dns_getnetbyname_r() stack overflow (CVE-2016-3075)
+    - Merge libnss-dns-udeb and libnss-files-udeb into libc6-udeb.
+  * Tidy up locale-gen, thanks to Gunnar Hjalmarsson (LP: #1560577):
+    - Fix thinko that broke handling of multiple locale arguments.
+    - Recognize UTF-8 locales without charset suffix in SUPPORTED.
+    - Fix bug that led to the unsupported message not being shown.
+  * Show reboot-required notification for all updates (LP: #1546457)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 14 Apr 2016 10:26:16 -0600
+
 glibc (2.23-0experimental2) experimental; urgency=medium
 
   [ Aurelien Jarno ]
@@ -2174,6 +2503,80 @@ glibc (2.23-0experimental2) experimental; urgency=medium
     fail where we've already done so for test-xfail-tst-malloc-thread-exit.
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 14 Apr 2016 14:20:30 +0200
+
+glibc (2.23-0ubuntu2) xenial; urgency=medium
+
+  * Merge with 2.23 from experimental, bringing in upstream updates.
+  * Revert dropping the ldconfig wrapper, xenial still has a lot of
+    packages that don't ship a trigger but instead call in postinst.
+  * Add more belocs options to locale-gen to appease our installers.
+  * Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+  * Tweak locales.config to allow langpacks for /etc/default/locale.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 22 Mar 2016 15:10:45 -0600
+
+glibc (2.23-0ubuntu1) xenial; urgency=medium
+
+  * Merge with 2.23 from experimental (LP: #1521172), remaining changes:
+    - Remove the libc6 recommends on libc6-i686, which we don't build.
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Ship update-locale and validlocale in /usr/sbin in libc-bin.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386/i686 flavour with -mno-tls-direct-seg-refs.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - debian/patches/ubuntu/local-warn-bsd-source.diff: Don't warn on
+      _BSD_SOURCE || _SVID_SOURCE, so we don't have to fix everything
+      that might define them and build with -Werror, drop after xenial.
+    - Don't build libc-l10n, its contents get stripped for language-packs.
+    - debian/control.in/libc: Remove a Breaks on s390x against a binary
+      NMU version of check that will never exist in the Ubuntu archive.
+  * Drop libc-bin manpages Recommends to Suggests to keep it in standard.
+  * Build with -fno-pie and -no-pie on s390x, upstream isn't PIE-ready.
+  * debian/testsuite-xfail-debian.mk: XFAIL tst-malloc-thread-{fail,exit}.
+  * debian/patches/any/cvs-netinet-in-4.2.diff: Dropped, merged upstream.
+  * debian/patches/any/cvs-netinet-tcp-4.2.diff: Dropped, merged upstream.
+  * debian/patches/any/cvs-selinux-nscd.diff: Dropped, merged upstream.
+  * debian/patches/powerpc/local-tune-power8.diff: Dropped, we build for P8.
+  * debian/patches/ubuntu/submitted-no-stack-backtrace.diff: Rebase patch.
+  * debian/patches/ubuntu/unsubmitted-increase-dtv-surplus.diff: Dropped.
+
+  * Evaluate and merge/drop/rebase localedata patches from langpack-locales.
+    - debian-*patch: Drop all langpack-locales patches copied from Debian.
+    - ubuntu/localedata/bn-language.patch: Rebase for glibc.
+    - ubuntu/localedata/ce_RU-new_locale.patch: Drop, merged upstream.
+    - ubuntu/localedata/ckb_IQ-new_locale.patch: Rebase for glibc.
+    - ubuntu/localedata/de_AT-february.patch: Drop, merged upstream.
+    - ubuntu/localedata/en_CA-dateformat.patch: Rebase for glibc.
+    - ubuntu/localedata/en_IE-am_pm.patch: Rebase for glibc.
+    - ubuntu/localedata/eo_US.patch: Rebase for glibc.
+    - ubuntu/localedata/es-decimal_point-thousands_sep.patch: Drop, merged.
+    - ubuntu/localedata/es_DO-am_pm.patch: Rebase for glibc.
+    - ubuntu/localedata/es_EV.patch: Drop, merged upstream.
+    - ubuntu/localedata/gd_GB-days-months.patch: Drop, merged upstream.
+    - ubuntu/localedata/it_IT-thousands_sep.patch: Drop, also in Debian.
+    - ubuntu/localedata/ln_CD-new_locale.patch: Rebase for glibc.
+    - ubuntu/localedata/lt_LT-currency.patch: Drop, merged upstream.
+    - ubuntu/localedata/lv_LV-currency.patch: Rebase for glibc.
+    - ubuntu/localedata/pt_BR-d_fmt.patch: Rebase for glibc.
+    - ubuntu/localedata/sd_PK.patch: Rebase for glibc.
+    - ubuntu/localedata/tr_TR-currency_symbol.patch: Drop, merged upstream.
+    - ubuntu/localedata/ug_CN.patch: Drop, merged upstream.
+    - ubuntu/localedata/ug_CN@latin.patch: Rebase for glibc.
+
+  * Merge locales back into glibc and provide locales-all (LP: #1394929):
+    - debian/control.in/*: Reinstate all locales{,-all} Breaks from Debian.
+    - debian/control.in/main: Let locales overwrite files from old libc-bin.
+    - debian/debhelper.in/libc.postinst: Move locale-gen purge to locales.
+    - debian/debhelper.in/locales.{config,postinst}: Upgrade local locales.
+    - debian/debhelper.in/locales.install: Install our language-pack hooks.
+    - debian/rules.d/debhelper.mk: Mark our language-pack hooks executable.
+    - debian/local/usr_sbin/locale-gen: Add support for langpack snippets.
+    - debian/rules: Reinstate building locales and locales-all for Ubuntu.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 17 Mar 2016 05:18:44 -0600
 
 glibc (2.23-0experimental1) experimental; urgency=medium
 
@@ -2732,6 +3135,32 @@ glibc (2.22-0experimental1) experimental; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 10 Dec 2015 23:29:06 +0100
 
+glibc (2.22-0ubuntu1) wily; urgency=medium
+
+  * Merge with 2.22 from experimental (LP: #1497473), remaining changes:
+    - Drop the Breaks line from libc which refers to a Debian transition.
+    - Remove the libc6 recommends on libc6-i686, which we don't build.
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Ship update-locale and validlocale in /usr/sbin in libc-bin.
+    - Don't build locales or locales-all in Ubuntu, we rely on langpacks.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386/i686 flavour with -mno-tls-direct-seg-refs.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - debian/patches/ubuntu/local-warn-bsd-source.diff: Don't warn on
+      _BSD_SOURCE || _SVID_SOURCE, so we don't have to fix everything
+      that might define them and build with -Werror, drop after wily.
+    - Force tuning POWER7 builds to POWER8, as POWER7 is just a stopgap.
+  * debian/patches/any/cvs-netinet-in-4.2.diff: Pull patch from git that
+    updates netinet/in.h to match the kernel UAPI header's values in 4.2.
+  * debian/patches/any/cvs-netinet-tcp-4.2.diff: Ditto for netinet/tcp.h.
+  * debian/rules: Don't build libc-l10n, its contents get stripped and put
+    in language-packs in Ubuntu, so the package would be completely empty.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 17 Sep 2015 13:04:44 -0600
+
 glibc (2.22-0experimental0) experimental; urgency=medium
 
   [ Adam Conrad ]
@@ -3138,6 +3567,80 @@ glibc (2.21-0experimental2) experimental; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 19 Oct 2015 00:20:34 +0200
 
+glibc (2.21-0ubuntu5) xenial; urgency=medium
+
+  * debian/patches/any/cvs-selinux-nscd.diff: Fix build with selinux.
+  * debian/control.in/libc: Remove a Breaks on s390x against a binary
+    NMU version of check that will never exist in the Ubuntu archive.
+  * debian/control: Regenerate for the above s390x-vs-binNMU changes.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 03 Dec 2015 13:24:51 -0700
+
+glibc (2.21-0ubuntu4) vivid; urgency=medium
+
+  * debian/patches/arm/local-arm-futex.diff: Lie about the minimum
+    kernel support for futex_atomic_cmpxchg_inatomic to restore the
+    previous state and make pulsesink happier on ARM (LP: #1436162)
+  * debian/debhelper.in/libc.preinst: Wipe ld.so.cache on upgrades.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 25 Mar 2015 14:31:51 -0600
+
+glibc (2.21-0ubuntu3) vivid; urgency=medium
+
+  * debian/patches/ubuntu/local-warn-bsd-source.diff: Don't warn on
+    _BSD_SOURCE || _SVID_SOURCE, so we don't have to fix everything
+    that might define them and build with -Werror, drop post-vivid.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 23 Mar 2015 09:01:43 -0600
+
+glibc (2.21-0ubuntu2) vivid; urgency=medium
+
+  * debian/patches/powerpc/cvs-ppc-sqrt.diff: Fix sqrt() on powerpc.
+  * debian/patches/powerpc/cvs-ppc-sqrtf.diff: Likewise for sqrtf().
+  * debian/patches/powerpc/cvs-ppc-pow.diff: Likewise for pow().
+  * debian/patches/powerpc/cvs-ppc-feraiseexcept.diff: Fix inline
+    feraiseexcept and feclearexcept macro input conversion on PPC.
+  * debian/patches/any/submitted-longdouble.diff: Refresh for above.
+  * debian/patches/any/local-disable-test-tgmath2.diff: Likewise.
+  * debian/patches/any/cvs-logbl-accuracy.diff: Fix ldbl-128ibm logbl.
+  * debian/patches/powerpc/local-math-logb.diff: Refresh and move to
+    debian/patches/any/local-math-logb.diff, as it's not PPC-specific.
+  * debian/patches/any/cvs-localplt-new-readelf.diff: Preemptively
+    fix localplt test breakage with binutils 2.26 before it lands.
+  * debian/patches/any/cvs-make-typo.diff: Fix typo in elf/Makefile.
+  * debian/patches/powerpc/cvs-power7-strncpy.diff: Optimize strncpy
+    for POWER7 drastically (10-70%) on strings longer than 16 chars.
+  * debian/patches/powerpc/cvs-ppc-tabort-le.diff: Fix TABORT encoding
+    when building on toolchains without HTM support (no-op on gcc-4.9)
+  * debian/patches/arm/cvs-arm-sfi_breg.diff: Fix LDR_GLOBAL macro.
+  * debian/patches/arm/cvs-memcpy-memmove-always-bx.diff: Fix memcpy
+    and memmove for the ARM_ALWAYS_BX class of hardware like ArmadaXP.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 20 Mar 2015 15:19:40 -0600
+
+glibc (2.21-0ubuntu1) vivid; urgency=medium
+
+  * Merge with 2.21 from experimental (LP: #1425623), remaining changes:
+    - Drop the Breaks line from libc which refers to a Debian transition.
+    - Remove the libc6 recommends on libc6-i686, which we don't build.
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel.
+    - Ship update-locale and validlocale in /usr/sbin in libc-bin.
+    - Don't build locales or locales-all in Ubuntu, we rely on langpacks.
+    - Heavily mangle the way we do service restarting on major upgrades.
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize.
+    - Build generic i386/i686 flavour with -mno-tls-direct-seg-refs.
+    - Drop the libc6-xen flavour, as the above change covers Xen's needs.
+    - Enable systemtap support, which is currently disabled in Debian.
+    - Force tuning POWER7 builds to POWER8, as POWER7 is just a stopgap.
+  * debian/patches/ubuntu/lddebug-scopes.diff: Disable tst-dl-iter-static.
+  * debian/patches/ubuntu/submitted-no-stack-backtrace.diff: Fix missing
+    include leading to FTBFS with -Werror=implicit-function-declaration.
+  * debian/testsuite-checking/compare.sh: Turn testsuite failures back on.
+  * debian/sysdeps/linux.mk: Also symlink sys/sdt-config.h (LP: #1418239)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 16 Mar 2015 10:25:48 -0600
+
 glibc (2.21-0experimental1) experimental; urgency=medium
 
   [ Samuel Thibault ]
@@ -3484,6 +3987,20 @@ glibc (2.19-16) unstable; urgency=medium
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 12 Mar 2015 22:00:40 +0100
 
+glibc (2.19-15ubuntu2) vivid; urgency=medium
+
+  * debian/patches/any/cvs-vismain-pie.diff: Compile vismain with -fPIE
+    and link with -pie to fix testsuite failure with the new binutils.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sat, 28 Feb 2015 00:59:56 -0700
+
+glibc (2.19-15ubuntu1) vivid; urgency=medium
+
+  * Merge with Debian unstable, bringing in several security and bug fixes
+    from upstream and swapping some Ubuntu patches for Debian equivalents.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sun, 08 Feb 2015 21:52:50 -0700
+
 glibc (2.19-15) unstable; urgency=medium
 
   [ Aurelien Jarno ]
@@ -3541,6 +4058,42 @@ glibc (2.19-14) unstable; urgency=medium
     - drop patches/any/cvs-CVE-2014-6040.diff (merged upstream).
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 01 Feb 2015 00:32:31 +0100
+
+glibc (2.19-13ubuntu3) vivid; urgency=medium
+
+  * any/cvs-CVE-2014-7817.diff: Backport fix from trunk for wordexp,
+    making it honour the WRDE_NOCMD flag in all cases (LP: #1396471)
+  * Update to release/2.19/master, fixing arm64 frame bug in _start.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 04 Dec 2014 16:56:41 -0700
+
+glibc (2.19-13ubuntu2) vivid; urgency=medium
+
+  * No, really, remove obsolete /etc/ld.so.conf.d/i686-linux-gnu.conf.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 11 Nov 2014 20:35:28 -0700
+
+glibc (2.19-13ubuntu1) vivid; urgency=medium
+
+  * Merge with Debian unstable, pulling in upstream and package fixes.
+  * Re-enable the testsuite that was disabled in Debian for the freeze.
+  * Drop obsolete /etc/ld.so.conf.d/i686-linux-gnu.conf (LP: #1381656)
+  * Update to release/2.19/master, and readjust patches to compensate:
+    - localedata/unsubmitted-tst-setlocale3-ENV.diff: Superseded.
+    - s390/cvs-s390-abi-reversal.diff: Superseded.
+    - any/cvs-resolv-reuse-fd.diff: Superseded.
+    - any/cvs-posix_spawn_file_actions_addopen.diff: Superseded.
+    - any/cvs-setlocale-alloca.diff: Superseded.
+    - any/cvs-CVE-2014-0475.diff: Superseded.
+    - any/cvs-CVE-2014-5119.diff: Superseded.
+    - any/cvs-CVE-2014-6040.diff: Superseded.
+    - any/cvs-resolv-first-query-failure.diff: Rebased with upstream.
+  * testsuite-checking: Ignore failures of the tst-dl-iter-static test,
+    which are caused by the lddebug-scopes patch, while we work out a
+    better solution upstream to the GDB versus linux-vdso.so.1 problem.
+  * Pull in latest PPC fixes from ibm/2.19/master branch (LP: #1341569)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 11 Nov 2014 18:48:22 -0700
 
 glibc (2.19-13) unstable; urgency=medium
 
@@ -3642,6 +4195,22 @@ glibc (2.19-11) unstable; urgency=medium
     Fixes x87 precision mode in newly created pthreads. Closes: #761175.
 
  -- Aurelien Jarno <aurel32@debian.org>  Fri, 12 Sep 2014 23:49:50 +0200
+
+glibc (2.19-10ubuntu2) utopic; urgency=medium
+
+  * Add patches/ubuntu/unsubmitted-increase-dtv-surplus.diff from Fedora to
+    allow up to 32 dlopened modules to use static TLS (LP: #1375555).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 30 Sep 2014 14:33:02 +0100
+
+glibc (2.19-10ubuntu1) utopic; urgency=medium
+
+  * Merge with Debian unstable, bringing in several CVE fixes (LP: #1362409)
+  * Enable systemtap support for Ubuntu which was dropped in Debian for now.
+  * Move MIN_KERNEL_SUPPORTED to 2.6.32 on x86 now that hardy PPAs are dead.
+  * libc-dev no longer Recommends 'gcc | c-compiler' (LP: #990982, #1005097)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 27 Aug 2014 22:47:48 -0600
 
 glibc (2.19-10) unstable; urgency=medium
 
@@ -3761,6 +4330,24 @@ glibc (2.19-5) unstable; urgency=medium
     fix to enable unwind tables when building the backtrace routines.
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 06 Jul 2014 21:42:09 +0200
+
+glibc (2.19-4ubuntu2) utopic; urgency=medium
+
+  * debian/sysdeps/linux.mk: Adjust for the change to sdt.h location.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 10 Jul 2014 10:08:36 -0600
+
+glibc (2.19-4ubuntu1) utopic; urgency=medium
+
+  * Merge with Debian unstable, switching us to glibc and fixing bugs:
+    - Fix invalid fd reuse while sending DNS queries (LP: #1328975)
+    - Avoid Freescale 8xx dcbz workaround on ppc64el (LP: #1333499)
+    - Remove wrong ibm long double assembly routines (LP: #1294588)
+    - Fix incorrect frexpl results with long doubles (LP: #1333506)
+  * debian/patches/powerpc/local-tune-power8.diff: When configured for
+    --with-cpu=power7, adjust -mtune for power8 instead (LP: #1333524)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 19 Jun 2014 03:38:10 -0600
 
 glibc (2.19-4) unstable; urgency=medium
 
@@ -3895,6 +4482,82 @@ eglibc (2.19-1) unstable; urgency=medium
     computation and enable again.
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 04 Jun 2014 20:32:06 +0200
+
+eglibc (2.19-0ubuntu6) trusty; urgency=medium
+
+  * debian/patches/arm64/submitted-setcontext.diff: Update to new version
+    of Will's setcontext patch to fix sigmask handling bug (LP: #1306829)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sat, 12 Apr 2014 01:47:43 -0600
+
+eglibc (2.19-0ubuntu5) trusty; urgency=medium
+
+  * Merge with unreleased 2.19 from Debian experimental, fixing more bugs:
+    - Pull in arm64 patches to fix setcontext corruption (LP: #1279620)
+    - Apply the IBM 2.19 branch for POWER8 bug fixes and optimizations.
+    - Change M_CHECK_ACTION to abort if first MALLOC_CHECK_ bit is set.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 09 Apr 2014 18:27:57 -0600
+
+eglibc (2.19-0ubuntu4) trusty; urgency=low
+
+  * debian/debhelper.in/libc.preinst:
+    - do not show glibc/restart-services question when the system
+      is uprading via the desktop session (LP: #1298281)
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Wed, 09 Apr 2014 11:33:31 +0200
+
+eglibc (2.19-0ubuntu3) trusty; urgency=medium
+
+  * Merge with unreleased 2.19 from Debian experimental, fixing more bugs:
+    - Fix bzero/__bzero definition on powerpc/ppc64 with static builds.
+    - Enable IFUNC on arm64 builds, now that the toolchain supports it.
+    - Revert removal of the XDR currency for installation-locale FTBFS.
+    - Pull update from 2.19 branch, fixing bad math in __sin and __cos.
+  * debian/sysdeps/{i386,amd64}.mk: Build i386 flavours with -fno-regmove,
+    this can be reverted when gcc-4.9 becomes the default distro compiler.
+  * debian/*: Drop the redundant libc6-xen packages on i386 (LP: #1271534)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sun, 09 Mar 2014 12:21:48 -0600
+
+eglibc (2.19-0ubuntu2) trusty; urgency=medium
+
+  * Merge with unreleased 2.19 from Debian experimental, fixing some bugs:
+    - debian/patches/any/local-no-malloc-backtrace.diff: Lower the default
+      for MALLOC_CHECK_ to 1, and add it to the list of insecure variables
+      that can't be set for suid binaries. This allows us to not backtrace
+      malloc failures by default (Closes: #739913, LP: #1266492) and skips
+      backtrace for suid binaries where an attacker calling into a corrupt
+      malloc internal data structure with malloc could lead to Bad Things.
+    - Make ldconfig stop operating on the linker entirely, so our packaged
+      symlinks take precedence and hack the postinst to skip ldconfig when
+      we detect a broken setup that the old ldconfig mangles (LP: #915995)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sun, 23 Feb 2014 22:39:18 -0700
+
+eglibc (2.19-0ubuntu1) trusty; urgency=medium
+
+  * Merge with unreleased 2.19 from Debian experimental, remaining changes:
+    - Drop the Breaks line from libc6, which refers to a Debian transition
+    - Remove the libc6 recommends on libc6-i686, which we don't build
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel
+    - Ship update-locale and validlocale in /usr/sbin in libc-bin
+    - Don't build locales or locales-all in Ubuntu, we rely on langpacks
+    - Heavily mangle the way we do service restarting on major upgrades
+    - Use different MIN_KERNEL_SUPPORTED versions than Debian, due to
+      buildd needs.  This should be universally bumped to 2.6.32 once all
+      our buildds (including the PPA guests) are running precise kernels
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize
+    - debian/patches/ubuntu/local-CVE-2012-3406.diff: switch to malloc when
+      array grows too large to handle via alloca extension (CVE-2012-3406)
+    - Build generic i386/i686 flavour with -mno-tls-direct-seg-refs
+  * debian/patches/series.ppc64el: Drop ppc64el patches included upstream.
+  * debian/patches/ubuntu/delete-header-pot.diff: Removed, fixed upstream.
+  * expected-results-aarch64-linux-gnu-libc: Ignore two new arm64 failures
+    for now, so we can get glibc built and test other packages against it.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sat, 15 Feb 2014 19:56:22 -0700
 
 eglibc (2.19-0experimental0) experimental; urgency=medium
 
@@ -4175,6 +4838,38 @@ eglibc (2.18-1) unstable; urgency=medium
 
  -- Adam Conrad <adconrad@0c3.net>  Thu, 20 Feb 2014 19:38:49 -0700
 
+eglibc (2.18-0ubuntu6) trusty; urgency=medium
+
+  * debian/sysdeps/ppc64el.mk: Use --with-cpu=power7 to optimize properly.
+  * debian/patches/ppc64el/cvs-ppc64-MCOUNT.diff: Fix uses of CALL_MCOUNT.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 15 Jan 2014 17:28:49 -0700
+
+eglibc (2.18-0ubuntu5) trusty; urgency=medium
+
+  * debian/patches/arm/cvs-arm__{longjmp,sigsetjmp}-thumb.diff: Pull patch
+    from upstream to allow building longjmp and sigsetjmp code with Thumb.
+  * debian/patches/arm/cvs-arm-pointer-mangle-frame.diff: Upstream diff to
+    no longer apply pointer encryption to the frame pointer (LP: #1268937)
+  * debian/patches/powerpc/cvs-gettimeofday-32.diff: Replace the submitted
+    version of this patch with the upstream commit, which also fixes time.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 14 Jan 2014 15:18:45 -0700
+
+eglibc (2.18-0ubuntu4) trusty; urgency=medium
+
+  * debian/patches/ppc64el/ibm-branch.diff: Rebase against vfscanf patch.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sat, 11 Jan 2014 03:46:41 -0700
+
+eglibc (2.18-0ubuntu3) trusty; urgency=medium
+
+  * Merge with Debian experimental, pulling in some POWER and build fixes.
+  * debian/patches/ppc64el/ibm-branch.diff: Rebase against vDSO backports.
+  * debian/patches/hurd-i386/libpthread_version.diff: Remove stderr vomit.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sat, 11 Jan 2014 02:37:18 -0700
+
 eglibc (2.18-0experimental1) experimental; urgency=low
 
   [ Adam Conrad ]
@@ -4225,6 +4920,41 @@ eglibc (2.18-0experimental1) experimental; urgency=low
   * libc0.3.symbols.hurd-i386: Add thread_terminate_release.
 
  -- Adam Conrad <adconrad@0c3.net>  Fri, 10 Jan 2014 16:06:00 -0700
+
+eglibc (2.18-0ubuntu2) trusty; urgency=medium
+
+  * debian/patches/i386/cvs-sse42-strstr*: Backport upstream commits which
+    drop buggy SSE4.2 srtstr implementations in favour of an SSE2 version.
+  * debian/patches/kfreebsd/submitted-waitid.diff: Drop this patch pending
+    the resolution of the upstream bug and the Linux/libc header mismatch.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 19 Dec 2013 17:44:12 -0700
+
+eglibc (2.18-0ubuntu1) trusty; urgency=low
+
+  * Merge with latest 2.18 from Debian experimental, remaining changes:
+    - Drop the Breaks line from libc6, which refers to a Debian transition
+    - Remove the libc6 recommends on libc6-i686, which we don't build
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel
+    - Ship update-locale and validlocale in /usr/sbin in libc-bin
+    - Don't build locales or locales-all in Ubuntu, we rely on langpacks
+    - Heavily mangle the way we do service restarting on major upgrades
+    - Use different MIN_KERNEL_SUPPORTED versions than Debian, due to
+      buildd needs.  This should be universally bumped to 2.6.32 once all
+      our buildds (including the PPA guests) are running precise kernels
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize
+    - debian/patches/ubuntu/local-CVE-2012-3406.diff: switch to malloc when
+      array grows too large to handle via alloca extension (CVE-2012-3406)
+    - Build generic i386/i686 flavour with -mno-tls-direct-seg-refs
+  * debian/patches/ubuntu/local-linaro-cortex-strings.diff: Dropped at the
+    request of Will Newton, who will upstream something more performant.
+  * debian/patches/i386/cvs-nonascii-case-strcmp.diff: Pull upstream patch
+    to fix LC_CTYPE nonascii-case fallback in i686 strcasecmp/strncasecmp.
+  * debian/testsuite-checking/*: Update 686 targets to match the 586 ones.
+  * Generate expected-results-powerpc64le-linux-gnu-libc for ppc64el port.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 22 Nov 2013 07:19:51 -0700
 
 eglibc (2.18-0experimental0) experimental; urgency=low
 
@@ -4518,6 +5248,45 @@ eglibc (2.17-94) unstable; urgency=low
 
  -- Adam Conrad <adconrad@0c3.net>  Sat, 09 Nov 2013 18:06:17 -0700
 
+eglibc (2.17-93ubuntu4) saucy; urgency=low
+
+  * patches/arm64/cvs-setjmp-clobber.diff: __sigsetjmp clobbers register
+    x1 before making the tail call to __sigjmp_save, which causes the
+    latter to always save the signal mask.  Backport git patch to fix.
+  * patches/series: Revert the CVE-2013-2207 pt_chown fix until we come
+    up with a sane plan to avoid users shooting themselves in the foot.
+  * debhelper.in/libc-bin.install: Install pt_chown again for the above.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 11 Oct 2013 21:06:21 -0600
+
+eglibc (2.17-93ubuntu3) saucy; urgency=low
+
+  * Revert the CVE-2013-4788 fix, as it causes the ARM testsuite to fail.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 10 Oct 2013 01:25:14 -0600
+
+eglibc (2.17-93ubuntu2) saucy; urgency=low
+
+  * patches/any/cvs-CVE-2012-44xx.diff: backport overflow fixes in strcoll
+    addressing CVE-2012-4412 and CVE-2012-4424 (Closes: #687530, #689423)
+  * patches/any/cvs-CVE-2013-4237.diff: backport git fix to respect the
+    NAME_MAX constraints in readdir_r: CVE-2013-4237 (Closes: #719558)
+  * debian/patches/any/cvs-CVE-2013-2207-pt_chown.diff: backpot git patch
+    to disable building and using pt_chown: CVE-2013-2207 (Closes: #717544)
+  * debhelper.in/libc-bin.install: Adjust packaging for the above change.
+  * patches/any/cvs-CVE-2013-4788-static-ptrguard*: backport fix from git
+    for pointer mangling in static builds: CVE-2013-4788 (Closes: #717178)
+  * patches/ubuntu/unsubmitted-dlopen-static-crash.diff: New patch from
+    Maciej Rozycki to fix a dlopen segfault in statically linked programs.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 09 Oct 2013 22:29:57 -0600
+
+eglibc (2.17-93ubuntu1) saucy; urgency=low
+
+  * Merge with Debian unstable, bringing in testsuite and security fixes.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sun, 22 Sep 2013 23:32:30 -0600
+
 eglibc (2.17-93) unstable; urgency=low
 
   [ Adam Conrad ]
@@ -4555,6 +5324,13 @@ eglibc (2.17-92) unstable; urgency=low
 
  -- Petr Salinger <petr.salinger@seznam.cz>  Wed, 31 Jul 2013 22:38:47 +0100
 
+eglibc (2.17-91ubuntu1) saucy; urgency=low
+
+  * Merge with Debian unstable, running the testsuite in parallel
+    and moving some manpages from eglibc to the manpages package.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 31 Jul 2013 21:00:31 +0100
+
 eglibc (2.17-91) unstable; urgency=low
 
   [ Petr Salinger ]
@@ -4586,6 +5362,15 @@ eglibc (2.17-91) unstable; urgency=low
     and zdump.1, and let them move to manpages (Reference: #556173)
 
  -- Adam Conrad <adconrad@0c3.net>  Wed, 31 Jul 2013 20:56:32 +0100
+
+eglibc (2.17-7ubuntu1) saucy; urgency=low
+
+  * Merge with Debian unstable, bringing in several tweaks and fixes.
+  * debian/control.in/main: Drop build-conflicts on binutils-gold to
+    make us buildable again with the new binutils that provides it.
+  * Re-enable hard failure on testsuite failure for development builds.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sat, 29 Jun 2013 19:53:57 -0600
 
 eglibc (2.17-7) unstable; urgency=medium
 
@@ -4782,6 +5567,34 @@ eglibc (2.17-1) unstable; urgency=low
 
  -- Adam Conrad <adconrad@0c3.net>  Tue, 07 May 2013 01:57:11 -0600
 
+eglibc (2.17-0ubuntu5) raring; urgency=low
+
+  * debian/debhelper.in/libc.postint: Switch from 'awk gsub' to 'tr -d' to
+    avoid warnings when the awk alternative points to gawk (LP: #1156923)
+  * debian/patches/any/submitted-setfsid-wur.diff: Drop __wur from setfsuid
+    and setfsgid functions to avoid -Werror=unused-result (Closes: #701422)
+  * debian/patches/i386/cvs-simd-exception.diff: Pull patch from upstream
+    to fix a performance regression in i386 SIMD exceptions (LP: #1157244)
+  * debian/patches/svn-updates.diff: Update to r22884 of eglibc-2_17 branch
+  * debian/testsuite-checking/compare.sh: Disable hard testsuite failures
+    for release to avoid stable updates exploding as buildd kernels change
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 17 Apr 2013 22:53:13 -0600
+
+eglibc (2.17-0ubuntu4) raring; urgency=low
+
+  * Brown paper bag release: restore g++-multilib build-dep on armhf.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 08 Feb 2013 23:09:13 -0700
+
+eglibc (2.17-0ubuntu3) raring; urgency=low
+
+  * Merge with Debian experimental, fixing arm64 builds and adding
+    support for upstart's shiny new stateful re-exec capabilities.
+  * Re-enable audit build-dep now that libaudit is moving to main.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 06 Feb 2013 22:52:48 -0700
+
 eglibc (2.17-0experimental2) experimental; urgency=low
 
   * Switch to gcc-4.7 across the board to tidy up some C99 conformance,
@@ -4792,6 +5605,13 @@ eglibc (2.17-0experimental2) experimental; urgency=low
   * debian/testsuite-checking/expected-mips*: Allow tst-audit8 to fail.
 
  -- Adam Conrad <adconrad@0c3.net>  Wed, 06 Feb 2013 22:41:23 -0700
+
+eglibc (2.17-0ubuntu2) raring; urgency=low
+
+  * Merge with Debian experimental, bringing in several small fixes.
+  * Sync Ubuntu's expected testsuite results with Debian's new ones.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 30 Jan 2013 20:49:20 -0700
 
 eglibc (2.17-0experimental1) experimental; urgency=low
 
@@ -4823,6 +5643,22 @@ eglibc (2.17-0experimental1) experimental; urgency=low
   * debian/rules.d/build.mk: When threads is no, disable nscd in all passes.
 
  -- Adam Conrad <adconrad@0c3.net>  Sun, 03 Feb 2013 20:34:44 -0700
+
+eglibc (2.17-0ubuntu1) raring; urgency=low
+
+  * Merge with Debian, bringing in a new upstream and many small fixes:
+    - patches/any/cvs-malloc-deadlock.diff: Dropped, merged upstream.
+    - patches/ubuntu/lddebug-scopes.diff: Rebase for upstream changes.
+    - patches/ubuntu/local-CVE-2012-3406.diff: Rebased against upstream.
+    - patches/ubuntu/no-asm-mtune-i686.diff: Fixed in recent binutils.
+  * This upstream merge fixes a nasty hang in pulseaudio (LP: #1085342)
+  * Bump MIN_KERNEL_SUPPORTED to 2.6.32 on ARM, now that we no longer
+    have to support shonky 2.6.31 kernels on imx51 babbage builders.
+  * Drop patches/ubuntu/local-disable-nscd-host-caching.diff, as these
+    issues were apparently resolved upstream a while ago (LP: #613662)
+  * Fix the compiled-in bug URL to point to launchpad.net, not Debian.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 10 Jan 2013 18:39:35 -0700
 
 eglibc (2.17-0experimental0) experimental; urgency=low
 
@@ -4925,6 +5761,27 @@ eglibc (2.17-0experimental0) experimental; urgency=low
 
  -- Adam Conrad <adconrad@0c3.net>  Sun, 27 Jan 2013 23:33:32 -0700
 
+eglibc (2.16-0ubuntu8) raring; urgency=low
+
+  * Switch armel/armhf libc-dev-alt builds to the same symlink method
+    used by other arches to avoid duplicate files and dpkg oopses.
+  * Merge with experimental, fixing rtlddir for x32 alternate builds.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 26 Nov 2012 18:32:55 -0700
+
+eglibc (2.16-0ubuntu7) raring; urgency=low
+
+  * Merge with 2.16-0experimental1 from Debian, bringing in my
+    upstream version of the C++ header autodetection patch, some
+    packaging and upgrade fixes, and reducing our delta further.
+  * Fix debian/tests/control syntax for autopkgtest (LP: #1081500)
+  * Add patch ubuntu/local-disable-nscd-netgroup-caching.diff to
+    disable netgroup caching in the default config (LP: #1068889)
+  * Backport any/cvs-malloc-deadlock.diff from upstream to prevent
+    glibc deadlocking in mallock arena retry paths (LP: #1081734)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sun, 25 Nov 2012 19:00:46 -0700
+
 eglibc (2.16-0experimental1) experimental; urgency=low
 
   [ Adam Conrad ]
@@ -4962,6 +5819,88 @@ eglibc (2.16-0experimental1) experimental; urgency=low
     takes too long to clean up after joined threads.  (closes: #673596)
 
  -- Adam Conrad <adconrad@0c3.net>  Sun, 25 Nov 2012 01:18:07 -0700
+
+eglibc (2.16-0ubuntu6) raring; urgency=low
+
+  * debian/tests/{control,rebuild}: add a stub autopkgtest rebuild
+    test and add the XS-Testsuite header to control (LP: #1081500)
+  * Rework unsubmitted-cxxheaders-detection3.diff one more time to
+    account for more multiarch versus multilib location oddities.
+  * Adjust expected results for intermittent tst-mqueue5 failures.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 21 Nov 2012 12:34:25 -0700
+
+eglibc (2.16-0ubuntu5) raring; urgency=low
+
+  * Adjust patches/any/unsubmitted-cxxheaders-detection3.diff to try
+    calling g++ -print-multiarch first and fall back to -dumpmachine,
+    to account for architectures where those two values can differ.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 21 Nov 2012 00:00:10 -0700
+
+eglibc (2.16-0ubuntu4) raring; urgency=low
+
+  * Merge with experimental SVN, bringing in several packaging fixes,
+    and my patch to give crti.o on armhf the Tag_ABI_VFP_args tag.
+  * Update expected testsuite results and re-enable testsuite checks.
+  * Add patches/powerpc/unsubmitted_UAPI_ASM_POWERPC_ELF.diff to track
+    the kernel's renaming _ASM_POWERPC_ELF to _UAPI_ASM_POWERPC_ELF.
+  * Backport patches/any/cvs-cxxheaders-{detection1,detection2}.diff
+    from upstream to clean up the C++ header detection for -nostdinc.
+  * Add patches/any/unsubmitted-cxxheaders-detection3.diff to make the
+    above work with our new g++, which puts headers in a new location.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 19 Nov 2012 20:14:14 -0700
+
+eglibc (2.16-0ubuntu3) raring; urgency=low
+
+  * Regenerate the control file.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 27 Oct 2012 23:54:17 +0200
+
+eglibc (2.16-0ubuntu2) raring; urgency=low
+
+  * Enable building x32 multilib libraries on amd64 and i386.
+  * Build x32 multilib libraries with -mx32.
+  * Don't run the x32 testsuite on amd64 and i386, kernel support missing.
+  * Revert the fix for bz13979, breaking AC_HEADER checks with compilers
+    having _FORTIFY_SOURCE enabled by default. To be reverted before the
+    13.04 release.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 27 Oct 2012 17:34:07 +0200
+
+eglibc (2.16-0ubuntu1) raring; urgency=low
+
+  * Merge with unreleased 2.16 in Debian experimental, remaining changes:
+    - Drop the Breaks line from libc6, which refers to a Debian transition
+    - Remove the libc6 recommends on libc6-i686, which we don't build
+    - Enable libc6{,-dev}-armel on armhf and libc6{-dev}-armhf on armel
+    - Ship update-locale and validlocale in /usr/sbin in libc-bin
+    - Don't build locales or locales-all in Ubuntu, we rely on langpacks
+    - Heavily mangle the way we do service restarting on major upgrades
+    - Use different MIN_KERNEL_SUPPORTED versions than Debian, due to
+      buildd needs.  This should be universally bumped to 2.6.32 once all
+      our buildds (including the PPA guests) are running precise kernels
+    - Build i386 variants as -march=i686, build amd64 with -O3, and build
+      ppc64 variants (both 64-bit and 32-bit) with -O3 -fno-tree-vectorize
+    - Re-enable unsubmitted-ldconfig-cache-abi.diff and rebuild the cache
+      on upgrades from previous versions that used a different constant
+    - debian/patches/any/local-CVE-2012-3406.diff: switch to malloc when
+      array grows too large to handle via alloca extension (CVE-2012-3406)
+    - Build generic i386/i686 flavour with -mno-tls-direct-seg-refs
+  * Changes added/dropped with this merge while reducing our delta:
+    - Stop building glibc docs from the eglibc source, and instead make
+      the glibc-docs stub have a hard dependency on glibc-doc-reference
+    - Remove outdated conflicts against ancient versions of ia32-libs
+    - Drop the tzdata dependency from libc6, it's in required and minimal
+    - Use gcc-4.7/g++-4.7 by default on all our supported architectures
+    - Save our historical changelog as changelog.ubuntu in the source
+    - Drop nscd's libaudit build-dep for now, as libaudit is in universe
+    - Drop the unnecessary Breaks from libc6 to locales and locales-all
+    - Ship xen's ld.so.conf.d snippet as /etc/ld.so.conf.d/libc6-xen.conf
+  * Disable hard failures on the test suite for the first upload to raring
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 26 Oct 2012 05:14:58 +0100
 
 eglibc (2.16-0experimental0) experimental; urgency=low
 
@@ -5369,6 +6308,226 @@ eglibc (2.16-0experimental0) experimental; urgency=low
     testsuite-checking/expected-results-i686-gnu-i686.
 
  -- Aurelien Jarno <aurel32@debian.org>  Tue, 20 Nov 2012 08:48:56 +0100
+
+eglibc (2.15-0ubuntu20) quantal; urgency=low
+
+  * Backport fixes for dbl-64 and ldbl-128 issues (LP: #1000498)
+  * Backport another FMA support patch from glibc master branch.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 03 Oct 2012 15:58:02 -0600
+
+eglibc (2.15-0ubuntu19) quantal-proposed; urgency=low
+
+  * SECURITY UPDATE: stack buffer overflow in vfprintf handling
+    (LP: #1031301)
+    - debian/patches/any/CVE-2012-3406.patch: switch to malloc when
+      array grows too large to handle via alloca extension
+    - CVE-2012-3406
+  * SECURITY UPDATE: stdlib strtod integer/buffer overflows
+    - debian/patches/any/CVE-2012-3480.patch: rearrange calculations
+      and modify types to void integer overflows
+    - CVE-2012-3480
+
+ -- Steve Beattie <sbeattie@ubuntu.com>  Tue, 02 Oct 2012 10:57:21 -0700
+
+eglibc (2.15-0ubuntu18) quantal; urgency=low
+
+  * Version Breaks on libhwloc0 so that it doesn't catch recent libhwloc5
+    packages which provide libhwloc0 (LP: #1048566).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 11 Sep 2012 16:38:52 +0100
+
+eglibc (2.15-0ubuntu17) quantal; urgency=low
+
+  * Backport fix from 2.16 for sscanf/realloc deadlock (LP: #1028038)
+  * Backport for bogus FPE on underflow for exp(double) (LP: #1007457)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 09 Aug 2012 20:25:35 -0600
+
+eglibc (2.15-0ubuntu16) quantal; urgency=low
+
+  * Backport fix from 2.16 to fix htons() conversion errors on non-x86
+    architectures, by correctly casting to uint16_t (LP: #1016349)
+  * Restore missing AT_EMPTY_PATH definition in fnctl.h (LP: #1010069)
+  * Backport FMA4/AVX detection from glibc 2.16 (LP: #956051, #979003)
+  * Backport fixups to AVX-using code to match the detection backport.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 09 Aug 2012 15:15:53 -0600
+
+eglibc (2.15-0ubuntu15) quantal; urgency=low
+
+  * debian/patches/any/unsubmitted-no-stack-backstrace.patch: disable
+    backtraces when triggering __stack_chk_fail.
+  * debian/patches/series: reorder and rename patches that should be in
+    Debian as well as Ubuntu, for easier upstreaming.
+
+ -- Kees Cook <kees@ubuntu.com>  Fri, 22 Jun 2012 11:55:45 -0700
+
+eglibc (2.15-0ubuntu14) quantal; urgency=low
+
+  * Cherry-pick my patch from Debian (r5185:5191) to make use of
+    dpkg's DPKG_MAINTSCRIPT_ARCH variable, so our maintainer scripts
+    don't explode with the new dpkg, and guard that same usage with
+    dpkg --assert-multi-arch, so we don't fail with old dpkg.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 19 Jun 2012 14:13:26 -0600
+
+eglibc (2.15-0ubuntu13) quantal; urgency=low
+
+  * arm/local-linaro-cortex-strings.diff: instead of sysdeps/arm, apply
+    to sysdeps/arm/eabi/armv6t2, as it implements routines that aren't
+    supported on old CPUs, and drop memchr.S half of the patch, in
+    favour of the version that's been submitted and accepted upstream.
+  * Make the strchr.S implementation above stop forcing armv7-a, since
+    it works on armv6t2, and moving the path enforces this during build.
+  * Force the libc6-armhf build on armel to be armv7-a with vfpv3-d16.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 29 May 2012 12:55:39 +0800
+
+eglibc (2.15-0ubuntu12) quantal; urgency=low
+
+  [ Steve Langasek ]
+  * Per Adam's suggestion, comment the NSS_CHECK substitution so it's
+    clearer what's going on here.
+
+  [ Adam Conrad ]
+  * Back out the march=armv5t from the libc6-armel build on armhf, as
+    this seems to cause a bit of an odd toolchain hiccup, and it's
+    impossible to run armhf on a less-than-v7 system anyway.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 23 May 2012 15:46:11 -0600
+
+eglibc (2.15-0ubuntu11) quantal; urgency=low
+
+  * Rebuild to pick up the armv5t defaults on armel.
+  * Build the soft float pass on armhf using -march=armv5t -mfloat-abi=soft.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 02 May 2012 23:41:18 +0200
+
+eglibc (2.15-0ubuntu10) precise-proposed; urgency=low
+
+  * kdm is not meant to be restarted, only warned about; moving the restart
+    code to the preinst is causing kdm restarts that will break the desktop
+    in the middle of the upgrade.  Zero out our list of services between the
+    two uses of the variable.  LP: #985735.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Thu, 19 Apr 2012 15:50:02 -0700
+
+eglibc (2.15-0ubuntu9) precise; urgency=low
+
+  * debian/debhelper.in/libc.preinst: Brown paper bag fix; when we
+    upgrade from older versions, we don't have our linker in place
+    before unpacking, however the preisnt wants one, so create a
+    temporary linker symlink in the new location for one-time use
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Sun, 15 Apr 2012 14:46:48 -0600
+
+eglibc (2.15-0ubuntu8) precise; urgency=low
+
+  * debian/patches/arm/unsubmitted-armhf-linker.diff: Add the new armhf
+    linker to the triplet/LDSO table in ports/sysdeps/arm/shlib-versions
+  * debian/sysdeps/arm{el,hf}.mk: Stop installing armhf linker to its
+    multiarch path, the new standard path is /lib/ld-linux-armhf.so.3
+  * debian/sysdeps/arm{el,hf}.mk: Define configure targets for alt libs
+  * debian/sysdeps/arm{el,hf}.mk: Provide compat symlinks in armhf builds
+    so that old binaries continue to work without needing rebuilding
+  * debian/rules.d/build.mk: Change ldd to use the new armhf linker path
+  * debian/libc6.symbols.armhf: ld-linux-armhf.so.3 depends on having a
+    new enough version of libc6 installed to make the linker available
+  * debian/patches/arm/unsubmitted-soname-hack.diff: Apply unfortunate
+    hack to elf/dl-load.c to allow our old binaries keep running with the
+    new linker, by spoofing the SONAME of the new as if it were the old
+  * debian/debhelper.in/libc-udeb.install.armhf: No longer required
+  * debian/sysdeps/armhf.mk: Create symlink in the udeb for legacy linker
+  * debian/debhelper.in/libc{,-alt}.postrm: If we remove libc6:i386 before
+    libc6-i386:amd64, maintain sanity of /lib/ld-linux.so.2 (LP: #852101)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 13 Apr 2012 19:09:11 -0600
+
+eglibc (2.15-0ubuntu7) precise; urgency=low
+
+  [ James Hunt ]
+  * debian/debhelper.in/libc.preinst: Moved logic from postinst to
+    prompt user for services to restart. We ask here to allow the
+    problematic cron to be stopped in the preinst, but defer the restart of
+    remaining services until postinst time (LP: #508083).
+
+  [ Steve Langasek ]
+  * debian/debhelper.in/libc.{pre,post}inst: drop special casing of upstart
+    jobs when restarting, since the check was completely wrong anyway,
+    depending on the no-longer-existent /lib/init/readlink.
+  * Drop obsolete gdm upgrade handling code that only applies for upgrades
+    from hardy to lucid.
+  * Remove the /etc/ld.so.conf.d/i486-linux-gnu.conf conffile on upgrade on
+    i386, since it's no longer shipped and we should give consistent results
+    on upgrade and install; and add a Breaks on the three library packages
+    in lucid that used this path.
+
+  [ Adam Conrad ]
+  * debian/patches/any/local-nscd-NO_MAPPING.diff: Apply patch from Jeff Law
+    to clean up thread handling in __nscd_get_nl_timestamp and resolve a few
+    random crashing issues with chromium-browser and ktorrent (LP: #929219)
+  * debian/rules.d/debhelper.mk: Fix RTLD_SO replacement regex for sanity.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 12 Apr 2012 00:18:08 -0600
+
+eglibc (2.15-0ubuntu6) precise; urgency=low
+
+  * SECURITY UPDATE: denial of service  in RPC implementation (LP: #901716)
+    - debian/patches/any/local-CVE-2011-4609.patch: nanosleep when too
+      many open fds are detected
+    - CVE-2011-4609
+  * SECURITY UPDATE: vfprintf nargs overflow leading to FORTIFY
+    check bypass (LP: #953171)
+    - debian/patches/any/cvs-CVE-2012-0864.patch: check for integer
+      overflow
+    - CVE-2012-0864
+
+ -- Steve Beattie <sbeattie@ubuntu.com>  Mon, 12 Mar 2012 09:20:41 -0700
+
+eglibc (2.15-0ubuntu5) precise; urgency=low
+
+  * Backport ARM makecontext() routines. LP: #696794
+
+ -- Michael Hope <michael.hope@linaro.org>  Wed, 07 Mar 2012 09:32:39 +1300
+
+eglibc (2.15-0ubuntu4) precise; urgency=low
+
+  * Merge from Debian (r5173, 2.13-27).
+  * Don't include the non-default multilib debug files in the libc6-dbg
+    package for any architecture.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 02 Mar 2012 19:41:37 +0100
+
+eglibc (2.15-0ubuntu3) precise; urgency=low
+
+  [ Matthias Klose ]
+  * debian/debhelper.in/libc.postinst: Call notify-reboot-required for
+    updates to 2.15.
+  * Expect same test failures on armhf as on armel.
+  * Only restart gdm if it is running. LP: #931745.
+  * Don't include the non-default multilib debug files in the libc6-dbg
+    package on ARM. Install the multiarch package instead.
+
+  [ Steve Langasek ]
+  * Synchronize the kernel version checks in
+    debian/debhelper.in/libc6.preinst with the values actually set in
+    debian/sysdeps/linux.mk.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 23 Feb 2012 20:04:15 +0100
+
+eglibc (2.15-0ubuntu2) precise; urgency=low
+
+  * Revert commit c5a0802a. LP: #929713.
+  * Fix nvidia libgl crashes. LP: #929384.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 09 Feb 2012 20:33:14 +0100
+
+eglibc (2.15-0ubuntu1) precise; urgency=low
+
+  * Build upstream tarball from r16526.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 08 Feb 2012 01:58:09 +0100
 
 eglibc (2.13-39) UNRELEASED; urgency=low
 

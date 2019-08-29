@@ -15,6 +15,15 @@ test-xfail-tst-cancel24-static = yes
 # control, we'll just let it fail
 test-xfail-tst-create-detached = yes
 
+# This test is skipped in chroots, and appears to fail on autopkgtest
+# testbeds.  I've run out of time to debug and fix it upstream for
+# disco, so this will have to XFAIL for now:
+test-xfail-tst-nss-test3 = yes
+
+# This test is flapping on all architectures, due to this upstream bug:
+# https://sourceware.org/bugzilla/show_bug.cgi?id=19329
+test-xfail-tst-stack4 = yes
+
 ######################################################################
 # alpha (including optimized flavours)
 ######################################################################
@@ -173,6 +182,26 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabi)
 # There is not support for protection key on ARM yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# These tests are currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend they fail on ARM:
+test-xfail-tst-ttyname = yes
+test-xfail-tst-support_descriptors = yes
+
+# This test fails due to a kernel bug when building armhf on an ARM64
+# machine. See bug #904385.
+test-xfail-tst-signal6 = yes
+
+# This test has regressed with recent kernels
+test-xfail-tst-thread-exit-clobber = yes
+
+# These (new in 2.29) tests appear to fail when building armhf on aarch64
+test-xfail-tst-minsigstksz-1 = yes
+test-xfail-tst-minsigstksz-2 = yes
+test-xfail-tst-minsigstksz-3 = yes
+test-xfail-tst-minsigstksz-3a = yes
+test-xfail-tst-minsigstksz-4 = yes
+test-xfail-tst-xsigstack = yes
 endif
 
 
@@ -183,6 +212,11 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabihf)
 # There is not support for protection key on ARM yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# These tests are currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend they fail on ARM:
+test-xfail-tst-ttyname = yes
+test-xfail-tst-support_descriptors = yes
 
 # This test fails due to a kernel bug when building armhf on an ARM64
 # machine. See bug #904385.
@@ -905,6 +939,16 @@ test-xfail-test-on_exit-race = yes
 test-xfail-tst-cond16 = yes
 test-xfail-tst-malloc-thread-fail = yes
 test-xfail-tst-stack4 = yes
+endif
+
+######################################################################
+# s390
+######################################################################
+ifeq ($(config-machine)-$(config-os),s390-linux-gnu)
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
