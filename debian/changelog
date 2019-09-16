@@ -1,3 +1,13 @@
+glibc (2.30-0ubuntu2) eoan; urgency=medium
+
+  * Merge with current Debian git, bringing in container-based testsuite fix:
+    - debian/patches/any/local-test-install.diff: Use install_root rather than
+      DESTDIR when installing container root, since we override install_root.
+  * debian/patches/ubuntu/local-pldd-root.diff: Run tst-pldd as root to get us
+    CAP_SYS_PTRACE, which is disabled by default in Ubuntu for non-root users.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 16 Sep 2019 08:56:30 -0600
+
 glibc (2.30-0ubuntu1) eoan; urgency=medium
 
   * Merge with current 2.30 in Debian git (LP: #1842024), remaining changes:
@@ -22,7 +32,7 @@ glibc (2.30-0ubuntu1) eoan; urgency=medium
 glibc (2.30-0experimental0) UNRELEASED; urgency=medium
 
   [ Adam Conrad ]
-  * New upstream release 2.30, with git updates up to 2019-08-28:
+  * New upstream release 2.30, with git updates up to 2019-09-08:
     - debian/symbols.wildcard: Add 2.30, and debian/control: Regenerate.
     - debian/patches/any/git-libio-stdout-putc.diff: Upstreamed.
     - debian/patches/any/git-pexpect-pretty-printers.diff: Upstreamed.
@@ -38,15 +48,55 @@ glibc (2.30-0experimental0) UNRELEASED; urgency=medium
     - debian/patches/hurd-i386/tg-thread-cancel.diff: Rebased.
     - debian/patches/kfreebsd/submitted-auxv.diff: Rebased.
     - debian/patches/locale/locale-print-LANGUAGE.diff: Update for new test.
+  * debian/patches/any/local-test-install.diff: Use install_root rather than
+    DESTDIR when installing container root, since we override install_root.
 
   [ Samuel Thibault ]
   * debian/patches/hurd-i386/local-fix-nss.diff: Rebased.
   * debian/patches/hurd-i386/{tg-single-select-timeout.diff,tg-setitimer.diff,
     tg-remap_getcwd.diff,tg-io_select_timeout.diff,tg-poll_errors_fixes.diff,
     submitted-anon-mmap-shared.diff,tg-ONSTACK.diff}: Rename to git-foo,
-    commited upstream for 2.31.
+    committed upstream for 2.31.
+  * debian/testsuite-xfail-debian.mk: Update with new failing tests.
+  * debian/patches/hurd-i386/git-ONSTACK.diff: Move earlier in the queue,
+    since was applied upstream.
+  * debian/patches/hurd-i386/tg-hurdsig-global-dispositions.diff: Rebase
+    accordingly.
+  * debian/patches/hurd-i386/libpthread_version.diff: Remove, now useless.
+  * debian/patches/hurd-i386/local-hurdsig-globaldisp-version.diff: Remove
+    version compatibility symbols, now useless.
+  * debian/libc0.3.symbols.hurd-i386: Update accordingly.
+  * debian/patches/hurd-i386/tg-sysvshm.diff: Fix warning.
+  * debian/patches/hurd-i386/local-versionshack.diff: Remove, now useless.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch.
 
  -- Adam Conrad <adconrad@0c3.net>  Thu, 29 Aug 2019 01:58:14 -0600
+
+glibc (2.29-1) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix math tests on alpha.
+  * debian/sysdeps/alpha.mk, debian/control.in/main: do not force build with
+    gcc-8.
+  * debian/testsuite-xfail-debian.mk: XFAIL narrowing add/sub tests, they
+    have always failed since they have been introduced.
+  * debian/control.in/libc: add a Breaks: iraf-fitsutil (<< 2018.07.06-4) to
+    libc0.1/0.3/6/6.1. See bug#939523.
+  * debian/testsuite-xfail-debian.mk: drop XFAILs related to the wrong value
+    of (MIN)SIGSTKSZ for 32-bit processes on arm64, now that (old-)stable
+    kernels are fixed.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/submitted-anon-mmap-shared.diff: Enable, now that
+    hurd 2017 is behind.
+  * control: Break old version of hurd package accordingly.
+  * debian/patches/hurd-i386/local-exec_filename.diff: Fix glibc 2.26
+    _hurd_exec_paths symbol visibility.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 08 Sep 2019 22:34:02 +0200
 
 glibc (2.29-0experimental1) experimental; urgency=medium
 
@@ -194,14 +244,6 @@ glibc (2.29-0experimental0) experimental; urgency=medium
     new format for ld.so.cache.  Closes: #908946.
 
  -- Aurelien Jarno <aurel32@debian.org>  Fri, 16 Aug 2019 12:42:42 +0200
-
-glibc (2.28-11) UNRELEASED; urgency=medium
-
-  * debian/patches/hurd-i386/submitted-anon-mmap-shared.diff: Enable, now that
-    hurd 2017 is behind.
-  * control: Break old version of hurd package accordingly.
-
- -- Samuel Thibault <sthibault@debian.org>  Fri, 30 Aug 2019 01:30:00 +0200
 
 glibc (2.28-10) unstable; urgency=medium
 
