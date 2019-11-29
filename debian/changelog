@@ -1,3 +1,9 @@
+glibc (2.30-0ubuntu3) focal; urgency=medium
+
+  * Cherrypick upstream fix for strstr on s390x z15. LP: #1854326
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 29 Nov 2019 14:19:57 +0000
+
 glibc (2.30-0ubuntu2) eoan; urgency=medium
 
   * Merge with current Debian git, bringing in container-based testsuite fix:
