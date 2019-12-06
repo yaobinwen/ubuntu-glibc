@@ -137,6 +137,7 @@ GCONV_PATH="$${builddir}/iconvdata"
 usage () {
   echo "usage: $$0 [--tool=strace] PROGRAM [ARGUMENTS...]" 2>&1
   echo "       $$0 --tool=valgrind PROGRAM [ARGUMENTS...]" 2>&1
+  exit 1
 }
 
 toolname=default
@@ -330,8 +331,13 @@ $(objpfx)check-installed-headers-cxx.out: \
 	  "$(CXX) $(filter-out -std=%,$(CXXFLAGS)) -D_ISOMAC $(+includes)" \
 	  $(headers) > $@; \
 	$(evaluate-test)
-endif
-endif
+endif # $(CXX)
+
+tests-special += $(objpfx)check-wrapper-headers.out
+$(objpfx)check-wrapper-headers.out: scripts/check-wrapper-headers.py $(headers)
+	$(PYTHON) $< --root=. --subdir=. $(headers) \
+	  --generated $(common-generated) > $@; $(evaluate-test)
+endif # $(headers)
 
 define summarize-tests
 @egrep -v '^(PASS|XFAIL):' $(objpfx)$1 || true
@@ -377,7 +383,7 @@ $(objpfx)testroot.pristine/install.stamp :
 ifeq ($(run-built-tests),yes)
 	# Copy these DSOs first so we can overwrite them with our own.
 	for dso in `$(test-wrapper-env) LD_TRACE_LOADED_OBJECTS=1  \
-		$(objpfx)elf/$(rtld-installed-name) \
+		$(rtld-prefix) \
 		$(objpfx)testroot.pristine/bin/sh \
 	        | grep / | sed 's/^[^/]*//' | sed 's/ .*//'` ;\
 	  do \
@@ -386,7 +392,7 @@ ifeq ($(run-built-tests),yes)
 	    $(test-wrapper) cp $$dso $(objpfx)testroot.pristine$$dso ;\
 	  done
 	for dso in `$(test-wrapper-env) LD_TRACE_LOADED_OBJECTS=1  \
-		$(objpfx)elf/$(rtld-installed-name) \
+		$(rtld-prefix) \
 		$(objpfx)support/$(LINKS_DSO_PROGRAM) \
 	        | grep / | sed 's/^[^/]*//' | sed 's/ .*//'` ;\
 	  do \
@@ -395,7 +401,8 @@ ifeq ($(run-built-tests),yes)
 	    $(test-wrapper) cp $$dso $(objpfx)testroot.pristine$$dso ;\
 	  done
 endif
-	$(MAKE) install DESTDIR=$(objpfx)testroot.pristine
+	$(MAKE) install DESTDIR=$(objpfx)testroot.pristine \
+	  subdirs='$(sorted-subdirs)'
 	touch $(objpfx)testroot.pristine/install.stamp
 
 tests-special-notdir = $(patsubst $(objpfx)%, %, $(tests-special))

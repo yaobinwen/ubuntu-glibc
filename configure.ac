@@ -1017,7 +1017,7 @@ AC_CHECK_PROG_VER(BISON, bison, --version,
 
 AC_CACHE_CHECK([if $CC is sufficient to build libc], libc_cv_compiler_ok, [
 AC_TRY_COMPILE([], [
-#if !defined __GNUC__ || __GNUC__ < 5
+#if !defined __GNUC__ || __GNUC__ < 6 || (__GNUC__ == 6 && __GNUC_MINOR__ < 2)
 #error insufficient compiler
 #endif],
 	       [libc_cv_compiler_ok=yes],
@@ -1804,6 +1804,7 @@ AC_SUBST(libc_cv_gcc_unwind_find_fde)
 if test x"$libc_cv_ld_gnu_indirect_function" = xyes; then
   AC_DEFINE(HAVE_IFUNC)
 fi
+LIBC_CONFIG_VAR([have-ifunc], [$libc_cv_ld_gnu_indirect_function])
 
 if test x"$libc_cv_gcc_indirect_function" = xyes; then
   AC_DEFINE(HAVE_GCC_IFUNC)

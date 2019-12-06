@@ -1,9 +1,62 @@
+glibc (2.30-0experimental0) experimental; urgency=medium
+
+  [ Adam Conrad ]
+  * New upstream release 2.30, with git updates up to 2019-09-08:
+    - debian/symbols.wildcard: Add 2.30, and debian/control: Regenerate.
+    - debian/patches/any/git-libio-stdout-putc.diff: Upstreamed.
+    - debian/patches/any/git-pexpect-pretty-printers.diff: Upstreamed.
+    - debian/patches/any/git-socket-constants.diff: Upstreamed.
+    - debian/patches/any/local-tst-eintr1-eagain.diff: Obsolete.
+    - debian/patches/hurd-i386/git-renameat2.diff: Upstreamed.
+    - debian/patches/any/submitted-resolv-unaligned.diff: Rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: Rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-fixes-2.diff: Rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-fixes.diff: Rebased.
+    - debian/patches/hurd-i386/tg-hurdsig-global-dispositions.diff: Rebased.
+    - debian/patches/hurd-i386/tg-io_select_timeout.diff: Rebased.
+    - debian/patches/hurd-i386/tg-thread-cancel.diff: Rebased.
+    - debian/patches/kfreebsd/submitted-auxv.diff: Rebased.
+    - debian/patches/locale/locale-print-LANGUAGE.diff: Update for new test.
+  * debian/patches/any/local-test-install.diff: Use install_root rather than
+    DESTDIR when installing container root, since we override install_root.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/local-fix-nss.diff: Rebased.
+  * debian/patches/hurd-i386/{tg-single-select-timeout.diff,tg-setitimer.diff,
+    tg-remap_getcwd.diff,tg-io_select_timeout.diff,tg-poll_errors_fixes.diff,
+    submitted-anon-mmap-shared.diff,tg-ONSTACK.diff}: Rename to git-foo,
+    committed upstream for 2.31.
+  * debian/testsuite-xfail-debian.mk: Update with new failing tests and fixed
+    tests.
+  * debian/patches/hurd-i386/git-ONSTACK.diff: Move earlier in the queue,
+    since was applied upstream.
+  * debian/patches/hurd-i386/tg-hurdsig-global-dispositions.diff: Rebase
+    accordingly.
+  * debian/patches/hurd-i386/libpthread_version.diff: Remove, now useless.
+  * debian/patches/hurd-i386/local-hurdsig-globaldisp-version.diff: Remove
+    version compatibility symbols, now useless.
+  * debian/libc0.3.symbols.hurd-i386: Update accordingly.
+  * debian/patches/hurd-i386/tg-sysvshm.diff: Fix warning.
+  * debian/patches/hurd-i386/local-versionshack.diff: Remove, now useless.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri, 06 Dec 2019 23:18:04 +0100
+
+glibc (2.29-5) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri, 06 Dec 2019 21:33:17 +0100
+
 glibc (2.29-4) experimental; urgency=medium
 
   [ Aurelien Jarno ]
   * Upload to experimental.
   * debian/control.in/libc: make libc depends on libcrypt1, libc-dev depends
-    on libcrypt1-dev and libc-udeb depends on libcrypt1-udeb.
+    on libcrypt1-dev and libc-udeb depends on libcrypt1-udeb.  Closes:
+    #941853.
   * debian/rules, debian/rules.d/build.mk, debian/rules.d/debhelper.mk,
     debian/sysdeps/amd64.mk: disable libcrypt by passing --disable-crypt
     except for bi/triarch builds.
@@ -659,7 +712,7 @@ glibc (2.27-3) unstable; urgency=medium
 glibc (2.27-2) unstable; urgency=medium
 
   [ Samuel Thibault ]
-  * debian/patches/hurd-i386/git-UTIME.diff: New patch.
+  * debian/patches/hurd-i386/git-UTIME.diff: New patch.  Closes: #762677.
   * debian/control: Bump hurd build dep accordingly.
   * debian/libc0.3.symbols.hurd-i386: Update accordingly.
 

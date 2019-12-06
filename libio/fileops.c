@@ -331,9 +331,6 @@ _IO_new_file_fopen (FILE *fp, const char *filename, const char *mode,
 
 	  cc = fp->_codecvt = &fp->_wide_data->_codecvt;
 
-	  /* The functions are always the same.  */
-	  *cc = __libio_codecvt;
-
 	  cc->__cd_in.__cd.__nsteps = fcts.towc_nsteps;
 	  cc->__cd_in.__cd.__steps = fcts.towc;
 
@@ -501,13 +498,13 @@ _IO_new_file_underflow (FILE *fp)
 	 traditional Unix systems did this for stdout.  stderr better
 	 not be line buffered.  So we do just that here
 	 explicitly.  --drepper */
-      _IO_acquire_lock (_IO_stdout);
+      _IO_acquire_lock (stdout);
 
-      if ((_IO_stdout->_flags & (_IO_LINKED | _IO_NO_WRITES | _IO_LINE_BUF))
+      if ((stdout->_flags & (_IO_LINKED | _IO_NO_WRITES | _IO_LINE_BUF))
 	  == (_IO_LINKED | _IO_LINE_BUF))
-	_IO_OVERFLOW (_IO_stdout, EOF);
+	_IO_OVERFLOW (stdout, EOF);
 
-      _IO_release_lock (_IO_stdout);
+      _IO_release_lock (stdout);
     }
 
   _IO_switch_to_get_mode (fp);

@@ -134,7 +134,8 @@ extern int __fxprintf (FILE *__fp, const char *__fmt, ...)
      __attribute__ ((__format__ (__printf__, 2, 3))) attribute_hidden;
 extern int __fxprintf_nocancel (FILE *__fp, const char *__fmt, ...)
      __attribute__ ((__format__ (__printf__, 2, 3))) attribute_hidden;
-int __vfxprintf (FILE *__fp, const char *__fmt, __gnuc_va_list)
+int __vfxprintf (FILE *__fp, const char *__fmt, __gnuc_va_list,
+		 unsigned int)
   attribute_hidden;
 
 /* Read the next line from FP into BUFFER, of LENGTH bytes.  LINE will
@@ -260,6 +261,8 @@ __putc_unlocked (int __c, FILE *__stream)
 
 extern __typeof (renameat) __renameat;
 libc_hidden_proto (__renameat)
+extern __typeof (renameat2) __renameat2;
+libc_hidden_proto (__renameat2)
 
 # endif /* not _ISOMAC */
 #endif /* stdio.h */
