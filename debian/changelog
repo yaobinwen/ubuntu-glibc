@@ -1,3 +1,26 @@
+glibc (2.30-0experimental1) experimental; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/tg-sendmsg-SCM_RIGHTS.diff: Rename to
+    git-sendmsg-SCM_RIGHTS.diff.
+  * patches/hurd-i386/tg-context_functions.diff: Rename to
+    git-context_functions.diff.
+  * patches/hurd-i386/tg-hurdsig-fixes.diff: Rename to git-hurdsig-fixes.diff.
+  * patches/hurd-i386/tg-hurdsig-global-dispositions.diff: Rename to
+    git-hurdsig-global-dispositions.diff, refresh.
+  * patches/hurd-i386/local-hurdsig-globaldisp-version.diff: Rename to
+    git-hurdsig-globaldisp-version.diff.
+  * patches/hurd-i386/tg-hurdsig-fixes-2.diff: Rename to
+    git-hurdsig-fixes-2.diff.
+  * patches/hurd-i386/tg-hurdsig-boot-fix.diff: Rename to
+    git-hurdsig-boot-fix.diff.
+  * patches/hurd-i386/libpthread_sigs.diff: Rename to libpthread_sigs.diff.
+  * patches/hurd-i386/local-hurd_sigstate-PLT.diff: Rename to
+    git-hurd_sigstate-PLT.diff.
+  * patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: Refresh.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 02 Jan 2020 12:16:20 +0100
+
 glibc (2.30-0experimental0) experimental; urgency=medium
 
   [ Adam Conrad ]
@@ -43,6 +66,32 @@ glibc (2.30-0experimental0) experimental; urgency=medium
   * debian/patches/git-updates.diff: update from upstream stable branch.
 
  -- Aurelien Jarno <aurel32@debian.org>  Fri, 06 Dec 2019 23:18:04 +0100
+
+glibc (2.29-7) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/git-altstack-RPC.diff: Fix restoring from altstack while
+    blocked in an RPC.
+  * patches/hurd-i386/git-getrandom.diff: Add support for getrandom &
+    getentropy.
+
+  [ Aurelien Jarno ]
+  * debian/rules.d/debhelper.mk: change dependency from libcrypt1-dev to
+    libcrypt-dev.  Closes: #947778.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 30 Dec 2019 19:12:42 +0100
+
+glibc (2.29-6) unstable; urgency=medium
+
+  * debian/shlibs-add-udebs: drop libcrypt.
+  * Fix rebootstrap and cross-toolchain-base (Closes: #946396):
+    - debian/control.in/libc: replace libcrypt1 by ${libcrypt:Depends} and
+      libcrypt1-dev by ${libcrypt-dev:Depends}.
+    - debian/rules.d/debhelper.mk: add libcrypt:Depends=libcrypt1 and
+      libcrypt-dev:Depends=libcrypt1-dev to substvars unless build with stage1
+      or stage2 profiles.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 10 Dec 2019 00:06:38 +0100
 
 glibc (2.29-5) unstable; urgency=medium
 
