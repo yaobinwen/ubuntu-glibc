@@ -1,3 +1,16 @@
+glibc (2.29-8) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * patches/hurd-i386/posix_openpt.diff: Add posix_openpt support.
+  * patches/hurd-i386/git-errno_location.diff: Fix pthread link of protobuf.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fixes ASLR bypass for setuid programs (CVE-2019-19126).  Closes: #945250.
+    - debian/patches/any/git-socket-constants.diff: upstreamed.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 05 Jan 2020 13:03:42 +0100
+
 glibc (2.29-7) unstable; urgency=medium
 
   [ Samuel Thibault ]
