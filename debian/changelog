@@ -1,3 +1,13 @@
+glibc (2.29-10) unstable; urgency=medium
+
+  * debian/debhelper.in/libc.{preinst,postrm}: Remove fallback to dpkg
+    --print-architecture for pre-multiarch systems.
+  * debian/debhelper.in/libc.preinst: fallback to text output in case
+    perl debconf is used and perl is not usable.  Closes: #946599, #950389.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 04 Feb 2020 20:37:26 +0100
+
 glibc (2.29-9) unstable; urgency=medium
 
   [ Samuel Thibault ]
@@ -5,8 +15,8 @@ glibc (2.29-9) unstable; urgency=medium
   * patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: Fix setitimer.
 
   [ Aurelien Jarno ]
-  * debian/sysdeps/{amd64,x32}.mk: do not optimize for pentium4.  Closes:
-    #948396.
+  * debian/sysdeps/{amd64,x32}.mk: do not optimize i386 pass for pentium4.
+    Closes: #948396.
   * debian/patches/any/local-revert-24323.diff: revert upstream change
     preventing dlopening PIE executable, The patch is correct, but breaks
     the autopkgtest for wcc and prevents the migration of glibc to testing.
