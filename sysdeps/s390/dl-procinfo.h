@@ -1,5 +1,5 @@
 /* s390 version of processor capability information handling macros.
-   Copyright (C) 2006-2019 Free Software Foundation, Inc.
+   Copyright (C) 2006-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Martin Schwidefsky <schwidefsky@de.ibm.com>, 2006.
 
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+   <https://www.gnu.org/licenses/>.  */
 
 #ifndef _DL_PROCINFO_H
 #define _DL_PROCINFO_H	1
@@ -23,7 +23,7 @@
 
 #define _DL_HWCAP_COUNT 19
 
-#define _DL_PLATFORMS_COUNT	9
+#define _DL_PLATFORMS_COUNT	10
 
 /* The kernel provides up to 32 capability bits with elf_hwcap.  */
 #define _DL_FIRST_PLATFORM	32

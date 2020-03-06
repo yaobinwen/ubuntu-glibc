@@ -15,6 +15,15 @@ test-xfail-tst-cancel24-static = yes
 # control, we'll just let it fail
 test-xfail-tst-create-detached = yes
 
+# This test is skipped in chroots, and appears to fail on autopkgtest
+# testbeds.  I've run out of time to debug and fix it upstream for
+# disco, so this will have to XFAIL for now:
+test-xfail-tst-nss-test3 = yes
+
+# This test is flapping on all architectures, due to this upstream bug:
+# https://sourceware.org/bugzilla/show_bug.cgi?id=19329
+test-xfail-tst-stack4 = yes
+
 ######################################################################
 # alpha (including optimized flavours)
 ######################################################################
@@ -185,6 +194,26 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabi)
 # There is not support for protection key on ARM yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# These tests are currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend they fail on ARM:
+test-xfail-tst-ttyname = yes
+test-xfail-tst-support_descriptors = yes
+
+# This test fails due to a kernel bug when building armhf on an ARM64
+# machine. See bug #904385.
+test-xfail-tst-signal6 = yes
+
+# This test has regressed with recent kernels
+test-xfail-tst-thread-exit-clobber = yes
+
+# These (new in 2.29) tests appear to fail when building armhf on aarch64
+test-xfail-tst-minsigstksz-1 = yes
+test-xfail-tst-minsigstksz-2 = yes
+test-xfail-tst-minsigstksz-3 = yes
+test-xfail-tst-minsigstksz-3a = yes
+test-xfail-tst-minsigstksz-4 = yes
+test-xfail-tst-xsigstack = yes
 endif
 
 
@@ -195,6 +224,24 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabihf)
 # There is not support for protection key on ARM yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# These tests are currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend they fail on ARM:
+test-xfail-tst-ttyname = yes
+test-xfail-tst-support_descriptors = yes
+
+# This test fails due to a kernel bug when building armhf on an ARM64
+# machine. See bug #904385.
+test-xfail-tst-signal6 = yes
+test-xfail-tst-minsigstksz-1 = yes
+test-xfail-tst-minsigstksz-2 = yes
+test-xfail-tst-minsigstksz-3 = yes
+test-xfail-tst-minsigstksz-3a = yes
+test-xfail-tst-minsigstksz-4 = yes
+test-xfail-tst-xsigstack = yes
+
+# This test has regressed with recent kernels
+test-xfail-tst-thread-exit-clobber = yes
 endif
 
 
@@ -363,8 +410,6 @@ test-xfail-tst-copy_file_range = yes
 test-xfail-tst-copy_file_range-compat = yes
 
 # new in 2.28
-test-xfail-tst-fgetc-after-eof = yes
-test-xfail-tst-fgetwc-after-eof = yes
 test-xfail-tst-malloc-stats-cancellation = yes
 
 # want /proc/self/fd
@@ -383,25 +428,30 @@ test-xfail-tst-res_hconf_reorder = yes
 test-xfail-ISO11/threads.h/conform = yes
 test-xfail-ISO11/threads.h/linknamespace = yes
 
-# new in 2.31
-#test-xfail-tst-auditmany = yes
-#test-xfail-tst-dlopenfail = yes
-
-# actually never succeded
-#test-xfail-tst-create_format1 = yes
-#test-xfail-tst-getcwd-abspath = yes
-# Assumes that self-locks are exclusive
-#test-xfail-tst-lockf = yes
-
-# assumes that all st_mode flags (32bit) can exist in stx_mode flags (16bit)
-#test-xfail-tst-statx = yes
-
 # wants pthread_barrierattr_setpshared
-#test-xfail-tst-pututxline-cache = yes
-#test-xfail-tst-pututxline-lockfail = yes
+test-xfail-tst-pututxline-cache = yes
+test-xfail-tst-pututxline-lockfail = yes
 
 # wants /proc/self/fd
-#test-xfail-tst-updwtmpx = yes
+test-xfail-tst-updwtmpx = yes
+
+# new in 2.31
+test-xfail-tst-auditmany = yes
+test-xfail-tst-dlopenfail = yes
+
+# actually never succeded
+test-xfail-tst-create_format1 = yes
+test-xfail-tst-getcwd-abspath = yes
+test-xfail-tst-udp-error = yes
+test-xfail-test-fesetexcept-traps = yes
+test-xfail-tst-support_capture_subprocess = yes
+
+# Assumes that self-locks are exclusive
+test-xfail-tst-lockf = yes
+
+# assumes that all st_mode flags (32bit) can exist in stx_mode flags (16bit)
+test-xfail-tst-statx = yes
+
 endif
 
 
@@ -929,6 +979,16 @@ test-xfail-tst-malloc-thread-fail = yes
 test-xfail-tst-stack4 = yes
 endif
 
+######################################################################
+# s390
+######################################################################
+ifeq ($(config-machine)-$(config-os),s390-linux-gnu)
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
+endif
+
 
 ######################################################################
 # s390x
@@ -999,4 +1059,47 @@ endif
 ######################################################################
 ifeq ($(config-machine)-$(config-os),x86_64-linux-gnux32)
 test-xfail-tst-platform-1 = yes
+endif
+
+######################################################################
+# Ubuntu additions
+######################################################################
+
+# fail on 32bit with the xenial kernel, working with bionic and focal
+ifneq (,$(filter $(config-machine)-$(config-os), arm-linux-gnueabihf arm-linux-gnueabi i686-linux-gnu))
+test-xfail-test-sysvmsg = yes
+test-xfail-test-sysvsem = yes
+test-xfail-test-sysvshm = yes
+endif
+
+# ignore soft-float issues for the non-default armel multilib
+ifeq ($(config-machine)-$(config-os),arm-linux-gnueabi)
+test-xfail-test-double-fma = yes
+test-xfail-test-float-double-add = yes
+test-xfail-test-float-double-div = yes
+test-xfail-test-float-double-mul = yes
+test-xfail-test-float-double-sub = yes
+test-xfail-test-float-fma = yes
+test-xfail-test-float-ldouble-add = yes
+test-xfail-test-float-ldouble-div = yes
+test-xfail-test-float-ldouble-mul = yes
+test-xfail-test-float-ldouble-sub = yes
+test-xfail-test-float32-float32x-add = yes
+test-xfail-test-float32-float32x-div = yes
+test-xfail-test-float32-float32x-mul = yes
+test-xfail-test-float32-float32x-sub = yes
+test-xfail-test-float32-float64-add = yes
+test-xfail-test-float32-float64-div = yes
+test-xfail-test-float32-float64-mul = yes
+test-xfail-test-float32-float64-sub = yes
+test-xfail-test-float32-fma = yes
+test-xfail-test-float32x-fma = yes
+test-xfail-test-float64-fma = yes
+test-xfail-test-idouble-fma = yes
+test-xfail-test-ifloat-fma = yes
+test-xfail-test-ifloat32-fma = yes
+test-xfail-test-ifloat32x-fma = yes
+test-xfail-test-ifloat64-fma = yes
+test-xfail-test-ildouble-fma = yes
+test-xfail-test-ldouble-fma = yes
 endif

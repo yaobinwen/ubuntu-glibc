@@ -1,8 +1,9 @@
 # configuration options for all flavours
-extra_config_options = --enable-multi-arch --enable-static-pie
+extra_config_options = --enable-multi-arch --enable-static-pie --enable-cet
 
 # main library
 libc_mvec = yes
+libc_extra_cflags = -O3
 libc_rtlddir = /lib64
 
 # multilib flavours

@@ -1,5 +1,5 @@
 /* spawn a new process running an executable.  Hurd version.
-   Copyright (C) 2001-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, see <http://www.gnu.org/licenses/>.  */
+   not, see <https://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <fcntl.h>
@@ -336,26 +336,29 @@ __spawni (pid_t *pid, const char *file,
   assert (! __spin_lock_locked (&ss->critical_section_lock));
   __spin_lock (&ss->critical_section_lock);
 
-  __spin_lock (&ss->lock);
+  _hurd_sigstate_lock (ss);
   ints[INIT_SIGMASK] = ss->blocked;
-  ints[INIT_SIGPENDING] = ss->pending;
+  ints[INIT_SIGPENDING] = 0;
   ints[INIT_SIGIGN] = 0;
   /* Unless we were asked to reset all handlers to SIG_DFL,
      pass down the set of signals that were set to SIG_IGN.  */
-  if ((flags & POSIX_SPAWN_SETSIGDEF) == 0)
-    for (i = 1; i < NSIG; ++i)
-      if (ss->actions[i].sa_handler == SIG_IGN)
-	ints[INIT_SIGIGN] |= __sigmask (i);
+  {
+    struct sigaction *actions = _hurd_sigstate_actions (ss);
+    if ((flags & POSIX_SPAWN_SETSIGDEF) == 0)
+      for (i = 1; i < NSIG; ++i)
+	if (actions[i].sa_handler == SIG_IGN)
+	  ints[INIT_SIGIGN] |= __sigmask (i);
+  }
 
-  /* We hold the sigstate lock until the exec has failed so that no signal
-     can arrive between when we pack the blocked and ignored signals, and
-     when the exec actually happens.  A signal handler could change what
+  /* We hold the critical section lock until the exec has failed so that no
+     signal can arrive between when we pack the blocked and ignored signals,
+     and when the exec actually happens.  A signal handler could change what
      signals are blocked and ignored.  Either the change will be reflected
      in the exec, or the signal will never be delivered.  Setting the
      critical section flag avoids anything we call trying to acquire the
      sigstate lock.  */
 
-  __spin_unlock (&ss->lock);
+  _hurd_sigstate_unlock (ss);
 
   /* Set signal mask.  */
   if ((flags & POSIX_SPAWN_SETSIGMASK) != 0)

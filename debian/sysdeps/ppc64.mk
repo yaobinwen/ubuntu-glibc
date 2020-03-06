@@ -3,6 +3,7 @@ extra_config_options = --enable-multi-arch
 
 # main library
 libc_rtlddir = /lib64
+libc_extra_cflags = -O3 -fno-tree-vectorize
 
 # multilib flavours
 ifeq (,$(filter nobiarch, $(DEB_BUILD_PROFILES)))
@@ -15,6 +16,7 @@ powerpc_configure_target = powerpc-linux-gnu
 powerpc_CC = $(CC) -m32
 powerpc_CXX = $(CXX) -m32
 powerpc_crypt = yes
+powerpc_extra_cflags = -O3 -fno-tree-vectorize
 powerpc_slibdir = /lib32
 powerpc_libdir = /usr/lib32
 
