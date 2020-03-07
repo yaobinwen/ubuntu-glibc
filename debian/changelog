@@ -1,3 +1,12 @@
+glibc (2.31-0ubuntu2) focal; urgency=medium
+
+  * libcrypt1 breaks/replaces libc6 (<< 2.31). cannot use a pre-depends on
+    libcrypt1.  In the preinst, call ldconfig unconditionally for the first
+    libc6 depending on libcrypt1
+  * libc6: Depend on libgcc-sN instead of libgccN.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 07 Mar 2020 09:34:11 +0100
+
 glibc (2.31-0ubuntu1) focal; urgency=medium
 
   * Merge with current Debian git glibc-2.31.
