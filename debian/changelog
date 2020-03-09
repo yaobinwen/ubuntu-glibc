@@ -1,3 +1,12 @@
+glibc (2.31-0ubuntu3) focal; urgency=medium
+
+  * Move ldconfig handling to the very TOP of the preinst, before we attempt
+    to load the debconf module, which requires perl.  This properly
+    localizes the handling of upgrade ordering to libc + libxcrypt instead
+    of involving other packages.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Mon, 09 Mar 2020 13:35:19 -0700
+
 glibc (2.31-0ubuntu2) focal; urgency=medium
 
   * libcrypt1 breaks/replaces libc6 (<< 2.31). cannot use a pre-depends on

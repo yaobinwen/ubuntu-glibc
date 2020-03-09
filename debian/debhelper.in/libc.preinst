@@ -90,6 +90,14 @@ check_dir () {
     done
 }
 
+# libcrypt1 breaks/replaces libc6 (<< 2.31). cannot use a pre-depends on libcrypt1
+# call ldconfig unconditionally for the first libc6 depending on libcrypt1
+if [ -n "$preversion" ] && dpkg --compare-versions "$preversion" lt 2.31-0ubuntu2; then
+	LCONFIG_NOTRIGGER=y
+	export LDCONFIG_NOTRIGGER
+	ldconfig || ldconfig --verbose
+fi
+
 if [ "$type" != abort-upgrade ]
 then
     # Load debconf module if available and usable
@@ -267,14 +275,6 @@ then
             echo
             exit 1
         fi
-    fi
-
-    # libcrypt1 breaks/replaces libc6 (<< 2.31). cannot use a pre-depends on libcrypt1
-    # call ldconfig unconditionally for the first libc6 depending on libcrypt1
-    if [ -n "$preversion" ] && dpkg --compare-versions "$preversion" lt 2.31-0ubuntu2; then
-	LDCONFIG_NOTRIGGER=y
-	export LDCONFIG_NOTRIGGER
-	ldconfig || ldconfig --verbose
     fi
 
     if [ -n "$preversion" ] && [ -x "$(which ischroot)" ] && ! ischroot; then
