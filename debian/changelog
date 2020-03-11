@@ -1,3 +1,40 @@
+glibc (2.30-1) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * testsuite-xfail-debian.mk: Update non-regressions.
+  * debian/patches/hurd-i386/git-fork-pthread_exit.diff: New patch to fix
+    pthread_exit after fork.
+  * debian/patches/hurd-i386/git-spin_lock.diff: New patch to fix
+    pthread_spin_lock behavior for shared memory.
+  * debian/patches/hurd-i386/git-barrier-1.diff: New patch to fix
+    pthread_barrier_wait with one thread.
+  * debian/patches/hurd-i386/git-sem-intr.diff: New patch to make
+    sem_wait/timedwait interruptible.
+  * debian/patches/hurd-i386/local-atfork-link.diff: New patch to fix
+    libpthread link.
+  * debian/patches/hurd-i386/git-register-atfork.diff: Fix linking with static
+    libpthread.
+  * debian/patches/hurd-i386/git-pthread_self.diff: New patch to improve
+    libpthread performance.
+
+  [ Aurelien Jarno ]
+  * debian/patches/any/local-revert-24323.diff: drop, obsolete.
+  * debian/control.in/libc: add a Breaks: against wcc (<< 0.0.2+dfsg-3).
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix argument passing for inlined syscalls on mips* and riscv64.
+      Closes: #951237.
+    - Fix stack corruption in trigonometric functions when passing a
+      pseudo-zero argument on x86 (CVE-2020-10029).  Closes: #953108.
+    - debian/patches/any/submitted-stt-gnu-ifunc-detection.patch: upstreamed.
+  * debian/sysdeps/*.mk: stop building libcrypt for multilib packages.
+    Closes: #951880.
+  * debian/debhelper.in/libc.postinst: drop upstart support.
+  * debian/patches/any/local-revert-glibc_has_include.diff: partial revert
+    of upstream commit bfa864e1645e until gcc stops providing fix-includes.
+    Closes: #953083.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 11 Mar 2020 22:02:51 +0100
+
 glibc (2.30-0experimental2) experimental; urgency=medium
 
   [ Aurelien Jarno ]
