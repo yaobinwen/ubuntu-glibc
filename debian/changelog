@@ -1,3 +1,17 @@
+glibc (2.31-0ubuntu4) focal; urgency=medium
+
+  * debian/testsuite-xfail-debian.mk: mark as XFAIL various new tests which
+    depend on a container setup which does not work correctly with Debian's
+    multiarch-style layout.
+    (https://sourceware.org/bugzilla/show_bug.cgi?id=25652)
+  * Move libcrypt to pre-depends of libc, to ensure libraries possibly
+    required by essential packages are always present on disk throughout an
+    upgrade.
+  * Install the architecture specific math-vector-fortran.h into the multiarch
+    include dir. LP: #1861353.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 10 Mar 2020 23:19:41 -0700
+
 glibc (2.31-0ubuntu3) focal; urgency=medium
 
   * Move ldconfig handling to the very TOP of the preinst, before we attempt

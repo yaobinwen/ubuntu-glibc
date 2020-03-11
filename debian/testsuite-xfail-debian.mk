@@ -24,6 +24,17 @@ test-xfail-tst-nss-test3 = yes
 # https://sourceware.org/bugzilla/show_bug.cgi?id=19329
 test-xfail-tst-stack4 = yes
 
+# new upstream container tests that don't set up the environment right for
+# Debian's multiarch paths.
+test-xfail-tst-dlopen-self-container = yes
+test-xfail-tst-dlopen-tlsmodid-container = yes
+test-xfail-tst-ldconfig-bad-aux-cache = yes
+test-xfail-tst-ldconfig-ld_so_conf-update = yes
+test-xfail-tst-pldd = yes
+test-xfail-tst-nss-db-endpwent = yes
+test-xfail-tst-nss-db-endgrent = yes
+test-xfail-tst-nss-files-hosts-long = yes
+
 ######################################################################
 # alpha (including optimized flavours)
 ######################################################################
