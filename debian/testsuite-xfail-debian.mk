@@ -363,8 +363,6 @@ test-xfail-tst-copy_file_range = yes
 test-xfail-tst-copy_file_range-compat = yes
 
 # new in 2.28
-test-xfail-tst-fgetc-after-eof = yes
-test-xfail-tst-fgetwc-after-eof = yes
 test-xfail-tst-malloc-stats-cancellation = yes
 
 # want /proc/self/fd
@@ -391,18 +389,21 @@ test-xfail-tst-pututxline-lockfail = yes
 test-xfail-tst-updwtmpx = yes
 
 # new in 2.31
-#test-xfail-tst-auditmany = yes
-#test-xfail-tst-dlopenfail = yes
+test-xfail-tst-auditmany = yes
+test-xfail-tst-dlopenfail = yes
 
 # actually never succeded
-#test-xfail-tst-create_format1 = yes
-#test-xfail-tst-getcwd-abspath = yes
+test-xfail-tst-create_format1 = yes
+test-xfail-tst-getcwd-abspath = yes
+test-xfail-tst-udp-error = yes
 test-xfail-test-fesetexcept-traps = yes
+test-xfail-tst-support_capture_subprocess = yes
+
 # Assumes that self-locks are exclusive
-#test-xfail-tst-lockf = yes
+test-xfail-tst-lockf = yes
 
 # assumes that all st_mode flags (32bit) can exist in stx_mode flags (16bit)
-#test-xfail-tst-statx = yes
+test-xfail-tst-statx = yes
 
 endif
 
