@@ -1,3 +1,11 @@
+glibc (2.31-0ubuntu5) focal; urgency=medium
+
+  * Move libcrypt1 back from pre-depends to depends; while this works fine
+    on upgrades, it fails on new installations of libc6+libcrypt1 via apt,
+    which is relevant for multiarch and therefore not viable.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 11 Mar 2020 23:26:31 -0700
+
 glibc (2.31-0ubuntu4) focal; urgency=medium
 
   * debian/testsuite-xfail-debian.mk: mark as XFAIL various new tests which
