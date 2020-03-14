@@ -1,3 +1,11 @@
+glibc (2.31-0ubuntu6) focal; urgency=medium
+
+  * Bump dependency on libcrypt1 to the version which fixes the path to
+    libcrypt.so.1, to avoid files disappearing due to replaces on upgrade.
+    LP: #18673431.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Sat, 14 Mar 2020 16:21:20 -0700
+
 glibc (2.31-0ubuntu5) focal; urgency=medium
 
   * Move libcrypt1 back from pre-depends to depends; while this works fine

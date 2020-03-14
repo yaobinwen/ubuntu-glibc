@@ -167,7 +167,7 @@ endif
 	: > tmp.substvars
 ifeq ($(filter stage1 stage2,$(DEB_BUILD_PROFILES)),)
 	echo 'libgcc:Depends=libgcc-s1 [!hppa !m68k], libgcc-s2 [m68k], libgcc-s4 [hppa]' >> tmp.substvars
-	echo 'libcrypt:Depends=libcrypt1' >> tmp.substvars
+	echo 'libcrypt:Depends=libcrypt1 (>= 1:4.4.10-10ubuntu4)' >> tmp.substvars
 	echo 'libcrypt-dev:Depends=libcrypt-dev' >> tmp.substvars
 endif
 	for pkg in $(DEB_ARCH_REGULAR_PACKAGES) $(DEB_INDEP_REGULAR_PACKAGES) $(DEB_UDEB_PACKAGES); do \
