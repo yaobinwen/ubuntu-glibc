@@ -1,3 +1,27 @@
+glibc (2.30-3) unstable; urgency=medium
+
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix a defect in the PowerPC backtrace function that could cause an
+      out-of-bounds write when executed in a signal frame context
+      (CVE-2020-1751).
+    - Fix use-after-free vulnerability in the glob function when expanding
+      ~user (CVE-2020-1752).  Closes: #953788.
+  * debian/debhelper.in/libc.preinst, debian/rules.d/debhelper.mk: determine
+    ld.so ELF magic at build time instead of at run time to avoid using
+    "readlink -m".  Closes: #954374.
+  * debian/rules.d/build.mk: unset LANGUAGE when running the testsuite.
+  * debian/testsuite-xfail-debian.mk: ignore signal/tst-minsigstksz-1 and
+    signal/tst-minsigstksz-2 on i386, they fail on i386 with an AVX-512 CPUs
+    due to a kernel bug.  Closes: #954715.
+  * debian/control.in/libc, debian/rules.d/debhelper.mk: Make libcX-dev
+    declare a Breaks against libcX-dev-${DEB_HOST_ARCH}-cross
+    (<< ${CURRENT_UPSTREAM_VERSION}~).  Closes: #954393.
+  * debian/control.in/libc, debian/control.in/main: drop Conflicts, Breaks and
+    Replaces against package version older than the one available in
+    oldstable.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 24 Mar 2020 23:31:35 +0100
+
 glibc (2.30-2) unstable; urgency=medium
 
   * debian/rules.d/debhelper.mk: depends on libgcc-sN instead of libgccN.

@@ -159,6 +159,7 @@ ifeq ($(filter stage1 stage2,$(DEB_BUILD_PROFILES)),)
 	echo 'libgcc:Depends=libgcc-s1 [!hppa !m68k], libgcc-s2 [m68k], libgcc-s4 [hppa]' >> tmp.substvars
 	echo 'libcrypt:Depends=libcrypt1' >> tmp.substvars
 	echo 'libcrypt-dev:Depends=libcrypt-dev' >> tmp.substvars
+	echo 'libc-dev:Breaks=$(libc)-dev-$(DEB_HOST_ARCH)-cross (<< $(GLIBC_VERSION)~)' >> tmp.substvars
 endif
 	for pkg in $(DEB_ARCH_REGULAR_PACKAGES) $(DEB_INDEP_REGULAR_PACKAGES) $(DEB_UDEB_PACKAGES); do \
 	  cp tmp.substvars debian/$$pkg.substvars; \
@@ -213,6 +214,7 @@ $(stamp)debhelper_%: $(stamp)debhelper-common $(stamp)install_%
 	rtlddir=$(call xx,rtlddir) ; \
 	curpass=$(curpass) ; \
 	rtld_so=`LANG=C LC_ALL=C readelf -l debian/tmp-$$curpass/usr/bin/iconv | grep "interpreter" | sed -e 's/.*interpreter: \(.*\)]/\1/g'`; \
+	rtld_magic=`od -An -tx1 -N20 -w20 $$rtld_so` ; \
 	case "$$curpass:$$slibdir" in \
 	  libc:*) \
 	    templates="libc libc-dev libc-pic libc-udeb" \
@@ -242,6 +244,7 @@ $(stamp)debhelper_%: $(stamp)debhelper-common $(stamp)install_%
 	    sed -e "s#LIBDIR#$$libdir#g" -i $$t; \
 	    sed -e "s#FLAVOR#$$curpass#g" -i $$t; \
 	    sed -e "s#RTLD_SO#$$rtld_so#g" -i $$t ; \
+	    sed -e "s#RTLD_MAGIC#$$rtld_magic#g" -i $$t ; \
 	    sed -e "s#MULTIARCHDIR#$$DEB_HOST_MULTIARCH#g" -i $$t ; \
 	    $(if $(filter $(call xx,mvec),no),sed -e "/libmvec/d" -e "/libm-\*\.a/d" -i $$t ;) \
 	    $(if $(filter $(call xx,crypt),no),sed -e "/libcrypt/d" -i $$t ;) \
