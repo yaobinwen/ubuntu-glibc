@@ -375,8 +375,6 @@ test-xfail-test-fenv-sse-2 = yes
 # new in 2.24
 test-xfail-tst-execvpe5 = yes
 test-xfail-tst-spawn2 = yes
-test-xfail-tst-support_record_failure = yes
-test-xfail-tst-support_record_failure-2 = yes
 
 # fails randomly
 test-xfail-tst-preadvwritev64 = yes
@@ -1081,36 +1079,4 @@ ifneq (,$(filter $(config-machine)-$(config-os), arm-linux-gnueabihf arm-linux-g
 test-xfail-test-sysvmsg = yes
 test-xfail-test-sysvsem = yes
 test-xfail-test-sysvshm = yes
-endif
-
-# ignore soft-float issues for the non-default armel multilib
-ifeq ($(config-machine)-$(config-os),arm-linux-gnueabi)
-test-xfail-test-double-fma = yes
-test-xfail-test-float-double-add = yes
-test-xfail-test-float-double-div = yes
-test-xfail-test-float-double-mul = yes
-test-xfail-test-float-double-sub = yes
-test-xfail-test-float-fma = yes
-test-xfail-test-float-ldouble-add = yes
-test-xfail-test-float-ldouble-div = yes
-test-xfail-test-float-ldouble-mul = yes
-test-xfail-test-float-ldouble-sub = yes
-test-xfail-test-float32-float32x-add = yes
-test-xfail-test-float32-float32x-div = yes
-test-xfail-test-float32-float32x-mul = yes
-test-xfail-test-float32-float32x-sub = yes
-test-xfail-test-float32-float64-add = yes
-test-xfail-test-float32-float64-div = yes
-test-xfail-test-float32-float64-mul = yes
-test-xfail-test-float32-float64-sub = yes
-test-xfail-test-float32-fma = yes
-test-xfail-test-float32x-fma = yes
-test-xfail-test-float64-fma = yes
-test-xfail-test-idouble-fma = yes
-test-xfail-test-ifloat-fma = yes
-test-xfail-test-ifloat32-fma = yes
-test-xfail-test-ifloat32x-fma = yes
-test-xfail-test-ifloat64-fma = yes
-test-xfail-test-ildouble-fma = yes
-test-xfail-test-ldouble-fma = yes
 endif

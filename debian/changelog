@@ -1,3 +1,29 @@
+glibc (2.31-0ubuntu7) focal; urgency=medium
+
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+    - Stop ignoring some float tests for the non-default armel multilib variant.
+    - submitted-stt-gnu-ifunc-detection.patch: Remove, applied upstream.
+    - 5828bc4523230685ac29a4a882967913255f5666.diff: Remove, applied upstream.
+  * Merge with Debian packaging 4cb14efd231568673b889a1ddf095457a19a8acb.
+    - Adjust the version number for the openssh-server break.
+  * restore__glibc_has_include.diff: Remove, not needed anymore by gcc-N
+    packages.
+  * debian/sysdeps/*.mk: stop building libcrypt for multilib packages.
+    Closes: #951880. LP: #1867432.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 02 Apr 2020 16:42:14 +0200
+
+glibc (2.31-0experimental1) UNRELEASED; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update hurd-i386 results.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Add clone3 syscall to arm64 version of arch-syscall.h.
+
+ -- Samuel Thibault <sthibault@debian.org>  Thu, 12 Mar 2020 12:58:29 +0100
+
 glibc (2.31-0ubuntu6) focal; urgency=medium
 
   * Bump dependency on libcrypt1 to the version which fixes the path to
@@ -62,7 +88,7 @@ glibc (2.31-0ubuntu1) focal; urgency=medium
 
  -- Matthias Klose <doko@ubuntu.com>  Fri, 06 Mar 2020 12:06:42 +0100
 
-glibc (2.31-0experimental0) UNRELEASED; urgency=medium
+glibc (2.31-0experimental0) experimental; urgency=medium
 
   [ Aurelien Jarno ]
   * New upstream release:
@@ -108,6 +134,9 @@ glibc (2.31-0experimental0) UNRELEASED; urgency=medium
     - debian/patches/any/submitted-bits-fcntl_h-at.diff: rebased.
     - debian/patches/any/unsubmitted-dlopen-static-crash.diff: obsolete.
     - debian/patches/any/local-test-install.diff: rebased.
+  * debian/control.in/libc: add a Breaks on openssh-server (<< 1:8.1p1-5) on
+    32-bit architectures with seccomp support, to the allow clock_gettime64
+    syscall.
 
   [ Samuel Thibault ]
   * debian/patches/hurd-i386/local-clock_gettime_MONOTONIC.diff: Refresh.
@@ -118,7 +147,7 @@ glibc (2.31-0experimental0) UNRELEASED; urgency=medium
   * debian/patches/hurd-i386/local-atfork-link.diff: Remove, now useless.
   * debian/patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: Fix build.
 
- -- Aurelien Jarno <aurel32@debian.org>  Sat, 08 Feb 2020 13:52:09 +0100
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 12 Mar 2020 07:10:01 +0100
 
 glibc (2.30-0experimental3) UNRELEASED; urgency=medium
 

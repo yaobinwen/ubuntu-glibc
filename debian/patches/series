@@ -121,7 +121,6 @@ any/submitted-resolv-unaligned.diff
 any/local-cudacc-float128.diff
 any/submitted-ld.so-cache-new-format.diff
 any/local-test-install.diff
-any/submitted-stt-gnu-ifunc-detection.patch
 
 # Ubuntu patches live in their own little world, to maintain sanity
 ubuntu/local-altlocaledir.diff
@@ -136,5 +135,3 @@ ubuntu/localedata/lv_LV-currency.diff
 ubuntu/localedata/sd_PK.diff
 ubuntu/localedata/ug_CN@latin.diff
 ubuntu/local-pldd-root.diff
-restore__glibc_has_include.diff
-5828bc4523230685ac29a4a882967913255f5666.diff

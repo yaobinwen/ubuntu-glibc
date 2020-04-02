@@ -10,7 +10,6 @@ DEB_ARCH_MULTILIB_PACKAGES += libc6-armhf libc6-dev-armhf
 armhf_configure_target = arm-linux-gnueabihf
 armhf_CC = $(CC) -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard
 armhf_CXX = $(CXX) -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard
-armhf_crypt = yes
 armhf_slibdir = /lib/arm-linux-gnueabihf
 armhf_libdir = /usr/lib/arm-linux-gnueabihf
 
