@@ -34,6 +34,7 @@ test-xfail-tst-pldd = yes
 test-xfail-tst-nss-db-endpwent = yes
 test-xfail-tst-nss-db-endgrent = yes
 test-xfail-tst-nss-files-hosts-long = yes
+test-xfail-tst-system = yes
 
 ######################################################################
 # alpha (including optimized flavours)

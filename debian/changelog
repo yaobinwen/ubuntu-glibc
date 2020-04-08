@@ -1,3 +1,10 @@
+glibc (2.31-0ubuntu8) focal; urgency=medium
+
+  * debian/testsuite-xfail-debian.mk: mark as XFAIL the new tst-system
+    which is another container test.
+ 
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 08 Apr 2020 08:03:34 -0700
+
 glibc (2.31-0ubuntu7) focal; urgency=medium
 
   * debian/patches/git-updates.diff: update from upstream stable branch.
