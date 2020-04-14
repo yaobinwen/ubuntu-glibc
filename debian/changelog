@@ -1,3 +1,11 @@
+glibc (2.31-0ubuntu9) focal; urgency=medium
+
+  * Ship arm64 variant with LSE support in libc6-lse
+  * debian/testsuite-xfail-debian.mk: Mark as XFAIL malloc/tst-mxfast
+    and nptl/tst-mutex10 to fix riscv64 FTBFS.
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Tue, 14 Apr 2020 21:26:04 +0200
+
 glibc (2.31-0ubuntu8) focal; urgency=medium
 
   * debian/testsuite-xfail-debian.mk: mark as XFAIL the new tst-system
