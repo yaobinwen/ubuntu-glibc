@@ -1,3 +1,40 @@
+glibc (2.30-5) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-trunc-times.diff: New patch to fix updating
+    mtime/ctime on O_TRUNC.  Closes: #955270.
+  * debian/control: Drop dependency on libihash-dev, not used any more by htl.
+  * debian/sysdeps/hurd.mk: Try to symlink mach/hurd headers from multiarch
+    directory when they are there.
+
+  [ Aurelien Jarno ]
+  * debian/rules: Add -fdebug-prefix-map= to CFLAGS to improve
+    reproducibility.
+  * debian/control.in/libc: Make libcX-dev declare a Breaks against python3.7
+    (<< 3.7.7-1+b1) and python3.8 (<< 3.8.2-1+b1) due to #955474.
+  * debian/rules.d/debhelper.mk: install the dynamic loader symlink in the
+    udeb package.
+  * debian/control: conflict against libgcc-X-dev versions that might need the
+    __glibc_has_include macro.
+  * debian/patches/any/local-revert-glibc_has_include.diff: drop patch,
+    obsolete.
+  * debian/control.in/libc: add a Provides: libc6-dbgsym to the libc6-dbg
+    package.  Closes: #953654.
+  * debian/control.in/libc: qualify the libselinux-dev build-depends with
+    <!stage2>.
+  * debian/debhelper.in/libc.postinst: drop the code removing
+    /etc/ld.so.hwcappkgs, it's not needed anymore since Squeeze.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fixes data race in setting function descriptor during lazy binding on
+      hppa. Closes: #941174.
+    - debian/patches/any/local-tst-system-disable-shell-tests.diff: obsolete.
+
+  [ Helmut Grohne ]
+  * Refactor generation of multilib include symlinks. (Closes: #958674).
+  * Initial, minimal support for DPKG_ROOT. (Closes: #910685).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 04 May 2020 23:39:18 +0200
+
 glibc (2.30-4) unstable; urgency=medium
 
   [ Aurelien Jarno ]
@@ -9,7 +46,7 @@ glibc (2.30-4) unstable; urgency=medium
 
   [ John Paul Adrian Glaubitz ]
   * debian/testsuite-xfail-debian.mk: mark nptl/tst-cond8-static and
-    nptl/tst-mutex{,pi}8-static as XFAIL on sparc64.
+    nptl/tst-mutex{,pi}8-static as XFAIL on sparc64.  Closes: #953869.
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 25 Mar 2020 13:56:56 +0100
 
@@ -402,7 +439,7 @@ glibc (2.29-0experimental0) experimental; urgency=medium
   * Fix ld.so link on mips{64,n32}r6{,el}.  Closes: #933513.
 
   [ Sven Mueller ]
-  * debian/rules: honor noudeb build profile.
+  * debian/rules: honor noudeb build profile.  Closes: #930734.
 
   [ Josh Triplett ]
   * debian/patches/any/submitted-ld.so-cache-new-format.diff: default to the
