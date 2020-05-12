@@ -95,7 +95,7 @@ crypt = no
 BASE_CC = gcc
 BASE_CXX = g++
 BASE_MIG = mig
-DEB_GCC_VERSION ?= -9
+DEB_GCC_VERSION ?= -10
 
 RUN_TESTSUITE = yes
 TIMEOUTFACTOR = 25
@@ -107,8 +107,8 @@ MIG    = $(DEB_HOST_GNU_TYPE)-$(BASE_MIG)
 BUILD_CC = $(DEB_BUILD_GNU_TYPE)-$(BASE_CC)
 BUILD_CXX = $(DEB_BUILD_GNU_TYPE)-$(BASE_CXX)
 
-BUILD_CFLAGS = -O2 -g
-HOST_CFLAGS = -pipe -O2 -g $(call xx,extra_cflags)
+BUILD_CFLAGS = -O2 -g -fdebug-prefix-map=$(CURDIR)=.
+HOST_CFLAGS = -pipe -O2 -g -fdebug-prefix-map=$(CURDIR)=. $(call xx,extra_cflags)
 
 # 32-bit MIPS builders have a 2GB memory space. This is not enough to
 # build test-tgmath3.o with GCC, unless tweaking the garbage collector.
@@ -135,7 +135,7 @@ ifneq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
     DEB_BUILD_OPTIONS+=nocheck
   endif
 else
-  DEB_ARCH_REGULAR_PACKAGES = $(libc) $(libc)-dev $(libc)-dbg $(libc)-pic libc-bin libc-dev-bin
+  DEB_ARCH_REGULAR_PACKAGES = $(libc) $(libc)-dev $(libc)-dbg libc-bin libc-dev-bin
   DEB_INDEP_REGULAR_PACKAGES = glibc-doc glibc-source libc-l10n locales
   ifneq ($(filter noudeb,$(DEB_BUILD_PROFILES)),)
     DEB_UDEB_PACKAGES =
