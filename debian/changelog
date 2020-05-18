@@ -1,3 +1,26 @@
+glibc (2.31-0experimental2) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * Add an explicit dependency on $(stamp)build_libc for the build-indep
+    target. Currently the build is made during the binary-indep target
+    instead.
+  * debian/control.in/main: build-depends on gcc-10 (>= 10-20200431) on arm64
+    to ensure that -moutline-atomics is enabled by default.  Closes: #956418.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/debhelper.in/libc.NEWS: add an entry explaining the new trust-ad
+    option in resolv.conf.
+  * debian/patches/riscv64/local-asin-acos-raise-invalid.diff: new patch to
+    workaround a GCC 10 bug on riscv64.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-tst-udp.diff: New patch to fix
+    sunrpc/tst-udp-* failures.
+  * debian/sysdeps/hurd-i386.mk: Add -march=i686 to fix math issues until gcc
+    is fixed to switch to i686 as was actually expected already.
+  * debian/testsuite-xfail-debian.mk: Update hurd-i386 results.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 19 May 2020 00:19:13 +0200
+
 glibc (2.31-0experimental1) experimental; urgency=medium
 
   [ Samuel Thibault ]
