@@ -1,3 +1,52 @@
+glibc (2.27-3ubuntu1.2) bionic-security; urgency=medium
+
+  * SECURITY UPDATE: integer overflow in realpath
+    - debian/patches/any/CVE-2018-11236.patch: fix path length overflow in
+      realpath in stdlib/Makefile, stdlib/canonicalize.c,
+      stdlib/test-bz22786.c.
+    - CVE-2018-11236
+  * SECURITY UPDATE: buffer overflow in __mempcpy_avx512_no_vzeroupper
+    - debian/patches/any/CVE-2018-11237-1.patch: don't write beyond
+      destination in string/test-mempcpy.c,
+      sysdeps/x86_64/multiarch/memmove-avx512-no-vzeroupper.S.
+    - debian/patches/any/CVE-2018-11237-2.patch: add a test case in
+      string/test-memcpy.c.
+    - CVE-2018-11237
+  * SECURITY UPDATE: if_nametoindex() does not close descriptor
+    - debian/patches/any/CVE-2018-19591.patch: fix descriptor for overlong
+      name in sysdeps/unix/sysv/linux/if_index.c.
+    - CVE-2018-19591
+  * SECURITY UPDATE: heap over-read via regular-expression match
+    - debian/patches/any/CVE-2019-9169.patch: fix read overrun in
+      posix/regexec.c.
+    - CVE-2019-9169
+  * SECURITY UPDATE: ASLR bypass
+    - debian/patches/any/CVE-2019-19126.patch: check __libc_enable_secure
+      before honoring LD_PREFER_MAP_32BIT_EXEC in
+      sysdeps/unix/sysv/linux/x86_64/64/dl-librecon.h.
+    - CVE-2019-19126
+  * SECURITY UPDATE: out-of-bounds write on PowerPC
+    - debian/patches/any/CVE-2020-1751.patch: fix array overflow in
+      backtrace on PowerPC in debug/tst-backtrace5.c,
+      sysdeps/powerpc/powerpc32/backtrace.c,
+      sysdeps/powerpc/powerpc64/backtrace.c.
+    - CVE-2020-1751
+  * SECURITY UPDATE: use-after-free via tilde expansion
+    - debian/patches/any/CVE-2020-1752.patch: fix use-after-free in glob
+      when expanding ~user in posix/glob.c.
+    - CVE-2020-1752
+  * SECURITY UPDATE: stack overflow via 80-bit long double function
+    - debian/patches/any/CVE-2020-10029-1.patch: avoid ldbl-96 stack
+      corruption from range reduction of pseudo-zero in
+      sysdeps/ieee754/ldbl-96/Makefile,
+      sysdeps/ieee754/ldbl-96/e_rem_pio2l.c,
+      sysdeps/ieee754/ldbl-96/test-sinl-pseudo.c.
+    - debian/patches/any/CVE-2020-10029-2.patch: use stack protector only
+      if available in sysdeps/ieee754/ldbl-96/Makefile.
+    - CVE-2020-10029
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Thu, 04 Jun 2020 13:25:26 -0400
+
 glibc (2.27-3ubuntu1) bionic; urgency=medium
 
   * Merge with Debian, with packaging tweaks and master updated to 2018-03-29.

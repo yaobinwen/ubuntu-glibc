@@ -183,6 +183,10 @@ any/local-bootstrap-headers.diff
 any/submitted-resolv-unaligned.diff
 any/submitted-intl-tstgettext.diff
 any/local-cudacc-float128.diff
+any/CVE-2018-11236.patch
+any/CVE-2018-11237-1.patch
+any/CVE-2018-11237-2.patch
+any/CVE-2018-19591.patch
 
 # Ubuntu patches live in their own little world, to maintain sanity
 ubuntu/local-altlocaledir.diff
@@ -197,3 +201,9 @@ ubuntu/localedata/lv_LV-currency.diff
 ubuntu/localedata/git-pt-fmt.diff
 ubuntu/localedata/sd_PK.diff
 ubuntu/localedata/ug_CN@latin.diff
+any/CVE-2019-9169.patch
+any/CVE-2019-19126.patch
+any/CVE-2020-1751.patch
+any/CVE-2020-1752.patch
+any/CVE-2020-10029-1.patch
+any/CVE-2020-10029-2.patch
