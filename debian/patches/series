@@ -151,3 +151,8 @@ ubuntu/localedata/sd_PK.diff
 ubuntu/localedata/ug_CN@latin.diff
 ubuntu/local-pldd-root.diff
 bfdb731438206b0f70fe7afa890681155c30b419.patch
+any/CVE-2019-19126.patch
+any/CVE-2020-1751.patch
+any/CVE-2020-1752.patch
+any/CVE-2020-10029-1.patch
+any/CVE-2020-10029-2.patch
