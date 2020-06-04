@@ -1,3 +1,56 @@
+glibc (2.23-0ubuntu11.2) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: Use-after-free in clntudp_call
+    - debian/patches/CVE-2017-12133.patch: avoid use-after-free read access
+      in sunrpc/Makefile, sunrpc/clnt_udp.c, sunrpc/tst-udp-error.c.
+    - CVE-2017-12133
+  * SECURITY UPDATE: overlap in SSE2-optimized memmove implementation
+    - debian/patches/CVE-2017-18269.patch: fixed branch conditions in
+      string/test-memmove.c,
+      sysdeps/i386/i686/multiarch/memcpy-sse2-unaligned.S.
+    - CVE-2017-18269
+  * SECURITY UPDATE: integer overflow in posix_memalign
+    - debian/patches/CVE-2018-6485.patch: fix integer overflows in internal
+      memalign and malloc in malloc/Makefile, malloc/malloc.c,
+      malloc/tst-malloc-too-large.c.
+    - CVE-2018-6485
+  * SECURITY UPDATE: integer overflow in realpath
+    - debian/patches/any/CVE-2018-11236.patch: fix path length overflow in
+      realpath in stdlib/Makefile, stdlib/canonicalize.c,
+      stdlib/test-bz22786.c.
+    - CVE-2018-11236
+  * SECURITY UPDATE: buffer overflow in __mempcpy_avx512_no_vzeroupper
+    - debian/patches/any/CVE-2018-11237.patch: don't write beyond
+      destination in string/test-mempcpy.c,
+      sysdeps/x86_64/multiarch/memcpy-avx512-no-vzeroupper.S.
+    - CVE-2018-11237
+  * SECURITY UPDATE: heap over-read via regular-expression match
+    - debian/patches/any/CVE-2019-9169.patch: fix read overrun in
+      posix/regexec.c.
+    - CVE-2019-9169
+  * SECURITY UPDATE: ASLR bypass
+    - debian/patches/any/CVE-2019-19126.patch: check __libc_enable_secure
+      before honoring LD_PREFER_MAP_32BIT_EXEC in
+      sysdeps/unix/sysv/linux/x86_64/64/dl-librecon.h.
+    - CVE-2019-19126
+  * SECURITY UPDATE: out-of-bounds write on PowerPC
+    - debian/patches/any/CVE-2020-1751.patch: fix array overflow in
+      backtrace on PowerPC in debug/tst-backtrace5.c,
+      sysdeps/powerpc/powerpc32/backtrace.c,
+      sysdeps/powerpc/powerpc64/backtrace.c.
+    - CVE-2020-1751
+  * SECURITY UPDATE: use-after-free via tilde expansion
+    - debian/patches/any/CVE-2020-1752.patch: fix use-after-free in glob
+      when expanding ~user in posix/glob.c.
+    - CVE-2020-1752
+  * SECURITY UPDATE: stack overflow via 80-bit long double function
+    - debian/patches/any/CVE-2020-10029.patch: avoid ldbl-96 stack
+      corruption from range reduction of pseudo-zero in
+      sysdeps/ieee754/ldbl-96/e_rem_pio2l.c,
+    - CVE-2020-10029
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Thu, 04 Jun 2020 13:56:35 -0400
+
 glibc (2.23-0ubuntu11) xenial; urgency=medium
 
   * debian/patches/ubuntu/xsave-part1.diff and

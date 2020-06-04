@@ -252,3 +252,13 @@ any/cvs-elf-check-for-empty-tokens.diff
 any/cvs-make-getcwd-fail-if-path-is-no-absolute.diff
 ubuntu/xsave-part1.diff
 ubuntu/xsave-part2.diff
+any/CVE-2017-12133.patch
+any/CVE-2017-18269.patch
+any/CVE-2018-6485.patch
+any/CVE-2018-11236.patch
+any/CVE-2018-11237.patch
+any/CVE-2019-9169.patch
+any/CVE-2019-19126.patch
+any/CVE-2020-1751.patch
+any/CVE-2020-1752.patch
+any/CVE-2020-10029.patch
