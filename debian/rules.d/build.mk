@@ -253,8 +253,8 @@ endif
 	  mv debian/tmp-$(curpass)/usr/include/fpu_control.h debian/tmp-$(curpass)/usr/include/$(DEB_HOST_MULTIARCH); \
 	  mv debian/tmp-$(curpass)/usr/include/a.out.h debian/tmp-$(curpass)/usr/include/$(DEB_HOST_MULTIARCH); \
 	  mv debian/tmp-$(curpass)/usr/include/ieee754.h debian/tmp-$(curpass)/usr/include/$(DEB_HOST_MULTIARCH); \
-	  mkdir -p debian/tmp-$(curpass)/usr/include/$(DEB_HOST_MULTIARCH)/finclude; \
-	  mv debian/tmp-$(curpass)/usr/include/finclude/math-vector-fortran.h debian/tmp-$(curpass)/usr/include/$(DEB_HOST_MULTIARCH)/finclude; \
+	  mkdir -p debian/tmp-$(curpass)/usr/include/finclude; \
+	  cp sysdeps/x86/fpu/finclude/math-vector-fortran.h debian/tmp-$(curpass)/usr/include/finclude/.; \
 	fi
 
 ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)

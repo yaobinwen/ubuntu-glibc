@@ -1,3 +1,19 @@
+glibc (2.31-0ubuntu10) groovy; urgency=medium
+
+  * Copy the fully conditionalized x86 variant for math-vector-fortran.h 
+    to /usr/include/finclude. On all architectures. LP: #1879092.
+  * Backport x86 CET patches from the trunk.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+    - [23296] Data race in setting function descriptor during lazy binding
+    - [25639] localedata: Some names of days and months wrongly spelt in Occitan
+    - [25810] x32: Incorrect syscall entries with pointer, off_t and size_t
+    - [25896] Incorrect prctl
+    - [25902] Bad LOADARGS_N
+    - [25966] Incorrect access of __x86_shared_non_temporal_threshold for x32
+    - [25976] nss_compat: internal_end*ent may clobber errno, hiding ERANGE
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 11 Jun 2020 11:53:48 +0200
+
 glibc (2.31-0ubuntu9) focal; urgency=medium
 
   * Ship arm64 variant with LSE support in libc6-lse

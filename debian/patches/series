@@ -135,3 +135,4 @@ ubuntu/localedata/lv_LV-currency.diff
 ubuntu/localedata/sd_PK.diff
 ubuntu/localedata/ug_CN@latin.diff
 ubuntu/local-pldd-root.diff
+ubuntu/cet-backport.diff
