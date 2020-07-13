@@ -1,3 +1,38 @@
+glibc (2.31-1) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/control: Build-depend on gcc-10 version that defaults to i686 on
+    hurd-i386.
+  * debian/control: Build-depend on mig-for-host instead of mig.
+  * debian/sysdeps/hurd-i386.mk: Drop adding -march=i686.
+  * debian/hurd-i386/git-pselect.diff: Fix pselect atomicity.
+  * debian/hurd-i386/git-fexecve.diff: Fix fexecve.
+  * debian/hurd-i386/git-cond_destroy.diff: Fix cond_destroy synchronization
+    with woken threads.
+  * debian/hurd-i386/git-holes.diff: Fix detecting support for file holes.
+  * debian/hurd-i386/local-clock_gettime_MONOTONIC.diff: Also fix clock_getres
+    with CLOCK_MONOTONIC.
+  * debian/hurd-i386/git-longjmp-onstack.diff: Fix longjmp-ing from altstack.
+  * debian/hurd-i386/git-register-atfork2.diff: Fix register-atfork ordering.
+  * debian/hurd-i386/git-intr-msg-unwind.diff: Fix unwinding over interruptible
+    RPC.
+  * debian/hurd-i386/git-strtol-test.diff: Fix testing strtol errors.
+  * debian/testsuite-xfail-debian.mk: Update.
+  * debian/debhelper.in/libc-udeb.install.hurd-i386: Add missing
+    libmachuser/libhurduser.
+  * debian/rules.d/debhelper.mk: Add dh_link pass to libc-udeb binaryinst.
+  * debian/debhelper.in/libc-udeb.links.hurd-i386: Add missing ld.so link.
+  * debian/rules: Clean links file.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/patches/any/git-surplus-tls-accounting.diff: backport TLS surplus
+    accounting from upstream.  Closes: #964141.
+  * debian/control.in/main: update breaks on cross-toolchain-base* as they
+    will need changes to build with glibc 2.31.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 13 Jul 2020 21:34:17 +0200
+
 glibc (2.31-0experimental2) experimental; urgency=medium
 
   [ Aurelien Jarno ]
