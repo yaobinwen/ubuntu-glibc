@@ -1,0 +1,101 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Format: 3.0 (quilt)
+Source: glibc
+Binary: libc-bin, libc-dev-bin, libc-l10n, glibc-doc, glibc-source, locales, locales-all, nscd, multiarch-support, libc6, libc6-dev, libc6-dbg, libc6-pic, libc6-udeb, libc6.1, libc6.1-dev, libc6.1-dbg, libc6.1-pic, libc6.1-udeb, libc0.3, libc0.3-dev, libc0.3-dbg, libc0.3-pic, libc0.3-udeb, libc0.1, libc0.1-dev, libc0.1-dbg, libc0.1-pic, libc0.1-udeb, libc6-i386, libc6-dev-i386, libc6-sparc, libc6-dev-sparc, libc6-sparc64, libc6-dev-sparc64, libc6-s390, libc6-dev-s390, libc6-amd64, libc6-dev-amd64, libc6-powerpc, libc6-dev-powerpc, libc6-ppc64, libc6-dev-ppc64, libc6-mips32, libc6-dev-mips32, libc6-mipsn32, libc6-dev-mipsn32, libc6-mips64, libc6-dev-mips64, libc0.1-i386, libc0.1-dev-i386, libc6-x32, libc6-dev-x32, libc6-xen, libc0.3-xen, libc6.1-alphaev67
+Architecture: any all
+Version: 2.26-0experimental1
+Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
+Uploaders: Clint Adams <clint@debian.org>, Aurelien Jarno <aurel32@debian.org>, Adam Conrad <adconrad@0c3.net>, Samuel Thibault <sthibault@debian.org>
+Homepage: http://www.gnu.org/software/libc/libc.html
+Standards-Version: 4.0.1
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-glibc/glibc.git
+Vcs-Git: https://anonscm.debian.org/git/pkg-glibc/glibc.git
+Testsuite: autopkgtest
+Testsuite-Triggers: binutils, fakeroot, gcc-7, linux-libc-dev
+Build-Depends: gettext, dpkg (>= 1.18.7), dpkg-dev (>= 1.17.14), xz-utils, file, quilt, autoconf, gawk, debhelper (>= 10), rdfind, symlinks, netbase, gperf, linux-libc-dev (>= 3.9) [linux-any], libaudit-dev [linux-any], libcap-dev [linux-any], libselinux-dev [linux-any], mig (>= 1.5-3) [hurd-i386], gnumach-dev (>= 2:1.8+git20170102-1~) [hurd-i386], hurd-dev (>= 1:0.5.git20140320~) [hurd-i386] | hurd-headers-dev [hurd-i386], hurd-dev (>= 1:0.5.git20140320~) [hurd-i386] <!stage1> | libihash-dev [hurd-i386] <!stage1>, kfreebsd-kernel-headers [kfreebsd-any], binutils (>= 2.25), g++-7, g++-7-multilib [amd64 i386 kfreebsd-amd64 mips mipsel mipsn32 mipsn32el mips64 mips64el powerpc ppc64 s390x sparc sparc64 x32], python3:native <!nocheck>, libc-bin (>= 2.26) <cross>
+Build-Depends-Indep: perl, po-debconf (>= 1.0)
+Package-List:
+ glibc-doc deb doc optional arch=all profile=!stage1
+ glibc-source deb devel optional arch=all profile=!stage1
+ libc-bin deb libs required arch=any profile=!stage1 essential=yes
+ libc-dev-bin deb libdevel optional arch=any profile=!stage1
+ libc-l10n deb localization standard arch=all profile=!stage1
+ libc0.1 deb libs required arch=kfreebsd-amd64,kfreebsd-i386 profile=!stage1
+ libc0.1-dbg deb debug optional arch=kfreebsd-amd64,kfreebsd-i386 profile=!stage1
+ libc0.1-dev deb libdevel optional arch=kfreebsd-amd64,kfreebsd-i386
+ libc0.1-dev-i386 deb libdevel optional arch=kfreebsd-amd64 profile=!nobiarch
+ libc0.1-i386 deb libs optional arch=kfreebsd-amd64 profile=!stage1,!nobiarch
+ libc0.1-pic deb libdevel optional arch=kfreebsd-amd64,kfreebsd-i386 profile=!stage1
+ libc0.1-udeb udeb debian-installer optional arch=kfreebsd-amd64,kfreebsd-i386 profile=!stage1
+ libc0.3 deb libs required arch=hurd-i386 profile=!stage1
+ libc0.3-dbg deb debug optional arch=hurd-i386 profile=!stage1
+ libc0.3-dev deb libdevel optional arch=hurd-i386
+ libc0.3-pic deb libdevel optional arch=hurd-i386 profile=!stage1
+ libc0.3-udeb udeb debian-installer optional arch=hurd-i386 profile=!stage1
+ libc0.3-xen deb libs optional arch=hurd-i386 profile=!stage1
+ libc6 deb libs required arch=amd64,arm64,armel,armhf,hppa,i386,m68k,mips,mipsel,mipsn32,mipsn32el,mips64,mips64el,mipsr6,mipsr6el,mipsn32r6,mipsn32r6el,mips64r6,mips64r6el,nios2,powerpc,powerpcspe,ppc64,ppc64el,sparc,sparc64,s390x,sh3,sh4,x32 profile=!stage1
+ libc6-amd64 deb libs optional arch=i386,x32 profile=!stage1,!nobiarch
+ libc6-dbg deb debug optional arch=amd64,arm64,armel,armhf,hppa,i386,m68k,mips,mipsel,mipsn32,mipsn32el,mips64,mips64el,mipsr6,mipsr6el,mipsn32r6,mipsn32r6el,mips64r6,mips64r6el,nios2,powerpc,powerpcspe,ppc64,ppc64el,sparc,sparc64,s390x,sh3,sh4,x32 profile=!stage1
+ libc6-dev deb libdevel optional arch=amd64,arm64,armel,armhf,hppa,i386,m68k,mips,mipsel,mipsn32,mipsn32el,mips64,mips64el,mipsr6,mipsr6el,mipsn32r6,mipsn32r6el,mips64r6,mips64r6el,nios2,powerpc,powerpcspe,ppc64,ppc64el,sparc,sparc64,s390x,sh3,sh4,x32
+ libc6-dev-amd64 deb libdevel optional arch=i386,x32 profile=!nobiarch
+ libc6-dev-i386 deb libdevel optional arch=amd64,x32 profile=!nobiarch
+ libc6-dev-mips32 deb libdevel optional arch=mipsn32,mipsn32el,mips64,mips64el,mipsn32r6,mipsn32r6el,mips64r6,mips64r6el profile=!nobiarch
+ libc6-dev-mips64 deb libdevel optional arch=mips,mipsel,mipsn32,mipsn32el,mipsr6,mipsr6el,mipsn32r6,mipsn32r6el profile=!nobiarch
+ libc6-dev-mipsn32 deb libdevel optional arch=mips,mipsel,mips64,mips64el,mipsr6,mipsr6el,mips64r6,mips64r6el profile=!nobiarch
+ libc6-dev-powerpc deb libdevel optional arch=ppc64 profile=!nobiarch
+ libc6-dev-ppc64 deb libdevel optional arch=powerpc profile=!nobiarch
+ libc6-dev-s390 deb libdevel optional arch=s390x profile=!nobiarch
+ libc6-dev-sparc deb libdevel optional arch=sparc64 profile=!nobiarch
+ libc6-dev-sparc64 deb libdevel optional arch=sparc profile=!nobiarch
+ libc6-dev-x32 deb libdevel optional arch=amd64,i386 profile=!nobiarch
+ libc6-i386 deb libs optional arch=amd64,x32 profile=!stage1,!nobiarch
+ libc6-mips32 deb libs optional arch=mipsn32,mipsn32el,mips64,mips64el,mipsn32r6,mipsn32r6el,mips64r6,mips64r6el profile=!stage1,!nobiarch
+ libc6-mips64 deb libs optional arch=mips,mipsel,mipsn32,mipsn32el,mipsr6,mipsr6el,mipsn32r6,mipsn32r6el profile=!stage1,!nobiarch
+ libc6-mipsn32 deb libs optional arch=mips,mipsel,mips64,mips64el,mipsr6,mipsr6el,mips64r6,mips64r6el profile=!stage1,!nobiarch
+ libc6-pic deb libdevel optional arch=amd64,arm64,armel,armhf,hppa,i386,m68k,mips,mipsel,mipsn32,mipsn32el,mips64,mips64el,mipsr6,mipsr6el,mipsn32r6,mipsn32r6el,mips64r6,mips64r6el,nios2,powerpc,powerpcspe,ppc64,ppc64el,sparc,sparc64,s390x,sh3,sh4,x32 profile=!stage1
+ libc6-powerpc deb libs optional arch=ppc64 profile=!stage1,!nobiarch
+ libc6-ppc64 deb libs optional arch=powerpc profile=!stage1,!nobiarch
+ libc6-s390 deb libs optional arch=s390x profile=!stage1,!nobiarch
+ libc6-sparc deb libs optional arch=sparc64 profile=!stage1,!nobiarch
+ libc6-sparc64 deb libs optional arch=sparc profile=!stage1,!nobiarch
+ libc6-udeb udeb debian-installer optional arch=amd64,arm64,armel,armhf,hppa,i386,m68k,mips,mipsel,mipsn32,mipsn32el,mips64,mips64el,mipsr6,mipsr6el,mipsn32r6,mipsn32r6el,mips64r6,mips64r6el,nios2,powerpc,powerpcspe,ppc64,ppc64el,sparc,sparc64,s390x,sh3,sh4,x32 profile=!stage1
+ libc6-x32 deb libs optional arch=amd64,i386 profile=!stage1,!nobiarch
+ libc6-xen deb libs optional arch=i386 profile=!stage1
+ libc6.1 deb libs required arch=alpha profile=!stage1
+ libc6.1-alphaev67 deb libs optional arch=alpha profile=!stage1
+ libc6.1-dbg deb debug optional arch=alpha profile=!stage1
+ libc6.1-dev deb libdevel optional arch=alpha
+ libc6.1-pic deb libdevel optional arch=alpha profile=!stage1
+ libc6.1-udeb udeb debian-installer optional arch=alpha profile=!stage1
+ locales deb localization standard arch=all profile=!stage1
+ locales-all deb localization optional arch=any profile=!stage1
+ multiarch-support deb oldlibs optional arch=any profile=!stage1
+ nscd deb admin optional arch=any profile=!stage1
+Checksums-Sha1:
+ 3e7cab60063b32c1eb15e71065e3380e81d29222 15270760 glibc_2.26.orig.tar.xz
+ 122d549e717ec8b8a010beb2fdbf5ee70721fca8 1057312 glibc_2.26-0experimental1.debian.tar.xz
+Checksums-Sha256:
+ 38afc835050aa0850fbe15b10a7b18b7c1c70dc5a2fdf980762f3ad49e771870 15270760 glibc_2.26.orig.tar.xz
+ 06021482997869ee98f8e37111b5a8ec172c88a14897b7a0970299046b96617c 1057312 glibc_2.26-0experimental1.debian.tar.xz
+Files:
+ 666ae66c12aeedd26a3a4c550ee79eaf 15270760 glibc_2.26.orig.tar.xz
+ 89ed6806d38396a99fc61e46ad339a80 1057312 glibc_2.26-0experimental1.debian.tar.xz
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEd0YmQqnvlP0Pdxltupx4Bh3djJsFAloVqqAACgkQupx4Bh3d
+jJuKKhAAqGKKnE/vCPKzwpYHLLlgmM8mgkH7QQ1qKbXjc7+0VomnVfWXh3FC7xyV
+fDJ3YDz4FDXq+IvAOV4YZlX05QoEBnrIPBwcTZpV9N8IjWamNWyOIJmK6MQL8hlI
+wbZaYkisKA5I3oxCF+sS9EAibAMhCYJm+5BKwdk8Llp6c0l62j7KmvZ+BN2b9YBf
+7BbZYpausyhn98zdmw4xPF53O2yR1Zy09N+rv9WcHy2s4ozGUdZ7dOrGl1dj27fh
+0aWQJsJHos1vmzDuqM7LqZw+d32tcfY1nn1MMZRu3plrIOelZqjArGRCpMcKrpWw
+O35zFRMANaW9Fv1UTV9tN1pxHV/yzumPBTvSNALgreNbk6ySi5QuyWAfItw2bDs9
+IJTLzy0gkFOJAJpr/Hr5TeEFbSvah0N+s0TJ1M1/QhpaGL4jxVUXzQCURNcLvBv8
+zD66o4/UvozFTag0pjEeN0UVwmfdHcwUzYN5vEHYL3iYm++2vAIjYkWHOa7dgNU0
+8N4m3L/58k1Vrbngj2Sk3/CbEf2uQ5oKFoL+qTNUefg+QWa94KNqbT3aANnc2h/f
+llGNLHtOJC0X3SXEc3/81eoN7mVY0IMgAYirnwaac6qCXcA7vJxdMMYGsRANIIeB
+KCI2WbhQc6KrrZZBKwsMNZzLNsz2PS8nbXqb5+HqXdU5lEC0dHg=
+=ALXp
+-----END PGP SIGNATURE-----
