@@ -47,6 +47,7 @@ sysincludes = @SYSINCLUDES@
 c++-sysincludes = @CXX_SYSINCLUDES@
 c++-cstdlib-header = @CXX_CSTDLIB_HEADER@
 c++-cmath-header = @CXX_CMATH_HEADER@
+c++-bits-std_abs-h = @CXX_BITS_STD_ABS_H@
 all-warnings = @all_warnings@
 enable-werror = @enable_werror@
 
@@ -77,6 +78,8 @@ multi-arch = @multi_arch@
 
 mach-interface-list = @mach_interface_list@
 
+experimental-malloc = @experimental_malloc@
+
 nss-crypt = @libc_cv_nss_crypt@
 static-nss-crypt = @libc_cv_static_nss_crypt@
 
@@ -92,6 +95,7 @@ sysdeps-add-ons = @sysdeps_add_ons@
 cross-compiling = @cross_compiling@
 force-install = @force_install@
 link-obsolete-rpc = @link_obsolete_rpc@
+build-obsolete-nsl = @build_obsolete_nsl@
 build-nscd = @build_nscd@
 use-nscd = @use_nscd@
 build-hardcoded-path-in-tests= @hardcoded_path_in_tests@

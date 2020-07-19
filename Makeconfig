@@ -386,6 +386,13 @@ LDFLAGS.so += $(hashstyle-LDFLAGS)
 LDFLAGS-rtld += $(hashstyle-LDFLAGS)
 endif
 
+# If lazy relocations are disabled, add the -z now flag.  Use
+# LDFLAGS-lib.so instead of LDFLAGS.so, to avoid adding the flag to
+# test modules.
+ifeq ($(bind-now),yes)
+LDFLAGS-lib.so += -Wl,-z,now
+endif
+
 # Command to run after every final link (executable or shared object).
 # This is invoked with $(call after-link,...), so it should operate on
 # the file $1.  This can be set to do some sort of post-processing on
@@ -901,7 +908,8 @@ libio-include = -I$(..)libio
 # List of non-library modules that we build.
 built-modules = iconvprogs iconvdata ldconfig lddlibc4 libmemusage \
 		libSegFault libpcprofile librpcsvc locale-programs \
-		memusagestat nonlib nscd extramodules libnldbl libsupport
+		memusagestat nonlib nscd extramodules libnldbl libsupport \
+		testsuite
 
 in-module = $(subst -,_,$(firstword $(libof-$(basename $(@F))) \
 				    $(libof-$(<F)) \
@@ -1099,6 +1107,7 @@ postclean-generated += soversions.mk soversions.i \
 		       shlib-versions.v shlib-versions.v.i
 
 before-compile += $(common-objpfx)libc-modules.h
+common-generated += libc-modules.h libc-modules.stmp
 ifeq ($(soversions.mk-done),t)
 # Generate a header with macro definitions for use with the IS_IN macro.
 # These are the possible values for the MODULE_NAME macro defined when building
@@ -1117,14 +1126,18 @@ endif
 # glibc.
 ifneq (no,$(have-tunables))
 before-compile += $(common-objpfx)dl-tunable-list.h
+common-generated += dl-tunable-list.h dl-tunable-list.stmp
 
-$(common-objpfx)dl-tunable-list.h: $(..)scripts/gen-tunables.awk \
-				   $(..)elf/dl-tunables.list
-	$(AWK) -f $^ > $@.tmp
-	mv $@.tmp $@
+$(common-objpfx)dl-tunable-list.h: $(common-objpfx)dl-tunable-list.stmp; @:
+$(common-objpfx)dl-tunable-list.stmp: \
+		$(..)scripts/gen-tunables.awk \
+		$(..)elf/dl-tunables.list \
+		$(wildcard $(subdirs:%=$(..)%/dl-tunables.list)) \
+		$(wildcard $(sysdirs:%=%/dl-tunables.list))
+	$(AWK) -f $^ > ${@:stmp=T}
+	$(move-if-change) ${@:stmp=T} ${@:stmp=h}
+	touch $@
 endif
-
-common-generated += libc-modules.h libc-modules.stmp
 
 # The name under which the run-time dynamic linker is installed.
 # We are currently going for the convention that `/lib/ld.so.1'
