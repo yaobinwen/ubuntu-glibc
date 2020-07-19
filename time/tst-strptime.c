@@ -51,6 +51,26 @@ static const struct
     6, 0, 0, 1 },
   { "ja_JP.EUC-JP", "2001 20 \xb7\xee", "%Y %U %a", 1, 140, 4, 21 },
   { "ja_JP.EUC-JP", "2001 21 \xb7\xee", "%Y %W %a", 1, 140, 4, 21 },
+  /* Most of the languages do not need the declension of the month names
+     and do not distinguish between %B and %OB.  */
+  { "en_US.ISO-8859-1", "November 17, 2017", "%B %e, %Y", 5, 320, 10, 17 },
+  { "de_DE.ISO-8859-1", "18. Nov 2017", "%d. %b %Y", 6, 321, 10, 18 },
+  { "fr_FR.UTF-8", "19 novembre 2017", "%d %OB %Y", 0, 322, 10, 19 },
+  { "es_ES.UTF-8", "20 de nov de 2017", "%d de %Ob de %Y", 1, 323, 10, 20 },
+  /* Some languages do need the declension of the month names.  */
+  { "pl_PL.UTF-8", "21 lis 2017", "%d %b %Y", 2, 324, 10, 21 },
+  { "pl_PL.UTF-8", "22 LIS 2017", "%d %B %Y", 3, 325, 10, 22 },
+  { "pl_PL.UTF-8", "23 listopada 2017", "%d %B %Y", 4, 326, 10, 23 },
+  /* The nominative case is incorrect here but it is parseable.  */
+  { "pl_PL.UTF-8", "24 listopad 2017", "%d %OB %Y", 5, 327, 10, 24 },
+  { "pl_PL.UTF-8", "25 lis 2017", "%d %Ob %Y", 6, 328, 10, 25 },
+  /* ноя - pronounce: 'noya' - "Nov" (abbreviated "November") in Russian.  */
+  { "ru_RU.UTF-8", "26 ноя 2017", "%d %b %Y", 0, 329, 10, 26 },
+  /* TODO: Add an example of "may"/"maya" (5th month, May) using %Ob in
+     Russian when the localedata is updated.  Without the genitive forms
+     in localedata the word "maya" is ambiguous and may be mistaken for
+     "mart" (March).
+   */
 };
 
 
