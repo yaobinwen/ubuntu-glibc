@@ -53,9 +53,9 @@ sysdep_headers += sys/mount.h sys/acct.h sys/sysctl.h \
 tests += tst-clone tst-clone2 tst-clone3 tst-fanotify tst-personality \
 	 tst-quota tst-sync_file_range tst-sysconf-iov_max tst-ttyname \
 	 test-errno-linux tst-memfd_create tst-mlock2 tst-pkey \
-	 tst-rlimit-infinity tst-ofdlocks
+	 tst-rlimit-infinity tst-ofdlocks tst-gettid tst-gettid-kill \
+	 tst-tgkill
 tests-internal += tst-ofdlocks-compat
-
 
 # Generate the list of SYS_* macros for the system calls (__NR_*
 # macros).  The file syscall-names.list contains all possible system
@@ -114,6 +114,10 @@ $(objpfx)tst-mman-consts.out: ../sysdeps/unix/sysv/linux/tst-mman-consts.py
 					  $(CPPFLAGS))" \
 	< /dev/null > $@ 2>&1; $(evaluate-test)
 
+$(objpfx)tst-gettid: $(shared-thread-library)
+$(objpfx)tst-gettid-kill: $(shared-thread-library)
+$(objpfx)tst-tgkill: $(shared-thread-library)
+
 endif # $(subdir) == misc
 
 ifeq ($(subdir),time)
@@ -142,11 +146,21 @@ endif
 ifeq ($(subdir),socket)
 sysdep_headers += net/if_ppp.h net/ppp-comp.h \
 		  net/ppp_defs.h net/if_arp.h net/route.h net/ethernet.h \
-		  net/if_slip.h net/if_packet.h net/if_shaper.h
+		  net/if_slip.h net/if_packet.h net/if_shaper.h \
+		  bits/socket-constants.h
 sysdep_routines += cmsg_nxthdr
 CFLAGS-recvmmsg.c = -fexceptions -fasynchronous-unwind-tables
 CFLAGS-sendmmsg.c = -fexceptions -fasynchronous-unwind-tables
-endif
+
+tests-special += $(objpfx)tst-socket-consts.out
+$(objpfx)tst-socket-consts.out: ../sysdeps/unix/sysv/linux/tst-socket-consts.py
+	PYTHONPATH=../scripts \
+	$(PYTHON) ../sysdeps/unix/sysv/linux/tst-socket-consts.py \
+		   --cc="$(CC) $(patsubst -DMODULE_NAME=%, \
+					  -DMODULE_NAME=testsuite, \
+					  $(CPPFLAGS)) -D_ISOMAC" \
+	< /dev/null > $@ 2>&1; $(evaluate-test)
+endif # $(subdir) == socket
 
 ifeq ($(subdir),sunrpc)
 sysdep_headers += nfs/nfs.h
@@ -184,6 +198,7 @@ inhibit-glue = yes
 
 ifeq ($(subdir),dirent)
 sysdep_routines += getdirentries getdirentries64
+tests += tst-getdents64
 tests-internal += tst-readdir64-compat
 endif
 

@@ -309,8 +309,8 @@ _hurdsig_abort_rpcs (struct hurd_sigstate *ss, int signo, int sigthread,
      receive completes immediately or aborts.  */
   abort_thread (ss, state, reply);
 
-  if (state->basic.PC >= (natural_t) &_hurd_intr_rpc_msg_about_to &&
-      state->basic.PC <  (natural_t) &_hurd_intr_rpc_msg_in_trap)
+  if (state->basic.PC >= (natural_t) &_hurd_intr_rpc_msg_about_to
+      && state->basic.PC < (natural_t) &_hurd_intr_rpc_msg_in_trap)
     {
       /* The thread is about to do the RPC, but hasn't yet entered
 	 mach_msg.  Mutate the thread's state so it knows not to try
@@ -321,11 +321,11 @@ _hurdsig_abort_rpcs (struct hurd_sigstate *ss, int signo, int sigthread,
       state->basic.SYSRETURN = MACH_SEND_INTERRUPTED;
       *state_change = 1;
     }
-  else if (state->basic.PC == (natural_t) &_hurd_intr_rpc_msg_in_trap &&
+  else if (state->basic.PC == (natural_t) &_hurd_intr_rpc_msg_in_trap
 	   /* The thread was blocked in the system call.  After thread_abort,
 	      the return value register indicates what state the RPC was in
 	      when interrupted.  */
-	   state->basic.SYSRETURN == MACH_RCV_INTERRUPTED)
+	   && state->basic.SYSRETURN == MACH_RCV_INTERRUPTED)
       {
 	/* The RPC request message was sent and the thread was waiting for
 	   the reply message; now the message receive has been aborted, so
@@ -462,8 +462,8 @@ sigset_t _hurdsig_preempted_set;
 weak_alias (_hurdsig_preemptors, _hurdsig_preempters)
 
 /* Mask of stop signals.  */
-#define STOPSIGS (sigmask (SIGTTIN) | sigmask (SIGTTOU) | \
-		  sigmask (SIGSTOP) | sigmask (SIGTSTP))
+#define STOPSIGS (sigmask (SIGTTIN) | sigmask (SIGTTOU) \
+		  | sigmask (SIGSTOP) | sigmask (SIGTSTP))
 
 /* Deliver a signal.  SS is not locked.  */
 void
@@ -538,8 +538,8 @@ _hurd_internal_post_signal (struct hurd_sigstate *ss,
       assert_perror (err);
       for (i = 0; i < nthreads; ++i)
 	{
-	  if (threads[i] != _hurd_msgport_thread &&
-	      (act != handle || threads[i] != ss->thread))
+	  if (threads[i] != _hurd_msgport_thread
+	      && (act != handle || threads[i] != ss->thread))
 	    {
 	      err = __thread_resume (threads[i]);
 	      assert_perror (err);
@@ -715,9 +715,9 @@ _hurd_internal_post_signal (struct hurd_sigstate *ss,
 	}
     }
 
-  if (_hurd_orphaned && act == stop &&
-      (__sigmask (signo) & (__sigmask (SIGTTIN) | __sigmask (SIGTTOU) |
-			    __sigmask (SIGTSTP))))
+  if (_hurd_orphaned && act == stop
+      && (__sigmask (signo) & (__sigmask (SIGTTIN) | __sigmask (SIGTTOU)
+			       | __sigmask (SIGTSTP))))
     {
       /* If we would ordinarily stop for a job control signal, but we are
 	 orphaned so noone would ever notice and continue us again, we just
@@ -728,9 +728,9 @@ _hurd_internal_post_signal (struct hurd_sigstate *ss,
     }
 
   /* Handle receipt of a blocked signal, or any signal while stopped.  */
-  if (act != ignore &&		/* Signals ignored now are forgotten now.  */
-      __sigismember (&ss->blocked, signo) ||
-      (signo != SIGKILL && _hurd_stopped))
+  if (act != ignore		/* Signals ignored now are forgotten now.  */
+      && __sigismember (&ss->blocked, signo)
+      || (signo != SIGKILL && _hurd_stopped))
     {
       mark_pending ();
       act = ignore;
@@ -1368,10 +1368,10 @@ reauth_proc (mach_port_t new)
   ref = __mach_reply_port ();
   if (! HURD_PORT_USE (&_hurd_ports[INIT_PORT_PROC],
 		       __proc_reauthenticate (port, ref,
-					      MACH_MSG_TYPE_MAKE_SEND) ||
-		       __auth_user_authenticate (new, ref,
-						 MACH_MSG_TYPE_MAKE_SEND,
-						 &ignore))
+					      MACH_MSG_TYPE_MAKE_SEND)
+		       || __auth_user_authenticate (new, ref,
+						    MACH_MSG_TYPE_MAKE_SEND,
+						    &ignore))
       && ignore != MACH_PORT_NULL)
     __mach_port_deallocate (__mach_task_self (), ignore);
   __mach_port_destroy (__mach_task_self (), ref);
