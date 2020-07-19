@@ -28,7 +28,33 @@
 
 extern void TUNABLE_CALLBACK (set_hwcaps) (tunable_val_t *)
   attribute_hidden;
+
+# if CET_ENABLED
+extern void TUNABLE_CALLBACK (set_x86_ibt) (tunable_val_t *)
+  attribute_hidden;
+extern void TUNABLE_CALLBACK (set_x86_shstk) (tunable_val_t *)
+  attribute_hidden;
+# endif
 #endif
+
+#if CET_ENABLED
+# include <dl-cet.h>
+# include <cet-tunables.h>
+#endif
+
+static void
+get_extended_indices (struct cpu_features *cpu_features)
+{
+  unsigned int eax, ebx, ecx, edx;
+  __cpuid (0x80000000, eax, ebx, ecx, edx);
+  if (eax >= 0x80000001)
+    __cpuid (0x80000001,
+	     cpu_features->cpuid[COMMON_CPUID_INDEX_80000001].eax,
+	     cpu_features->cpuid[COMMON_CPUID_INDEX_80000001].ebx,
+	     cpu_features->cpuid[COMMON_CPUID_INDEX_80000001].ecx,
+	     cpu_features->cpuid[COMMON_CPUID_INDEX_80000001].edx);
+
+}
 
 static void
 get_common_indeces (struct cpu_features *cpu_features,
@@ -78,8 +104,15 @@ get_common_indeces (struct cpu_features *cpu_features,
 	      /* The following features depend on AVX being usable.  */
 	      /* Determine if AVX2 is usable.  */
 	      if (CPU_FEATURES_CPU_P (cpu_features, AVX2))
+	      {
 		cpu_features->feature[index_arch_AVX2_Usable]
 		  |= bit_arch_AVX2_Usable;
+
+	        /* Unaligned load with 256-bit AVX registers are faster on
+	           Intel/AMD processors with AVX2.  */
+	        cpu_features->feature[index_arch_AVX_Fast_Unaligned_Load]
+		  |= bit_arch_AVX_Fast_Unaligned_Load;
+	      }
 	      /* Determine if FMA is usable.  */
 	      if (CPU_FEATURES_CPU_P (cpu_features, FMA))
 		cpu_features->feature[index_arch_FMA_Usable]
@@ -205,6 +238,8 @@ init_cpu_features (struct cpu_features *cpu_features)
       get_common_indeces (cpu_features, &family, &model, &extended_model,
 			  &stepping);
 
+      get_extended_indices (cpu_features);
+
       if (family == 0x06)
 	{
 	  model += extended_model;
@@ -298,11 +333,6 @@ init_cpu_features (struct cpu_features *cpu_features)
 	    }
 	}
 
-      /* Unaligned load with 256-bit AVX registers are faster on
-	 Intel processors with AVX2.  */
-      if (CPU_FEATURES_ARCH_P (cpu_features, AVX2_Usable))
-	cpu_features->feature[index_arch_AVX_Fast_Unaligned_Load]
-	  |= bit_arch_AVX_Fast_Unaligned_Load;
 
       /* Since AVX512ER is unique to Xeon Phi, set Prefer_No_VZEROUPPER
          if AVX512ER is available.  Don't use AVX512 to avoid lower CPU
@@ -324,16 +354,9 @@ init_cpu_features (struct cpu_features *cpu_features)
       get_common_indeces (cpu_features, &family, &model, &extended_model,
 			  &stepping);
 
-      ecx = cpu_features->cpuid[COMMON_CPUID_INDEX_1].ecx;
+      get_extended_indices (cpu_features);
 
-      unsigned int eax;
-      __cpuid (0x80000000, eax, ebx, ecx, edx);
-      if (eax >= 0x80000001)
-	__cpuid (0x80000001,
-		 cpu_features->cpuid[COMMON_CPUID_INDEX_80000001].eax,
-		 cpu_features->cpuid[COMMON_CPUID_INDEX_80000001].ebx,
-		 cpu_features->cpuid[COMMON_CPUID_INDEX_80000001].ecx,
-		 cpu_features->cpuid[COMMON_CPUID_INDEX_80000001].edx);
+      ecx = cpu_features->cpuid[COMMON_CPUID_INDEX_1].ecx;
 
       if (HAS_ARCH_FEATURE (AVX_Usable))
 	{
@@ -351,9 +374,15 @@ init_cpu_features (struct cpu_features *cpu_features)
 #endif
 	  /* "Excavator"   */
 	  if (model >= 0x60 && model <= 0x7f)
+	  {
 	    cpu_features->feature[index_arch_Fast_Unaligned_Load]
 	      |= (bit_arch_Fast_Unaligned_Load
 		  | bit_arch_Fast_Copy_Backward);
+
+	    /* Unaligned AVX loads are slower.*/
+	    cpu_features->feature[index_arch_AVX_Fast_Unaligned_Load]
+		  &= ~bit_arch_AVX_Fast_Unaligned_Load;
+	  }
 	}
     }
   else
@@ -440,5 +469,56 @@ no_cpuid:
     GLRO(dl_platform) = "i686";
   else if (CPU_FEATURES_ARCH_P (cpu_features, I586))
     GLRO(dl_platform) = "i586";
+#endif
+
+#if CET_ENABLED
+# if HAVE_TUNABLES
+  TUNABLE_GET (x86_ibt, tunable_val_t *,
+	       TUNABLE_CALLBACK (set_x86_ibt));
+  TUNABLE_GET (x86_shstk, tunable_val_t *,
+	       TUNABLE_CALLBACK (set_x86_shstk));
+# endif
+
+  /* Check CET status.  */
+  unsigned int cet_status = get_cet_status ();
+
+  if (cet_status)
+    {
+      GL(dl_x86_feature_1)[0] = cet_status;
+
+# ifndef SHARED
+      /* Check if IBT and SHSTK are enabled by kernel.  */
+      if ((cet_status & GNU_PROPERTY_X86_FEATURE_1_IBT)
+	  || (cet_status & GNU_PROPERTY_X86_FEATURE_1_SHSTK))
+	{
+	  /* Disable IBT and/or SHSTK if they are enabled by kernel, but
+	     disabled by environment variable:
+
+	     GLIBC_TUNABLES=glibc.tune.hwcaps=-IBT,-SHSTK
+	   */
+	  unsigned int cet_feature = 0;
+	  if (!HAS_CPU_FEATURE (IBT))
+	    cet_feature |= GNU_PROPERTY_X86_FEATURE_1_IBT;
+	  if (!HAS_CPU_FEATURE (SHSTK))
+	    cet_feature |= GNU_PROPERTY_X86_FEATURE_1_SHSTK;
+
+	  if (cet_feature)
+	    {
+	      int res = dl_cet_disable_cet (cet_feature);
+
+	      /* Clear the disabled bits in dl_x86_feature_1.  */
+	      if (res == 0)
+		GL(dl_x86_feature_1)[0] &= ~cet_feature;
+	    }
+
+	  /* Lock CET if IBT or SHSTK is enabled in executable.  Don't
+	     lock CET if SHSTK is enabled permissively.  */
+	  if (((GL(dl_x86_feature_1)[1] >> CET_MAX)
+	       & ((1 << CET_MAX) - 1))
+	       != CET_PERMISSIVE)
+	    dl_cet_lock_cet ();
+	}
+# endif
+    }
 #endif
 }

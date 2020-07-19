@@ -22,21 +22,22 @@ subdir	:= nptl
 
 include ../Makeconfig
 
-headers := pthread.h semaphore.h bits/semaphore.h
+headers := pthread.h semaphore.h bits/semaphore.h threads.h
 
 extra-libs := libpthread
 extra-libs-others := $(extra-libs)
-install-lib-ldscripts := libpthread.so
 
 routines = alloca_cutoff forward libc-lowlevellock libc-cancellation \
 	   libc-cleanup libc_pthread_init libc_multiple_threads \
-	   register-atfork unregister-atfork pthread_self
+	   register-atfork pthread_atfork pthread_self thrd_current \
+	   thrd_equal thrd_sleep thrd_yield
 shared-only-routines = forward
+static-only-routines = pthread_atfork
 
 # We need to provide certain routines for compatibility with existing
 # binaries.
 pthread-compat-wrappers = \
-		      write read close fcntl accept \
+		      write read close accept \
 		      connect recv recvfrom send \
 		      sendto fsync lseek lseek64 \
 		      msync nanosleep open open64 pause \
@@ -45,7 +46,7 @@ pthread-compat-wrappers = \
 		      sigwait sigsuspend \
 		      recvmsg sendmsg
 
-libpthread-routines = nptl-init vars events version pt-interp \
+libpthread-routines = nptl-init nptlfreeres vars events version pt-interp \
 		      pthread_create pthread_exit pthread_detach \
 		      pthread_join pthread_tryjoin pthread_timedjoin \
 		      pthread_join_common \
@@ -106,7 +107,7 @@ libpthread-routines = nptl-init vars events version pt-interp \
 		      pthread_cancel pthread_testcancel \
 		      pthread_setcancelstate pthread_setcanceltype \
 		      pthread_once \
-		      old_pthread_atfork pthread_atfork \
+		      old_pthread_atfork \
 		      pthread_getcpuclockid \
 		      pthread_clock_gettime pthread_clock_settime \
 		      shm-directory \
@@ -120,7 +121,7 @@ libpthread-routines = nptl-init vars events version pt-interp \
 		      cancellation \
 		      lowlevellock \
 		      lll_timedlock_wait lll_timedwait_tid \
-		      pt-fork pt-vfork \
+		      pt-fork pt-vfork pt-fcntl \
 		      $(pthread-compat-wrappers) \
 		      pt-raise pt-system \
 		      flockfile ftrylockfile funlockfile \
@@ -139,7 +140,12 @@ libpthread-routines = nptl-init vars events version pt-interp \
 		      pthread_mutex_getprioceiling \
 		      pthread_mutex_setprioceiling \
 		      pthread_setname pthread_getname \
-		      pthread_setattr_default_np pthread_getattr_default_np
+		      pthread_setattr_default_np pthread_getattr_default_np \
+		      thrd_create thrd_detach thrd_exit thrd_join \
+		      mtx_destroy mtx_init mtx_lock mtx_timedlock \
+		      mtx_trylock mtx_unlock call_once cnd_broadcast \
+		      cnd_destroy cnd_init cnd_signal cnd_timedwait cnd_wait \
+		      tss_create tss_delete tss_get tss_set
 #		      pthread_setuid pthread_seteuid pthread_setreuid \
 #		      pthread_setresuid \
 #		      pthread_setgid pthread_setegid pthread_setregid \
@@ -147,7 +153,6 @@ libpthread-routines = nptl-init vars events version pt-interp \
 
 libpthread-shared-only-routines = version pt-interp pt-allocrtsig \
 				  unwind-forcedunwind
-libpthread-static-only-routines = pthread_atfork
 
 # Since cancellation handling is in large parts handled using exceptions
 # we have to compile some files with exception handling enabled, some
@@ -192,6 +197,7 @@ CFLAGS-sem_timedwait.c += -fexceptions -fasynchronous-unwind-tables
 
 # These are the function wrappers we have to duplicate here.
 CFLAGS-fcntl.c += -fexceptions -fasynchronous-unwind-tables
+CFLAGS-fcntl64.c += -fexceptions -fasynchronous-unwind-tables
 CFLAGS-lockf.c += -fexceptions
 CFLAGS-pread.c += -fexceptions -fasynchronous-unwind-tables
 CFLAGS-pread64.c += -fexceptions -fasynchronous-unwind-tables
@@ -309,7 +315,10 @@ tests = tst-attr1 tst-attr2 tst-attr3 tst-default-attr \
 	tst-thread_local1 tst-mutex-errorcheck tst-robust10 \
 	tst-robust-fork tst-create-detached tst-memstream \
 	tst-thread-exit-clobber tst-minstack-cancel tst-minstack-exit \
-	tst-minstack-throw
+	tst-minstack-throw \
+	tst-cnd-basic tst-mtx-trylock tst-cnd-broadcast \
+	tst-cnd-timedwait tst-thrd-detach tst-mtx-basic tst-thrd-sleep \
+	tst-mtx-recursive tst-tss-basic tst-call-once tst-mtx-timedlock
 
 tests-internal := tst-rwlock19 tst-rwlock20 \
 		  tst-sem11 tst-sem12 tst-sem13 \
@@ -473,29 +482,6 @@ ifeq (yes,$(build-shared))
 # Make sure these things are built in the `make lib' pass so they can be used
 # to run programs during the `make others' pass.
 lib-noranlib: $(addprefix $(objpfx),$(extra-objs))
-
-# What we install as libpthread.so for programs to link against is in fact a
-# link script.  It contains references for the various libraries we need.
-# The libpthread.so object is not complete since some functions are only
-# defined in libpthread_nonshared.a.
-# We need to use absolute paths since otherwise local copies (if they exist)
-# of the files are taken by the linker.
-install: $(inst_libdir)/libpthread.so
-
-$(inst_libdir)/libpthread.so: $(common-objpfx)format.lds \
-			      $(objpfx)libpthread.so$(libpthread.so-version) \
-			      $(inst_libdir)/$(patsubst %,$(libtype.oS),\
-							$(libprefix)pthread) \
-			      $(+force)
-	(echo '/* GNU ld script';\
-	 echo '   Use the shared library, but some functions are only in';\
-	 echo '   the static library, so try that secondarily.  */';\
-	 cat $<; \
-	 echo 'GROUP ( $(slibdir)/libpthread.so$(libpthread.so-version)' \
-	      '$(libdir)/$(patsubst %,$(libtype.oS),$(libprefix)pthread)'\
-	      ')' \
-	) > $@.new
-	mv -f $@.new $@
 endif
 
 
@@ -644,14 +630,12 @@ $(addprefix $(objpfx), \
   $(filter-out $(tests-static) $(xtests-static) $(tests-reverse) \
     $(tests-nolibpthread), \
     $(tests) $(tests-internal) $(xtests) $(test-srcs))): \
-	$(objpfx)libpthread.so \
-	$(objpfx)libpthread_nonshared.a
+	$(objpfx)libpthread.so
 $(objpfx)tst-unload: $(libdl)
 # $(objpfx)../libc.so is used instead of $(common-objpfx)libc.so,
 # since otherwise libpthread.so comes before libc.so when linking.
 $(addprefix $(objpfx), $(tests-reverse)): \
-  $(objpfx)../libc.so $(objpfx)libpthread.so \
-  $(objpfx)libpthread_nonshared.a
+  $(objpfx)../libc.so $(objpfx)libpthread.so
 $(objpfx)../libc.so: $(common-objpfx)libc.so ;
 $(addprefix $(objpfx),$(tests-static) $(xtests-static)): $(objpfx)libpthread.a
 
@@ -681,8 +665,7 @@ $(objpfx)$(multidir)/crtn.o: $(objpfx)crtn.o $(objpfx)$(multidir)/
 	ln -f $< $@
 endif
 
-generated += libpthread_nonshared.a \
-	     multidir.mk tst-atfork2.mtrace tst-cancel-wrappers.out \
+generated += multidir.mk tst-atfork2.mtrace tst-cancel-wrappers.out \
 	     tst-tls6.out
 
 generated += $(objpfx)tst-atfork2.mtrace \
@@ -725,10 +708,6 @@ $(objpfx)tst-oddstacklimit.out: $(objpfx)tst-oddstacklimit $(objpfx)tst-basic1
 endif
 
 $(objpfx)tst-compat-forwarder: $(objpfx)tst-compat-forwarder-mod.so
-
-# Disable elision for tst-mutex8 so it can verify error case for
-# destroying a mutex.
-tst-mutex8-ENV = GLIBC_TUNABLES=glibc.elision.enable=0
 
 # The tests here better do not run in parallel
 ifneq ($(filter %tests,$(MAKECMDGOALS)),)
