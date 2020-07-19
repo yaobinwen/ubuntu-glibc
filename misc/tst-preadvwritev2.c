@@ -1,5 +1,5 @@
 /* Tests for preadv2 and pwritev2.
-   Copyright (C) 2016-2018 Free Software Foundation, Inc.
+   Copyright (C) 2016-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -30,6 +30,8 @@ do_test (void)
 {
   do_test_with_invalid_flags ();
   do_test_without_offset ();
+  do_test_with_invalid_fd ();
+  do_test_with_invalid_iov ();
 
   return do_test_with_offset (0);
 }

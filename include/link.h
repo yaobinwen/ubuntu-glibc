@@ -1,6 +1,6 @@
 /* Data structure for communication from the run-time dynamic linker for
    loaded ELF shared objects.
-   Copyright (C) 1995-2018 Free Software Foundation, Inc.
+   Copyright (C) 1995-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -216,6 +216,10 @@ struct link_map
       unsigned int boundndx;
       uint32_t enterexit;
       unsigned int flags;
+      /* CONCURRENCY NOTE: This is used to guard the concurrent initialization
+	 of the relocation result across multiple threads.  See the more
+	 detailed notes in elf/dl-runtime.c.  */
+      unsigned int init;
     } *l_reloc_result;
 
     /* Pointer to the version information if available.  */

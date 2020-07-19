@@ -1,5 +1,5 @@
 /* Host and service name lookups using Name Service Switch modules.
-   Copyright (C) 1996-2018 Free Software Foundation, Inc.
+   Copyright (C) 1996-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -488,7 +488,7 @@ gaih_inet (const char *name, const struct gaih_service *service,
 	  malloc_name = true;
 	}
 
-      if (__inet_aton (name, (struct in_addr *) at->addr) != 0)
+      if (__inet_aton_exact (name, (struct in_addr *) at->addr) != 0)
 	{
 	  if (req->ai_family == AF_UNSPEC || req->ai_family == AF_INET)
 	    at->family = AF_INET;

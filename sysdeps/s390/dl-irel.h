@@ -1,6 +1,6 @@
 /* Machine-dependent ELF indirect relocation inline functions.
    Version for S/390 32 and 64 bit.
-   Copyright (C) 2012-2018 Free Software Foundation, Inc.
+   Copyright (C) 2012-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ elf_irela (const ElfW(Rela) *reloc)
       *reloc_addr = value;
     }
   else
-    __libc_fatal ("unexpected reloc type in static binary");
+    __libc_fatal ("Unexpected reloc type in static binary.\n");
 }
 
 #endif /* dl-irel.h */

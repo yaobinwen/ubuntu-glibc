@@ -1,6 +1,6 @@
 /* Machine-dependent ELF indirect relocation inline functions.
    i386 version.
-   Copyright (C) 2009-2018 Free Software Foundation, Inc.
+   Copyright (C) 2009-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ elf_irel (const Elf32_Rel *reloc)
       *reloc_addr = value;
     }
   else
-    __libc_fatal ("unexpected reloc type in static binary");
+    __libc_fatal ("Unexpected reloc type in static binary.\n");
 }
 
 #endif /* dl-irel.h */

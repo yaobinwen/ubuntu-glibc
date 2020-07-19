@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2018 Free Software Foundation, Inc.
+# Copyright (C) 1991-2019 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -38,6 +38,7 @@ tests := mallocbug tst-malloc tst-valloc tst-calloc tst-obstack \
 	 tst-malloc_info \
 	 tst-malloc-too-large \
 	 tst-malloc-stats-cancellation \
+	 tst-tcfree1 tst-tcfree2 tst-tcfree3 \
 
 tests-static := \
 	 tst-interpose-static-nothread \

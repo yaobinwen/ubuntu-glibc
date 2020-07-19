@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2018 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -53,6 +53,8 @@ __pthread_mutex_timedlock (pthread_mutex_t *mutex,
   /* We must not check ABSTIME here.  If the thread does not block
      abstime must not be checked for a valid value.  */
 
+  /* See concurrency notes regarding mutex type which is loaded from __kind
+     in struct __pthread_mutex_s in sysdeps/nptl/bits/thread-shared-types.h.  */
   switch (__builtin_expect (PTHREAD_MUTEX_TYPE_ELISION (mutex),
 			    PTHREAD_MUTEX_TIMED_NP))
     {
@@ -116,7 +118,7 @@ __pthread_mutex_timedlock (pthread_mutex_t *mutex,
       if (lll_trylock (mutex->__data.__lock) != 0)
 	{
 	  int cnt = 0;
-	  int max_cnt = MIN (MAX_ADAPTIVE_COUNT,
+	  int max_cnt = MIN (max_adaptive_count (),
 			     mutex->__data.__spins * 2 + 10);
 	  do
 	    {
@@ -338,8 +340,14 @@ __pthread_mutex_timedlock (pthread_mutex_t *mutex,
     case PTHREAD_MUTEX_PI_ROBUST_NORMAL_NP:
     case PTHREAD_MUTEX_PI_ROBUST_ADAPTIVE_NP:
       {
-	int kind = mutex->__data.__kind & PTHREAD_MUTEX_KIND_MASK_NP;
-	int robust = mutex->__data.__kind & PTHREAD_MUTEX_ROBUST_NORMAL_NP;
+	int kind, robust;
+	{
+	  /* See concurrency notes regarding __kind in struct __pthread_mutex_s
+	     in sysdeps/nptl/bits/thread-shared-types.h.  */
+	  int mutex_kind = atomic_load_relaxed (&(mutex->__data.__kind));
+	  kind = mutex_kind & PTHREAD_MUTEX_KIND_MASK_NP;
+	  robust = mutex_kind & PTHREAD_MUTEX_ROBUST_NORMAL_NP;
+	}
 
 	if (robust)
 	  {
@@ -509,7 +517,10 @@ __pthread_mutex_timedlock (pthread_mutex_t *mutex,
     case PTHREAD_MUTEX_PP_NORMAL_NP:
     case PTHREAD_MUTEX_PP_ADAPTIVE_NP:
       {
-	int kind = mutex->__data.__kind & PTHREAD_MUTEX_KIND_MASK_NP;
+	/* See concurrency notes regarding __kind in struct __pthread_mutex_s
+	   in sysdeps/nptl/bits/thread-shared-types.h.  */
+	int kind = atomic_load_relaxed (&(mutex->__data.__kind))
+	  & PTHREAD_MUTEX_KIND_MASK_NP;
 
 	oldval = mutex->__data.__lock;
 

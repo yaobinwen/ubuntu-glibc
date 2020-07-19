@@ -1,5 +1,5 @@
 /* memmove/memcpy/mempcpy optimized with AVX512 for KNL hardware.
-   Copyright (C) 2016-2018 Free Software Foundation, Inc.
+   Copyright (C) 2016-2019 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -24,27 +24,31 @@
 
 	.section .text.avx512,"ax",@progbits
 ENTRY (__mempcpy_chk_avx512_no_vzeroupper)
-	cmpq	%rdx, %rcx
+	cmp	%RDX_LP, %RCX_LP
 	jb	HIDDEN_JUMPTARGET (__chk_fail)
 END (__mempcpy_chk_avx512_no_vzeroupper)
 
 ENTRY (__mempcpy_avx512_no_vzeroupper)
-	movq	%rdi, %rax
-	addq	%rdx, %rax
+	mov	%RDI_LP, %RAX_LP
+	add	%RDX_LP, %RAX_LP
 	jmp	L(start)
 END (__mempcpy_avx512_no_vzeroupper)
 
 ENTRY (__memmove_chk_avx512_no_vzeroupper)
-	cmpq	%rdx, %rcx
+	cmp	%RDX_LP, %RCX_LP
 	jb	HIDDEN_JUMPTARGET (__chk_fail)
 END (__memmove_chk_avx512_no_vzeroupper)
 
 ENTRY (__memmove_avx512_no_vzeroupper)
-	mov	%rdi, %rax
+	mov	%RDI_LP, %RAX_LP
 # ifdef USE_AS_MEMPCPY
-	add	%rdx, %rax
+	add	%RDX_LP, %RAX_LP
 # endif
 L(start):
+# ifdef __ILP32__
+	/* Clear the upper 32 bits.  */
+	mov	%edx, %edx
+# endif
 	lea	(%rsi, %rdx), %rcx
 	lea	(%rdi, %rdx), %r9
 	cmp	$512, %rdx
