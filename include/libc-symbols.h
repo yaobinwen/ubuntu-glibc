@@ -1,6 +1,6 @@
 /* Support macros for making weak and strong aliases for symbols,
    and for using symbol sets and linker warnings with GNU ld.
-   Copyright (C) 1995-2017 Free Software Foundation, Inc.
+   Copyright (C) 1995-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -83,6 +83,14 @@
 #endif
 
 #include <config.h>
+
+/* When PIC is defined and SHARED isn't defined, we are building PIE
+   by default.  */
+#if defined PIC && !defined SHARED
+# define BUILD_PIE_DEFAULT 1
+#else
+# define BUILD_PIE_DEFAULT 0
+#endif
 
 /* Define this for the benefit of portable GNU code that wants to check it.
    Code that checks with #if will not #include <config.h> again, since we've
@@ -186,13 +194,6 @@
   .weak C_SYMBOL_NAME (symbol)
 
 #endif /* __ASSEMBLER__ */
-
-/* On some platforms we can make internal function calls (i.e., calls of
-   functions not exported) a bit faster by using a different calling
-   convention.  */
-#ifndef internal_function
-# define internal_function	/* empty */
-#endif
 
 /* Determine the return address.  */
 #define RETURN_ADDRESS(nr) \
@@ -355,7 +356,8 @@ for linking")
   strong_alias(real, name)
 #endif
 
-#if defined SHARED || defined LIBC_NONSHARED
+#if defined SHARED || defined LIBC_NONSHARED \
+  || (BUILD_PIE_DEFAULT && IS_IN (libc))
 # define attribute_hidden __attribute__ ((visibility ("hidden")))
 #else
 # define attribute_hidden
@@ -504,8 +506,21 @@ for linking")
 # endif
 #else
 # ifndef __ASSEMBLER__
-#  define hidden_proto(name, attrs...)
-#  define hidden_tls_proto(name, attrs...)
+#  if !defined SHARED && IS_IN (libc) && !defined LIBC_NONSHARED \
+      && (!defined PIC || !defined NO_HIDDEN_EXTERN_FUNC_IN_PIE) \
+      && !defined NO_HIDDEN
+#   define __hidden_proto_hiddenattr(attrs...) \
+  __attribute__ ((visibility ("hidden"), ##attrs))
+#   define hidden_proto(name, attrs...) \
+  __hidden_proto (name, , name, ##attrs)
+#   define hidden_tls_proto(name, attrs...) \
+  __hidden_proto (name, __thread, name, ##attrs)
+#  define __hidden_proto(name, thread, internal, attrs...)	     \
+  extern thread __typeof (name) name __hidden_proto_hiddenattr (attrs);
+# else
+#   define hidden_proto(name, attrs...)
+#   define hidden_tls_proto(name, attrs...)
+# endif
 # else
 #  define HIDDEN_JUMPTARGET(name) JUMPTARGET(name)
 # endif /* Not  __ASSEMBLER__ */
@@ -544,7 +559,7 @@ for linking")
 # define libc_hidden_data_ver(local, name)
 #endif
 
-#if IS_IN (rtld)
+#if IS_IN (rtld) && !defined NO_RTLD_HIDDEN
 # define rtld_hidden_proto(name, attrs...) hidden_proto (name, ##attrs)
 # define rtld_hidden_tls_proto(name, attrs...) hidden_tls_proto (name, ##attrs)
 # define rtld_hidden_def(name) hidden_def (name)
@@ -782,7 +797,8 @@ for linking")
 
 /* Helper / base  macros for indirect function symbols.  */
 #define __ifunc_resolver(type_name, name, expr, arg, init, classifier)	\
-  classifier inhibit_stack_protector void *name##_ifunc (arg)					\
+  classifier inhibit_stack_protector					\
+  __typeof (type_name) *name##_ifunc (arg)				\
   {									\
     init ();								\
     __typeof (type_name) *res = expr;					\
@@ -809,7 +825,7 @@ for linking")
 
 # define __ifunc(type_name, name, expr, arg, init)			\
   extern __typeof (type_name) name;					\
-  void *name##_ifunc (arg) __asm__ (#name);				\
+  __typeof (type_name) *name##_ifunc (arg) __asm__ (#name);		\
   __ifunc_resolver (type_name, name, expr, arg, init,)			\
  __asm__ (".type " #name ", %gnu_indirect_function");
 

@@ -1,5 +1,5 @@
 /* __sigset_t manipulators.  Generic/BSD version.
-   Copyright (C) 1991-2017 Free Software Foundation, Inc.
+   Copyright (C) 1991-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -50,27 +50,26 @@
     *(dest) = *(left) | *(right);		\
     (void)0;					\
   }))
-#endif
 
 /* These macros needn't check for a bogus signal number;
    checking is done in the non-__ versions.  */
 # define __sigismember(set, sig)		\
   (__extension__ ({				\
     __sigset_t __mask = __sigmask (sig);	\
-    (set) & __mask ? 1 : 0;			\
+    *(set) & __mask ? 1 : 0;			\
   }))
 
 # define __sigaddset(set, sig)			\
   (__extension__ ({				\
     __sigset_t __mask = __sigmask (sig);	\
-    (set) |= __mask;				\
+    *(set) |= __mask;				\
     (void)0;					\
   }))
 
 # define __sigdelset(set, sig)			\
   (__extension__ ({				\
     __sigset_t __mask = __sigmask (sig);	\
-    (set) &= ~__mask;				\
+    *(set) &= ~__mask;				\
     (void)0;					\
   }))
 

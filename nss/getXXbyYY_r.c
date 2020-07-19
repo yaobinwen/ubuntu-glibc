@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2017 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
@@ -180,8 +180,7 @@ typedef enum nss_status (*lookup_function) (ADD_PARAMS, LOOKUP_TYPE *, char *,
 
 /* The lookup function for the first entry of this service.  */
 extern int DB_LOOKUP_FCT (service_user **nip, const char *name,
-			  const char *name2, void **fctp)
-     internal_function;
+			  const char *name2, void **fctp);
 libc_hidden_proto (DB_LOOKUP_FCT)
 
 
@@ -234,6 +233,9 @@ INTERNAL (REENTRANT_NAME) (ADD_PARAMS, LOOKUP_TYPE *resbuf, char *buffer,
 				      H_ERRNO_VAR_P))
     {
     case -1:
+# ifdef NEED__RES
+      __resolv_context_put (res_ctx);
+# endif
       return errno;
     case 1:
 #ifdef NEED_H_ERRNO
@@ -253,7 +255,12 @@ INTERNAL (REENTRANT_NAME) (ADD_PARAMS, LOOKUP_TYPE *resbuf, char *buffer,
       nscd_status = NSCD_NAME (ADD_VARIABLES, resbuf, buffer, buflen, result
 			       H_ERRNO_VAR);
       if (nscd_status >= 0)
-	return nscd_status;
+	{
+# ifdef NEED__RES
+	  __resolv_context_put (res_ctx);
+# endif
+	  return nscd_status;
+	}
     }
 #endif
 

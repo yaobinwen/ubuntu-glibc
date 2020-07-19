@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2017 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -307,7 +307,6 @@ queue_stack (struct pthread *stack)
 
 
 static int
-internal_function
 change_stack_perm (struct pthread *pd
 #ifdef NEED_SEPARATE_REGISTER_STACK
 		   , size_t pagemask
@@ -356,7 +355,7 @@ setup_stack_prot (char *mem, size_t size, char *guard, size_t guardsize,
 		  const int prot)
 {
   char *guardend = guard + guardsize;
-#if _STACK_GROWS_DOWN
+#if _STACK_GROWS_DOWN && !defined(NEED_SEPARATE_REGISTER_STACK)
   /* As defined at guard_position, for architectures with downward stack
      the guard page is always at start of the allocated area.  */
   if (__mprotect (guardend, size - guardsize, prot) != 0)
@@ -370,6 +369,33 @@ setup_stack_prot (char *mem, size_t size, char *guard, size_t guardsize,
     return errno;
 #endif
   return 0;
+}
+
+/* Mark the memory of the stack as usable to the kernel.  It frees everything
+   except for the space used for the TCB itself.  */
+static inline void
+__always_inline
+advise_stack_range (void *mem, size_t size, uintptr_t pd, size_t guardsize)
+{
+  uintptr_t sp = (uintptr_t) CURRENT_STACK_FRAME;
+  size_t pagesize_m1 = __getpagesize () - 1;
+#if _STACK_GROWS_DOWN && !defined(NEED_SEPARATE_REGISTER_STACK)
+  size_t freesize = (sp - (uintptr_t) mem) & ~pagesize_m1;
+  assert (freesize < size);
+  if (freesize > PTHREAD_STACK_MIN)
+    __madvise (mem, freesize - PTHREAD_STACK_MIN, MADV_DONTNEED);
+#else
+  /* Page aligned start of memory to free (higher than or equal
+     to current sp plus the minimum stack size).  */
+  uintptr_t freeblock = (sp + PTHREAD_STACK_MIN + pagesize_m1) & ~pagesize_m1;
+  uintptr_t free_end = (pd - guardsize) & ~pagesize_m1;
+  if (free_end > freeblock)
+    {
+      size_t freesize = free_end - freeblock;
+      assert (freesize < size);
+      __madvise ((void*) freeblock, freesize, MADV_DONTNEED);
+    }
+#endif
 }
 
 /* Returns a usable stack for a new thread either by allocating a
@@ -727,7 +753,7 @@ allocate_stack (const struct pthread_attr *attr, struct pthread **pdp,
 				  - offsetof (pthread_mutex_t,
 					      __data.__list.__next));
   pd->robust_head.list_op_pending = NULL;
-#ifdef __PTHREAD_MUTEX_HAVE_PREV
+#if __PTHREAD_MUTEX_HAVE_PREV
   pd->robust_prev = &pd->robust_head;
 #endif
   pd->robust_head.list = &pd->robust_head;
@@ -760,7 +786,6 @@ allocate_stack (const struct pthread_attr *attr, struct pthread **pdp,
 
 
 void
-internal_function
 __deallocate_stack (struct pthread *pd)
 {
   lll_lock (stack_cache_lock, LLL_PRIVATE);
@@ -784,7 +809,6 @@ __deallocate_stack (struct pthread *pd)
 
 
 int
-internal_function
 __make_stacks_executable (void **stack_endp)
 {
   /* First the main thread's stack.  */
@@ -990,7 +1014,6 @@ __find_thread_by_id (pid_t tid)
 
 #ifdef SIGSETXID
 static void
-internal_function
 setxid_mark_thread (struct xid_command *cmdp, struct pthread *t)
 {
   int ch;
@@ -1028,7 +1051,6 @@ setxid_mark_thread (struct xid_command *cmdp, struct pthread *t)
 
 
 static void
-internal_function
 setxid_unmark_thread (struct xid_command *cmdp, struct pthread *t)
 {
   int ch;
@@ -1049,7 +1071,6 @@ setxid_unmark_thread (struct xid_command *cmdp, struct pthread *t)
 
 
 static int
-internal_function
 setxid_signal_thread (struct xid_command *cmdp, struct pthread *t)
 {
   if ((t->cancelhandling & SETXID_BITMASK) == 0)
@@ -1084,8 +1105,13 @@ __nptl_setxid_error (struct xid_command *cmdp, int error)
       if (olderror == error)
 	break;
       if (olderror != -1)
-	/* Mismatch between current and previous results.  */
-	abort ();
+	{
+	  /* Mismatch between current and previous results.  Save the
+	     error value to memory so that is not clobbered by the
+	     abort function and preserved in coredumps.  */
+	  volatile int xid_err __attribute__((unused)) = error;
+	  abort ();
+	}
     }
   while (atomic_compare_and_exchange_bool_acq (&cmdp->error, error, -1));
 }

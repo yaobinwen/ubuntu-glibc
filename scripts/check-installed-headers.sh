@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2016-2017 Free Software Foundation, Inc.
+# Copyright (C) 2016-2018 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 #
 # The GNU C Library is free software; you can redistribute it and/or
@@ -82,6 +82,11 @@ for header in "$@"; do
         # exhortation (either a #warning or an #error) to use sys/procfs.h
         # instead, plus an inclusion of that header.
         (sys/elf.h)
+            continue;;
+
+        # libio.h and _G_config.h are deprecation stubs containing #warnings
+        # to use stdio.h instead.
+        (libio.h | _G_config.h)
             continue;;
 
 	# sys/sysctl.h is unsupported for x32.

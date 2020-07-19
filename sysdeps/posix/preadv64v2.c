@@ -1,5 +1,5 @@
 /* Generic version of preadv2.
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,16 +16,17 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-#include <unistd.>
+#include <errno.h>
+#include <unistd.h>
 #include <sys/uio.h>
 
 ssize_t
-preadv64v2 (int fd, const struct iovec *vector, int count, OFF_T offset,
+preadv64v2 (int fd, const struct iovec *vector, int count, off64_t offset,
 	    int flags)
 {
   if (flags != 0)
     {
-      __set_errno (EOPNOTSUPP);
+      __set_errno (ENOTSUP);
       return -1;
     }
 

@@ -14,9 +14,20 @@ CPPFLAGS += -I../soft-fp
 $(foreach suf,$(all-object-suffixes),%f128$(suf)): CFLAGS += -mfloat128
 $(foreach suf,$(all-object-suffixes),%f128_r$(suf)): CFLAGS += -mfloat128
 $(foreach suf,$(all-object-suffixes),$(objpfx)test-float128%$(suf)): CFLAGS += -mfloat128
+$(foreach suf,$(all-object-suffixes),$(objpfx)test-float64x%$(suf)): CFLAGS += -mfloat128
 $(foreach suf,$(all-object-suffixes),$(objpfx)test-ifloat128%$(suf)): CFLAGS += -mfloat128
+$(foreach suf,$(all-object-suffixes),$(objpfx)test-ifloat64x%$(suf)): CFLAGS += -mfloat128
 CFLAGS-libm-test-support-float128.c += -mfloat128
-$(objpfx)test-float128% $(objpfx)test-ifloat128%: \
+CFLAGS-libm-test-support-float64x.c += -mfloat128
+CFLAGS-test-math-iscanonical.cc += -mfloat128
+CFLAGS-test-math-iseqsig.cc += -mfloat128
+CFLAGS-test-math-issignaling.cc += -mfloat128
+CFLAGS-test-math-iszero.cc += -mfloat128
+$(foreach test, \
+	  test-float128% test-ifloat128% test-float64x% test-ifloat64x% \
+	  test-math-iscanonical test-math-iseqsig test-math-issignaling \
+	  test-math-iszero, \
+	  $(objpfx)$(test)): \
   gnulib-tests += $(f128-loader-link)
 endif
 
@@ -31,12 +42,15 @@ CFLAGS-bug-strtod.c += -mfloat128
 CFLAGS-bug-strtod2.c += -mfloat128
 CFLAGS-tst-strtod-round.c += -mfloat128
 CFLAGS-tst-wcstod-round.c += -mfloat128
+CFLAGS-tst-strtod-nan-locale.c += -mfloat128
+CFLAGS-tst-wcstod-nan-locale.c += -mfloat128
 CFLAGS-tst-strtod6.c += -mfloat128
 CFLAGS-tst-strfrom.c += -mfloat128
 CFLAGS-tst-strfrom-locale.c += -mfloat128
 CFLAGS-strfrom-skeleton.c += -mfloat128
 $(foreach test,bug-strtod bug-strtod2 bug-strtod2 tst-strtod-round \
 tst-wcstod-round tst-strtod6 tst-strrom tst-strfrom-locale \
+tst-strtod-nan-locale tst-wcstod-nan-locale \
 strfrom-skeleton,$(objpfx)$(test)): gnulib-tests += $(f128-loader-link)
 
 # When building glibc with support for _Float128, the powers of ten tables in

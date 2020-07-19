@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2017 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Based on work contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
@@ -43,6 +43,8 @@
 #define __PTHREAD_COMPAT_PADDING_MID
 #define __PTHREAD_COMPAT_PADDING_END
 #define __PTHREAD_MUTEX_LOCK_ELISION    0
+#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  (__WORDSIZE != 64)
+#define __PTHREAD_MUTEX_USE_UNION          (__WORDSIZE != 64)
 
 #define __LOCK_ALIGNMENT
 #define __ONCE_ALIGNMENT

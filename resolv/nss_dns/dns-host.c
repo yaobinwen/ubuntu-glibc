@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2017 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Extended from original form by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
@@ -82,9 +82,10 @@
 #include "nsswitch.h"
 #include <arpa/nameser.h>
 
-/* Get implementeation for some internal functions.  */
 #include <resolv/resolv-internal.h>
 #include <resolv/resolv_context.h>
+
+/* Get implementations of some internal functions.  */
 #include <resolv/mapv4v6addr.h>
 #include <resolv/mapv4v6hostent.h>
 
@@ -889,19 +890,6 @@ getanswer_r (struct resolv_context *ctx,
 	  /* bind would put multiple PTR records as aliases, but we don't do
 	     that.  */
 	  result->h_name = bp;
-	  if (have_to_map)
-	    {
-	      n = strlen (bp) + 1;	/* for the \0 */
-	      if (__glibc_unlikely (n >= MAXHOSTNAMELEN))
-		{
-		  ++had_error;
-		  break;
-		}
-	      bp += n;
-	      linebuflen -= n;
-	      if (map_v4v6_hostent (result, &bp, &linebuflen))
-		goto too_small;
-	    }
 	  *h_errnop = NETDB_SUCCESS;
 	  return NSS_STATUS_SUCCESS;
 	case T_A:

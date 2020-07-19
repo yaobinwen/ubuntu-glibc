@@ -1,5 +1,5 @@
 /* Assembly macros for 32-bit PowerPC.
-   Copyright (C) 1999-2017 Free Software Foundation, Inc.
+   Copyright (C) 1999-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -90,7 +90,7 @@ GOT_LABEL:			;					      \
   cfi_endproc;								      \
   ASM_SIZE_DIRECTIVE(name)
 
-#if ! IS_IN(rtld) && defined (ENABLE_LOCK_ELISION)
+#if ! IS_IN(rtld)
 # define ABORT_TRANSACTION \
     cmpwi    2,0;		\
     beq      1f;		\

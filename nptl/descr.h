@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2017 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -65,6 +65,9 @@ struct pthread_unwind_buf
   {
     __jmp_buf jmp_buf;
     int mask_was_saved;
+#ifdef NEED_SAVED_MASK_IN_CANCEL_JMP_BUF
+    __sigset_t saved_mask;
+#endif
   } cancel_jmp_buf[1];
 
   union
@@ -169,7 +172,7 @@ struct pthread
   pid_t pid_ununsed;
 
   /* List of robust mutexes the thread is holding.  */
-#ifdef __PTHREAD_MUTEX_HAVE_PREV
+#if __PTHREAD_MUTEX_HAVE_PREV
   void *robust_prev;
   struct robust_list_head robust_head;
 

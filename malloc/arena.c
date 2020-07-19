@@ -1,5 +1,5 @@
 /* Malloc implementation for multiple threads without lock contention.
-   Copyright (C) 2001-2017 Free Software Foundation, Inc.
+   Copyright (C) 2001-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Wolfram Gloger <wg@malloc.de>, 2001.
 
@@ -116,7 +116,7 @@ int __malloc_initialized = -1;
   } while (0)
 
 #define arena_lock(ptr, size) do {					      \
-      if (ptr && !arena_is_corrupt (ptr))				      \
+      if (ptr)								      \
         __libc_lock_lock (ptr->mutex);					      \
       else								      \
         ptr = arena_get2 ((size), NULL);				      \
@@ -141,7 +141,6 @@ int __malloc_initialized = -1;
    subsystem.  */
 
 void
-internal_function
 __malloc_fork_lock_parent (void)
 {
   if (__malloc_initialized < 1)
@@ -162,7 +161,6 @@ __malloc_fork_lock_parent (void)
 }
 
 void
-internal_function
 __malloc_fork_unlock_parent (void)
 {
   if (__malloc_initialized < 1)
@@ -179,7 +177,6 @@ __malloc_fork_unlock_parent (void)
 }
 
 void
-internal_function
 __malloc_fork_unlock_child (void)
 {
   if (__malloc_initialized < 1)
@@ -215,8 +212,7 @@ void
 TUNABLE_CALLBACK (set_mallopt_check) (tunable_val_t *valp)
 {
   int32_t value = (int32_t) valp->numval;
-  do_set_mallopt_check (value);
-  if (check_action != 0)
+  if (value != 0)
     __malloc_check_init ();
 }
 
@@ -247,7 +243,6 @@ TUNABLE_CALLBACK_FNDECL (set_tcache_unsorted_limit, size_t)
 extern char **_environ;
 
 static char *
-internal_function
 next_env_entry (char ***position)
 {
   char **current = *position;
@@ -312,13 +307,9 @@ ptmalloc_init (void)
 
   thread_arena = &main_arena;
 
-#if HAVE_TUNABLES
-  /* Ensure initialization/consolidation and do it under a lock so that a
-     thread attempting to use the arena in parallel waits on us till we
-     finish.  */
-  __libc_lock_lock (main_arena.mutex);
-  malloc_consolidate (&main_arena);
+  malloc_init_state (&main_arena);
 
+#if HAVE_TUNABLES
   TUNABLE_GET (check, int32_t, TUNABLE_CALLBACK (set_mallopt_check));
   TUNABLE_GET (top_pad, size_t, TUNABLE_CALLBACK (set_top_pad));
   TUNABLE_GET (perturb, int32_t, TUNABLE_CALLBACK (set_perturb_byte));
@@ -327,13 +318,12 @@ ptmalloc_init (void)
   TUNABLE_GET (mmap_max, int32_t, TUNABLE_CALLBACK (set_mmaps_max));
   TUNABLE_GET (arena_max, size_t, TUNABLE_CALLBACK (set_arena_max));
   TUNABLE_GET (arena_test, size_t, TUNABLE_CALLBACK (set_arena_test));
-#if USE_TCACHE
+# if USE_TCACHE
   TUNABLE_GET (tcache_max, size_t, TUNABLE_CALLBACK (set_tcache_max));
   TUNABLE_GET (tcache_count, size_t, TUNABLE_CALLBACK (set_tcache_count));
   TUNABLE_GET (tcache_unsorted_limit, size_t,
 	       TUNABLE_CALLBACK (set_tcache_unsorted_limit));
-#endif
-  __libc_lock_unlock (main_arena.mutex);
+# endif
 #else
   const char *s = NULL;
   if (__glibc_likely (_environ != NULL))
@@ -397,12 +387,8 @@ ptmalloc_init (void)
             }
         }
     }
-  if (s && s[0])
-    {
-      __libc_mallopt (M_CHECK_ACTION, (int) (s[0] - '0'));
-      if (check_action != 0)
-        __malloc_check_init ();
-    }
+  if (s && s[0] != '\0' && s[0] != '0')
+    __malloc_check_init ();
 #endif
 
 #if HAVE_MALLOC_INIT_HOOK
@@ -463,7 +449,6 @@ static char *aligned_heap_area;
    of the page size. */
 
 static heap_info *
-internal_function
 new_heap (size_t size, size_t top_pad)
 {
   size_t pagesize = GLRO (dl_pagesize);
@@ -607,7 +592,6 @@ shrink_heap (heap_info *h, long diff)
     } while (0)
 
 static int
-internal_function
 heap_trim (heap_info *heap, size_t pad)
 {
   mstate ar_ptr = heap->ar_ptr;
@@ -837,7 +821,7 @@ reused_arena (mstate avoid_arena)
   result = next_to_use;
   do
     {
-      if (!arena_is_corrupt (result) && !__libc_lock_trylock (result->mutex))
+      if (!__libc_lock_trylock (result->mutex))
         goto out;
 
       /* FIXME: This is a data race, see _int_new_arena.  */
@@ -849,18 +833,6 @@ reused_arena (mstate avoid_arena)
      in that arena and it is currently locked.   */
   if (result == avoid_arena)
     result = result->next;
-
-  /* Make sure that the arena we get is not corrupted.  */
-  mstate begin = result;
-  while (arena_is_corrupt (result) || result == avoid_arena)
-    {
-      result = result->next;
-      if (result == begin)
-	/* We looped around the arena list.  We could not find any
-	   arena that was either not corrupted or not the one we
-	   wanted to avoid.  */
-	return NULL;
-    }
 
   /* No arena available without contention.  Wait for the next in line.  */
   LIBC_PROBE (memory_arena_reuse_wait, 3, &result->mutex, result, avoid_arena);
@@ -897,7 +869,6 @@ out:
 }
 
 static mstate
-internal_function
 arena_get2 (size_t size, mstate avoid_arena)
 {
   mstate a;
@@ -958,10 +929,6 @@ arena_get_retry (mstate ar_ptr, size_t bytes)
   if (ar_ptr != &main_arena)
     {
       __libc_lock_unlock (ar_ptr->mutex);
-      /* Don't touch the main arena if it is corrupt.  */
-      if (arena_is_corrupt (&main_arena))
-	return NULL;
-
       ar_ptr = &main_arena;
       __libc_lock_lock (ar_ptr->mutex);
     }
@@ -977,6 +944,11 @@ arena_get_retry (mstate ar_ptr, size_t bytes)
 static void __attribute__ ((section ("__libc_thread_freeres_fn")))
 arena_thread_freeres (void)
 {
+  /* Shut down the thread cache first.  This could deallocate data for
+     the thread arena, so do this before we put the arena on the free
+     list.  */
+  tcache_thread_shutdown ();
+
   mstate a = thread_arena;
   thread_arena = NULL;
 

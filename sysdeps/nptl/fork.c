@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2017 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -166,7 +166,7 @@ __libc_fork (void)
 	 inherit the correct value from the parent.  We do not need to clear
 	 the pending operation because it must have been zero when fork was
 	 called.  */
-# ifdef __PTHREAD_MUTEX_HAVE_PREV
+# if __PTHREAD_MUTEX_HAVE_PREV
       self->robust_prev = &self->robust_head;
 # endif
       self->robust_head.list = &self->robust_head;

@@ -1,5 +1,5 @@
 /* Test parsing of /etc/resolv.conf.  Genric version.
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -341,11 +341,15 @@ run_res_init (void *closure)
     setenv ("RES_OPTIONS", ctx->t->res_options, 1);
   if (ctx->t->hostname != NULL)
     {
+#ifdef CLONE_NEWUTS
       /* This test needs its own namespace, to avoid changing the host
          name for the parent, too.  */
       TEST_VERIFY_EXIT (unshare (CLONE_NEWUTS) == 0);
       if (sethostname (ctx->t->hostname, strlen (ctx->t->hostname)) != 0)
         FAIL_EXIT1 ("sethostname (\"%s\"): %m", ctx->t->hostname);
+#else
+      FAIL_UNSUPPORTED ("clone (CLONE_NEWUTS) not supported");
+#endif
     }
 
   switch (ctx->init)

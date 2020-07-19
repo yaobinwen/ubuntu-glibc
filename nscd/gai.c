@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2017 Free Software Foundation, Inc.
+/* Copyright (C) 2004-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 2004.
 
@@ -43,6 +43,3 @@
 #ifdef HAVE_LIBIDN
 # include <libidn/idn-stub.c>
 #endif
-
-/* Some variables normally defined in libc.  */
-service_user *__nss_hosts_database;

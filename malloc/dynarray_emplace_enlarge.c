@@ -1,5 +1,5 @@
 /* Increase the size of a dynamic array in preparation of an emplace operation.
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -17,6 +17,7 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <dynarray.h>
+#include <errno.h>
 #include <malloc-internal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,7 +33,7 @@ __libc_dynarray_emplace_enlarge (struct dynarray_header *list,
          size.  */
       if (element_size < 4)
         new_allocated = 16;
-      if (element_size < 8)
+      else if (element_size < 8)
         new_allocated = 8;
       else
         new_allocated = 4;
@@ -43,8 +44,11 @@ __libc_dynarray_emplace_enlarge (struct dynarray_header *list,
     {
       new_allocated = list->allocated + list->allocated / 2 + 1;
       if (new_allocated <= list->allocated)
-        /* Overflow.  */
-        return false;
+        {
+          /* Overflow.  */
+          __set_errno (ENOMEM);
+          return false;
+        }
     }
 
   size_t new_size;
