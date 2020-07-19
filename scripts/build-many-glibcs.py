@@ -329,6 +329,21 @@ class Context(object):
                         os_name='linux-gnuspe',
                         variant='e500v1',
                         gcc_cfg=['--disable-multilib', '--enable-secureplt'])
+        self.add_config(arch='riscv64',
+                        os_name='linux-gnu',
+                        variant='rv64imac-lp64',
+                        gcc_cfg=['--with-arch=rv64imac', '--with-abi=lp64',
+                                 '--disable-multilib'])
+        self.add_config(arch='riscv64',
+                        os_name='linux-gnu',
+                        variant='rv64imafdc-lp64',
+                        gcc_cfg=['--with-arch=rv64imafdc', '--with-abi=lp64',
+                                 '--disable-multilib'])
+        self.add_config(arch='riscv64',
+                        os_name='linux-gnu',
+                        variant='rv64imafdc-lp64d',
+                        gcc_cfg=['--with-arch=rv64imafdc', '--with-abi=lp64d',
+                                 '--disable-multilib'])
         self.add_config(arch='s390x',
                         os_name='linux-gnu',
                         glibcs=[{},
@@ -701,11 +716,11 @@ class Context(object):
                             'gcc': 'vcs-7',
                             'glibc': 'vcs-mainline',
                             'gmp': '6.1.2',
-                            'linux': '4.14',
+                            'linux': '4.15',
                             'mpc': '1.1.0',
                             'mpfr': '4.0.0',
-                            'mig': '1.8',
-                            'gnumach': '1.8',
+                            'mig': 'vcs-mainline',
+                            'gnumach': 'vcs-mainline',
                             'hurd': 'vcs-mainline'}
         use_versions = {}
         explicit_versions = {}
@@ -786,6 +801,20 @@ class Context(object):
             r = self.git_checkout(component, git_url, git_branch, update)
             self.fix_glibc_timestamps()
             return r
+        elif component == 'gnumach':
+            git_url = 'git://git.savannah.gnu.org/hurd/gnumach.git'
+            git_branch = 'master'
+            r = self.git_checkout(component, git_url, git_branch, update)
+            subprocess.run(['autoreconf', '-i'],
+                           cwd=self.component_srcdir(component), check=True)
+            return r
+        elif component == 'mig':
+            git_url = 'git://git.savannah.gnu.org/hurd/mig.git'
+            git_branch = 'master'
+            r = self.git_checkout(component, git_url, git_branch, update)
+            subprocess.run(['autoreconf', '-i'],
+                           cwd=self.component_srcdir(component), check=True)
+            return r
         elif component == 'hurd':
             git_url = 'git://git.savannah.gnu.org/hurd/hurd.git'
             git_branch = 'master'
@@ -802,6 +831,9 @@ class Context(object):
         if update:
             subprocess.run(['git', 'remote', 'prune', 'origin'],
                            cwd=self.component_srcdir(component), check=True)
+            if self.replace_sources:
+                subprocess.run(['git', 'clean', '-dxfq'],
+                               cwd=self.component_srcdir(component), check=True)
             subprocess.run(['git', 'pull', '-q'],
                            cwd=self.component_srcdir(component), check=True)
         else:
@@ -1234,6 +1266,8 @@ class Config(object):
                     'nios2': 'nios2',
                     'powerpc': 'powerpc',
                     's390': 's390',
+                    'riscv32': 'riscv',
+                    'riscv64': 'riscv',
                     'sh': 'sh',
                     'sparc': 'sparc',
                     'tile': 'tile',
@@ -1297,8 +1331,12 @@ class Config(object):
         # libsanitizer commonly breaks because of glibc header
         # changes, or on unusual targets.  libssp is of little
         # relevance with glibc's own stack checking support.
+        # libcilkrts does not support GNU/Hurd (and has been removed
+        # in GCC 8, so --disable-libcilkrts can be removed once glibc
+        # no longer supports building with older GCC versions).
         cfg_opts = list(self.gcc_cfg)
-        cfg_opts += ['--disable-libsanitizer', '--disable-libssp']
+        cfg_opts += ['--disable-libsanitizer', '--disable-libssp',
+                     '--disable-libcilkrts']
         host_libs = self.ctx.host_libraries_installdir
         cfg_opts += ['--with-gmp=%s' % host_libs,
                      '--with-mpfr=%s' % host_libs,
