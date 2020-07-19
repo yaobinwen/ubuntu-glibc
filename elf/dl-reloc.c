@@ -1,5 +1,5 @@
 /* Relocate a shared object and resolve its references to other loaded objects.
-   Copyright (C) 1995-2019 Free Software Foundation, Inc.
+   Copyright (C) 1995-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+   <https://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <libintl.h>
@@ -244,7 +244,8 @@ _dl_relocate_object (struct link_map *l, struct r_scope_elem *scope[],
 	       v = (version);						      \
 	     _lr = _dl_lookup_symbol_x (strtab + (*ref)->st_name, l, (ref),   \
 					scope, v, _tc,			      \
-					DL_LOOKUP_ADD_DEPENDENCY, NULL);      \
+					DL_LOOKUP_ADD_DEPENDENCY	      \
+					| DL_LOOKUP_FOR_RELOCATE, NULL);      \
 	     l->l_lookup_cache.ret = (*ref);				      \
 	     l->l_lookup_cache.value = _lr; }))				      \
      : l)

@@ -1,5 +1,5 @@
 /* Malloc implementation for multiple threads without lock contention.
-   Copyright (C) 2001-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Wolfram Gloger <wg@malloc.de>, 2001.
 
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, see <http://www.gnu.org/licenses/>.  */
+   not, see <https://www.gnu.org/licenses/>.  */
 
 #include <stdbool.h>
 
@@ -236,6 +236,7 @@ TUNABLE_CALLBACK_FNDECL (set_tcache_max, size_t)
 TUNABLE_CALLBACK_FNDECL (set_tcache_count, size_t)
 TUNABLE_CALLBACK_FNDECL (set_tcache_unsorted_limit, size_t)
 #endif
+TUNABLE_CALLBACK_FNDECL (set_mxfast, size_t)
 #else
 /* Initialization routine. */
 #include <string.h>
@@ -323,6 +324,7 @@ ptmalloc_init (void)
   TUNABLE_GET (tcache_unsorted_limit, size_t,
 	       TUNABLE_CALLBACK (set_tcache_unsorted_limit));
 # endif
+  TUNABLE_GET (mxfast, size_t, TUNABLE_CALLBACK (set_mxfast));
 #else
   const char *s = NULL;
   if (__glibc_likely (_environ != NULL))

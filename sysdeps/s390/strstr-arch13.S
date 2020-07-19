@@ -1,5 +1,5 @@
 /* Vector optimized 32/64 bit S/390 version of strstr.
-   Copyright (C) 2019 Free Software Foundation, Inc.
+   Copyright (C) 2019-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+   <https://www.gnu.org/licenses/>.  */
 
 #include <ifunc-strstr.h>
 #if HAVE_STRSTR_ARCH13
@@ -164,7 +164,7 @@ ENTRY(STRSTR_ARCH13)
 	vfenezb	%v19,%v18,%v18	/* Search zero in loaded needle bytes.  */
 	veclb	%v19,%v21	/* Zero index <= max loaded byte index?  */
 	jle	.Lneedle_loaded	/* -> v18 contains full needle.  */
-	vl	%v16,0(%r3)	/* Load needle beyond page boundary.  */
+	vl	%v18,0(%r3)	/* Load needle beyond page boundary.  */
 	vfenezb	%v19,%v18,%v18
 	j	.Lneedle_loaded
 END(STRSTR_ARCH13)

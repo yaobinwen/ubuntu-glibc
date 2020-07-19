@@ -1,5 +1,5 @@
 /* Run time dynamic linker.
-   Copyright (C) 1995-2019 Free Software Foundation, Inc.
+   Copyright (C) 1995-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+   <https://www.gnu.org/licenses/>.  */
 
 #include <errno.h>
 #include <dlfcn.h>
@@ -39,6 +39,8 @@
 #include <dl-osinfo.h>
 #include <dl-procinfo.h>
 #include <dl-prop.h>
+#include <dl-vdso.h>
+#include <dl-vdso-setup.h>
 #include <tls.h>
 #include <stap-probe.h>
 #include <stackinfo.h>
@@ -833,7 +835,7 @@ security_init (void)
   _dl_random = NULL;
 }
 
-#include "setup-vdso.h"
+#include <setup-vdso.h>
 
 /* The library search path.  */
 static const char *library_path attribute_relro;
@@ -1008,13 +1010,7 @@ ERROR: audit interface '%s' requires version %d (maximum supported version %d); 
 
       /* Store the pointer.  */
       if (err_str == NULL && largs.result != NULL)
-	{
-	  newp->fptr[cnt] = largs.result;
-
-	  /* The dynamic linker link map is statically allocated,
-	     initialize the data now.  */
-	  GL(dl_rtld_map).l_audit[cnt].cookie = (intptr_t) &GL(dl_rtld_map);
-	}
+	newp->fptr[cnt] = largs.result;
       else
 	newp->fptr[cnt] = NULL;
       ++cnt;
@@ -1030,6 +1026,12 @@ ERROR: audit interface '%s' requires version %d (maximum supported version %d); 
     *last_audit = GLRO(dl_audit) = &newp->ifaces;
   else
     *last_audit = (*last_audit)->next = &newp->ifaces;
+
+  /* The dynamic linker link map is statically allocated, so the
+     cookie in _dl_new_object has not happened.  */
+  link_map_audit_state (&GL (dl_rtld_map), GLRO (dl_naudit))->cookie
+    = (intptr_t) &GL (dl_rtld_map);
+
   ++GLRO(dl_naudit);
 
   /* Mark the DSO as being used for auditing.  */
@@ -1046,9 +1048,9 @@ notify_audit_modules_of_loaded_object (struct link_map *map)
     {
       if (afct->objopen != NULL)
 	{
-	  map->l_audit[cnt].bindflags
-	    = afct->objopen (map, LM_ID_BASE, &map->l_audit[cnt].cookie);
-	  map->l_audit_any_plt |= map->l_audit[cnt].bindflags != 0;
+	  struct auditstate *state = link_map_audit_state (map, cnt);
+	  state->bindflags = afct->objopen (map, LM_ID_BASE, &state->cookie);
+	  map->l_audit_any_plt |= state->bindflags != 0;
 	}
 
       afct = afct->next;
@@ -1538,6 +1540,9 @@ ERROR: '%s': cannot process note segment.\n", _dl_argv[0]);
      so they can influence _dl_init_paths.  */
   setup_vdso (main_map, &first_preload);
 
+  /* With vDSO setup we can initialize the function pointers.  */
+  setup_vdso_pointers ();
+
 #ifdef DL_SYSDEP_OSCHECK
   DL_SYSDEP_OSCHECK (_dl_fatal_printf);
 #endif
@@ -1662,7 +1667,8 @@ ERROR: '%s': cannot process note segment.\n", _dl_argv[0]);
       for (unsigned int cnt = 0; cnt < GLRO(dl_naudit); ++cnt)
 	{
 	  if (afct->activity != NULL)
-	    afct->activity (&main_map->l_audit[cnt].cookie, LA_ACT_ADD);
+	    afct->activity (&link_map_audit_state (main_map, cnt)->cookie,
+			    LA_ACT_ADD);
 
 	  afct = afct->next;
 	}
@@ -2214,7 +2220,7 @@ ERROR: '%s': cannot process note segment.\n", _dl_argv[0]);
 
 	  /* Add object to slot information data if necessasy.  */
 	  if (l->l_tls_blocksize != 0 && tls_init_tp_called)
-	    _dl_add_to_slotinfo (l);
+	    _dl_add_to_slotinfo (l, true);
 	}
     }
   else
@@ -2259,7 +2265,7 @@ ERROR: '%s': cannot process note segment.\n", _dl_argv[0]);
 
 	  /* Add object to slot information data if necessasy.  */
 	  if (l->l_tls_blocksize != 0 && tls_init_tp_called)
-	    _dl_add_to_slotinfo (l);
+	    _dl_add_to_slotinfo (l, true);
 	}
       rtld_timer_stop (&relocate_time, start);
 
@@ -2333,7 +2339,8 @@ ERROR: '%s': cannot process note segment.\n", _dl_argv[0]);
 	  for (unsigned int cnt = 0; cnt < GLRO(dl_naudit); ++cnt)
 	    {
 	      if (afct->activity != NULL)
-		afct->activity (&head->l_audit[cnt].cookie, LA_ACT_CONSISTENT);
+		afct->activity (&link_map_audit_state (head, cnt)->cookie,
+				LA_ACT_CONSISTENT);
 
 	      afct = afct->next;
 	    }

@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2019 Free Software Foundation, Inc.
+# Copyright (C) 1991-2020 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -13,7 +13,7 @@
 
 # You should have received a copy of the GNU Lesser General Public
 # License along with the GNU C Library; if not, see
-# <http://www.gnu.org/licenses/>.
+# <https://www.gnu.org/licenses/>.
 
 #
 #	Makefile for malloc routines
@@ -27,7 +27,7 @@ headers := $(dist-headers) obstack.h mcheck.h
 tests := mallocbug tst-malloc tst-valloc tst-calloc tst-obstack \
 	 tst-mcheck tst-mallocfork tst-trim1 \
 	 tst-malloc-usable tst-realloc tst-reallocarray tst-posix_memalign \
-	 tst-pvalloc tst-memalign tst-mallopt \
+	 tst-pvalloc tst-pvalloc-fortify tst-memalign tst-mallopt \
 	 tst-malloc-backtrace tst-malloc-thread-exit \
 	 tst-malloc-thread-fail tst-malloc-fork-deadlock \
 	 tst-mallocfork2 \
@@ -54,7 +54,7 @@ tests-internal += \
 	 tst-dynarray-at-fail \
 
 ifneq (no,$(have-tunables))
-tests += tst-malloc-usable-tunables
+tests += tst-malloc-usable-tunables tst-mxfast
 tests-static += tst-malloc-usable-static-tunables
 endif
 
@@ -195,6 +195,8 @@ tst-malloc-usable-ENV = MALLOC_CHECK_=3
 tst-malloc-usable-static-ENV = $(tst-malloc-usable-ENV)
 tst-malloc-usable-tunables-ENV = GLIBC_TUNABLES=glibc.malloc.check=3
 tst-malloc-usable-static-tunables-ENV = $(tst-malloc-usable-tunables-ENV)
+
+tst-mxfast-ENV = GLIBC_TUNABLES=glibc.malloc.tcache_count=0:glibc.malloc.mxfast=0
 
 ifeq ($(experimental-malloc),yes)
 CPPFLAGS-malloc.c += -DUSE_TCACHE=1
