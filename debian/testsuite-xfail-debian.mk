@@ -36,6 +36,10 @@ test-xfail-tst-nss-db-endgrent = yes
 test-xfail-tst-nss-files-hosts-long = yes
 test-xfail-tst-system = yes
 
+# LP: #1891403 needs good entropy source
+test-xfail-tst-getrandom = yes
+
+
 ######################################################################
 # alpha (including optimized flavours)
 ######################################################################
@@ -196,6 +200,13 @@ test-xfail-tst-pkey = yes
 # In some conditions the kernel might not provide a heap, causing
 # some tests to fail. See bug#889817 for details.
 test-xfail-tst-malloc-usable-tunables = yes
+
+# This test fails when libnss-systemd is configured (LP: #1869364)
+# because getauxval doesn't work when you run a binary as
+# "/lib/ld-linux-aarch64.so.1 binary"
+# (https://sourceware.org/bugzilla/show_bug.cgi?id=23293).
+test-xfail-tst-getpw = yes
+
 endif
 
 
@@ -254,6 +265,12 @@ test-xfail-tst-xsigstack = yes
 
 # This test has regressed with recent kernels
 test-xfail-tst-thread-exit-clobber = yes
+
+# This test fails when libnss-systemd is configured (LP: #1869364)
+# because getauxval doesn't work when you run a binary as
+# "/lib/ld-linux-armhf.so.3 binary"
+# (https://sourceware.org/bugzilla/show_bug.cgi?id=23293).
+test-xfail-tst-getpw = yes
 endif
 
 
