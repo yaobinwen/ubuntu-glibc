@@ -1,3 +1,32 @@
+glibc (2.31-0ubuntu11) groovy; urgency=medium
+
+  [ Michael Hudson-Doyle ]
+  * Mark tst-getpw as XFAIL on arm64. (LP: #1869364)
+
+  [ Balint Reczey ]
+  * debian/control: Add Vcs-* pointing to Ubuntu packaging repository
+  * debian/gbp.conf: Add initial configuration
+  * debian/debhelper.in/libc.preinst: Fix setting LDCONFIG_NOTRIGGER
+  * debian/control.in/main: Add Vcs-* pointing to Ubuntu packaging repository
+  * Fall back to calling nanosleep syscall when __clock_nanosleep returns EINVAL
+    (LP: #1871240)
+  * debian/testsuite-xfail-debian.mk: XFAIL stdlib/tst-strtod-round on riscv64
+  * debian/testsuite-xfail-debian.mk: XFAIL tst-getpw on armhf, too
+  * debian/watch: Use HTTPS and download xz-compressed tarball
+  * debian/watch: Use upstream's signing key to verify the tarball
+  * XFAIL stdlib/tst-getrandom (LP: #1891403)
+
+  [ Dimitri John Ledkov ]
+  * debian/patches/powerpc: Cherrypick upstream patches to support POWER10
+    optimized library loading. (LP: #1887989)
+
+  [ Aurelien Jarno ]
+  * debian/patches/any/submitted-selinux-deprecations.diff: proposed patch to
+    ignore the selinux deprecations introduced in libselinux (>= 3.1), fixing
+    an FTBFS. (Closes: #965941)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Thu, 27 Aug 2020 23:36:39 +0200
+
 glibc (2.31-0ubuntu10) groovy; urgency=medium
 
   * Copy the fully conditionalized x86 variant for math-vector-fortran.h 

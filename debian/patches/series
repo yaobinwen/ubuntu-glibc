@@ -86,6 +86,10 @@ m68k/submitted-gcc34-seccomment.diff
 mips/submitted-rld_map.diff
 
 powerpc/local-powerpc8xx-dcbz.diff
+powerpc/146fea07640387c78e334933de24b6353e1f0eba.patch
+powerpc/ae725e3f9cb4e1eb825ebe1d55241c98c2ea32f1.patch
+powerpc/d2ba3677da7a785556fcd708404d8e049b1c063b.patch
+powerpc/f6add169c89bbdd139a2eb845686127ead5799cd.patch
 
 sh4/local-fpscr_values.diff
 
@@ -121,6 +125,7 @@ any/submitted-resolv-unaligned.diff
 any/local-cudacc-float128.diff
 any/submitted-ld.so-cache-new-format.diff
 any/local-test-install.diff
+any/submitted-selinux-deprecations.diff
 
 # Ubuntu patches live in their own little world, to maintain sanity
 ubuntu/local-altlocaledir.diff
@@ -136,3 +141,4 @@ ubuntu/localedata/sd_PK.diff
 ubuntu/localedata/ug_CN@latin.diff
 ubuntu/local-pldd-root.diff
 ubuntu/cet-backport.diff
+ubuntu/local-fallback-to-monotonic.diff
