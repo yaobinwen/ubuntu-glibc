@@ -15,6 +15,9 @@ test-xfail-tst-cancel24-static = yes
 # control, we'll just let it fail
 test-xfail-tst-create-detached = yes
 
+# LP: #1891403 needs good entropy source
+test-xfail-tst-getrandom = yes
+
 ######################################################################
 # alpha (including optimized flavours)
 ######################################################################
@@ -216,6 +219,7 @@ test-xfail-tst-waitid = yes
 # This test is currently known to fail under lxc, where we run our ARM
 # regression tests, so pretend it fails on ARM:
 test-xfail-tst-ttyname = yes
+test-xfail-tst-support_descriptors = yes
 
 # There is not support for protection key on Alpha yet, and there is a
 # disagreement between kernel and glibc how to report that.

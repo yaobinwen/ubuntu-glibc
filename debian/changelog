@@ -1,3 +1,30 @@
+glibc (2.27-3ubuntu1.3) bionic; urgency=medium
+
+  [ Balint Reczey ]
+  * debian/gbp.conf: Add initial configuration
+  * debian/control.in/main: Add Vcs-* pointing to Ubuntu packaging repository
+  * arm64: Enable searching shared libraries in atomics/ on LSE HW
+  * Ship arm64 variant with LSE support in libc6-lse (LP: #1885012)
+  * Run tests of libc6-lse on HW supporting LSE
+  * debian/patches/git-updates.diff: update from upstream stable branch
+    - pthread_cond_broadcast: Fix waiters-after-spinning case
+    - Fix SSe2-based memmove corrupting memory (CVE-2017-18269)
+    - Fix strstr() performance regression on Haswell processors
+    - Support Japanese new era "令和 (Reiwa)"
+    - io: Remove copy_file_range emulation
+    (LP: #1851263, #1858203, #1838327, #1797335, #1756209, #1853193)
+  * XFAIL stdlib/tst-getrandom (LP: #1891403)
+  * debian/testsuite-xfail-debian.mk: XFAIL new tst-support_descriptors
+
+  [ Thadeu Lima de Souza Cascardo ]
+  * tests: Make preadwritev2 invalid flags tests unsupported (LP: #1770480)
+
+  [ Andreas Hasenack ]
+  * branch-pthread_rwlock_trywrlock-hang-23844.patch:
+    nptl: Fix pthread_rwlock_try*lock stalls (Bug 23844) (LP: #1864864)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Wed, 02 Sep 2020 11:18:37 +0200
+
 glibc (2.27-3ubuntu1.2) bionic-security; urgency=medium
 
   * SECURITY UPDATE: integer overflow in realpath

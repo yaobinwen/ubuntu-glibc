@@ -173,6 +173,7 @@ NOSTRIP_$(libc)-dbg = 1
 DEBUG_$(libc) = 1
 DEBUG_libc6-xen = 1
 DEBUG_libc6.1-alphaev67 = 1
+DEBUG_libc6-lse = 1
 
 ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
   ifeq ($(threads),yes)
@@ -195,7 +196,7 @@ clean:: unpatch
 # Required Debian targets
 build-arch: $(stamp)info \
 	$(patsubst %,$(stamp)build_%,$(GLIBC_PASSES)) \
-	$(patsubst %,$(stamp)check_%,$(GLIBC_PASSES))
+	$(patsubst %,$(stamp)check_%,$(filter-out $(GLIBC_PASSES_NOCHECK),$(GLIBC_PASSES)))
 ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
 build-arch: $(stamp)build_C.UTF-8 \
 	$(stamp)build_locales-all
