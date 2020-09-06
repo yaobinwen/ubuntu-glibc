@@ -56,17 +56,6 @@
 # endif
 #endif
 
-/* Threshold to use Enhanced REP MOVSB.  Since there is overhead to set
-   up REP MOVSB operation, REP MOVSB isn't faster on short data.  The
-   memcpy micro benchmark in glibc shows that 2KB is the approximate
-   value above which REP MOVSB becomes faster than SSE2 optimization
-   on processors with Enhanced REP MOVSB.  Since larger register size
-   can move more data with a single load and store, the threshold is
-   higher with larger register size.  */
-#ifndef REP_MOVSB_THRESHOLD
-# define REP_MOVSB_THRESHOLD	(2048 * (VEC_SIZE / 16))
-#endif
-
 #ifndef PREFETCH
 # define PREFETCH(addr) prefetcht0 addr
 #endif
@@ -244,7 +233,7 @@ L(return):
 	ret
 
 L(movsb):
-	cmpq	__x86_shared_non_temporal_threshold(%rip), %rdx
+	cmp	__x86_shared_non_temporal_threshold(%rip), %RDX_LP
 	jae	L(more_8x_vec)
 	cmpq	%rsi, %rdi
 	jb	1f
@@ -253,9 +242,6 @@ L(movsb):
 	leaq	(%rsi,%rdx), %r9
 	cmpq	%r9, %rdi
 	/* Avoid slow backward REP MOVSB.  */
-# if REP_MOVSB_THRESHOLD <= (VEC_SIZE * 8)
-#  error Unsupported REP_MOVSB_THRESHOLD and VEC_SIZE!
-# endif
 	jb	L(more_8x_vec_backward)
 1:
 	mov	%RDX_LP, %RCX_LP
@@ -331,7 +317,7 @@ L(between_2_3):
 
 #if defined USE_MULTIARCH && IS_IN (libc)
 L(movsb_more_2x_vec):
-	cmpq	$REP_MOVSB_THRESHOLD, %rdx
+	cmp	__x86_rep_movsb_threshold(%rip), %RDX_LP
 	ja	L(movsb)
 #endif
 L(more_2x_vec):
@@ -402,7 +388,7 @@ L(more_8x_vec):
 	addq	%r8, %rdx
 #if (defined USE_MULTIARCH || VEC_SIZE == 16) && IS_IN (libc)
 	/* Check non-temporal store threshold.  */
-	cmpq	__x86_shared_non_temporal_threshold(%rip), %rdx
+	cmp	__x86_shared_non_temporal_threshold(%rip), %RDX_LP
 	ja	L(large_forward)
 #endif
 L(loop_4x_vec_forward):
@@ -454,7 +440,7 @@ L(more_8x_vec_backward):
 	subq	%r8, %rdx
 #if (defined USE_MULTIARCH || VEC_SIZE == 16) && IS_IN (libc)
 	/* Check non-temporal store threshold.  */
-	cmpq	__x86_shared_non_temporal_threshold(%rip), %rdx
+	cmp	__x86_shared_non_temporal_threshold(%rip), %RDX_LP
 	ja	L(large_backward)
 #endif
 L(loop_4x_vec_backward):

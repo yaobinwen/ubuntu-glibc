@@ -15,6 +15,38 @@ test-xfail-tst-cancel24-static = yes
 # control, we'll just let it fail
 test-xfail-tst-create-detached = yes
 
+# This test is skipped in chroots, and appears to fail on autopkgtest
+# testbeds.  I've run out of time to debug and fix it upstream for
+# disco, so this will have to XFAIL for now:
+test-xfail-tst-nss-test3 = yes
+
+# This test is flapping on all architectures, due to this upstream bug:
+# https://sourceware.org/bugzilla/show_bug.cgi?id=19329
+test-xfail-tst-stack4 = yes
+
+# new upstream container tests that don't set up the environment right for
+# Debian's multiarch paths.
+test-xfail-tst-dlopen-self-container = yes
+test-xfail-tst-dlopen-tlsmodid-container = yes
+test-xfail-tst-ldconfig-bad-aux-cache = yes
+test-xfail-tst-ldconfig-ld_so_conf-update = yes
+test-xfail-tst-pldd = yes
+test-xfail-tst-nss-db-endpwent = yes
+test-xfail-tst-nss-db-endgrent = yes
+test-xfail-tst-nss-files-hosts-long = yes
+test-xfail-tst-system = yes
+
+# LP: #1891403 needs good entropy source
+test-xfail-tst-getrandom = yes
+
+
+# LP: #1894447 detected as unsupported during build, fails in autopkgtest
+test-xfail-tst-localedef-path-norm = yes
+test-xfail-tst-localedef-hardlinks = yes
+test-xfail-tst-pthread-getattr = yes
+test-xfail-tst-strerror = yes
+test-xfail-tst-strsignal = yes
+
 ######################################################################
 # alpha (including optimized flavours)
 ######################################################################
@@ -175,6 +207,13 @@ test-xfail-tst-pkey = yes
 # In some conditions the kernel might not provide a heap, causing
 # some tests to fail. See bug#889817 for details.
 test-xfail-tst-malloc-usable-tunables = yes
+
+# This test fails when libnss-systemd is configured (LP: #1869364)
+# because getauxval doesn't work when you run a binary as
+# "/lib/ld-linux-aarch64.so.1 binary"
+# (https://sourceware.org/bugzilla/show_bug.cgi?id=23293).
+test-xfail-tst-getpw = yes
+
 endif
 
 
@@ -185,6 +224,26 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabi)
 # There is not support for protection key on ARM yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# These tests are currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend they fail on ARM:
+test-xfail-tst-ttyname = yes
+test-xfail-tst-support_descriptors = yes
+
+# This test fails due to a kernel bug when building armhf on an ARM64
+# machine. See bug #904385.
+test-xfail-tst-signal6 = yes
+
+# This test has regressed with recent kernels
+test-xfail-tst-thread-exit-clobber = yes
+
+# These (new in 2.29) tests appear to fail when building armhf on aarch64
+test-xfail-tst-minsigstksz-1 = yes
+test-xfail-tst-minsigstksz-2 = yes
+test-xfail-tst-minsigstksz-3 = yes
+test-xfail-tst-minsigstksz-3a = yes
+test-xfail-tst-minsigstksz-4 = yes
+test-xfail-tst-xsigstack = yes
 endif
 
 
@@ -195,6 +254,30 @@ ifeq ($(config-machine)-$(config-os),arm-linux-gnueabihf)
 # There is not support for protection key on ARM yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
+
+# These tests are currently known to fail under lxc, where we run our ARM
+# regression tests, so pretend they fail on ARM:
+test-xfail-tst-ttyname = yes
+test-xfail-tst-support_descriptors = yes
+
+# This test fails due to a kernel bug when building armhf on an ARM64
+# machine. See bug #904385.
+test-xfail-tst-signal6 = yes
+test-xfail-tst-minsigstksz-1 = yes
+test-xfail-tst-minsigstksz-2 = yes
+test-xfail-tst-minsigstksz-3 = yes
+test-xfail-tst-minsigstksz-3a = yes
+test-xfail-tst-minsigstksz-4 = yes
+test-xfail-tst-xsigstack = yes
+
+# This test has regressed with recent kernels
+test-xfail-tst-thread-exit-clobber = yes
+
+# This test fails when libnss-systemd is configured (LP: #1869364)
+# because getauxval doesn't work when you run a binary as
+# "/lib/ld-linux-armhf.so.3 binary"
+# (https://sourceware.org/bugzilla/show_bug.cgi?id=23293).
+test-xfail-tst-getpw = yes
 endif
 
 
@@ -864,6 +947,11 @@ test-xfail-tst-malloc-usable-tunables = yes
 test-xfail-tst-pkey = yes
 endif
 
+# LP: #1894447 detected as unsupported during build, fails in autopkgtest
+test-xfail-test-syslog-chk-ibm128 = yes
+test-xfail-test-syslog-chk-ieee128 = yes
+test-xfail-test-syslog-ibm128 = yes
+test-xfail-test-syslog-ieee128 = yes
 
 ######################################################################
 # ppc64
@@ -929,6 +1017,21 @@ test-xfail-test-on_exit-race = yes
 test-xfail-tst-cond16 = yes
 test-xfail-tst-malloc-thread-fail = yes
 test-xfail-tst-stack4 = yes
+
+# needs investigation, fail on launchpad
+test-xfail-tst-mxfast = yes
+test-xfail-tst-mutex10 = yes
+test-xfail-tst-strtod-round = yes
+endif
+
+######################################################################
+# s390
+######################################################################
+ifeq ($(config-machine)-$(config-os),s390-linux-gnu)
+
+# In some conditions the kernel might not provide a heap, causing
+# some tests to fail. See bug#889817 for details.
+test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -1004,4 +1107,15 @@ endif
 ######################################################################
 ifeq ($(config-machine)-$(config-os),x86_64-linux-gnux32)
 test-xfail-tst-platform-1 = yes
+endif
+
+######################################################################
+# Ubuntu additions
+######################################################################
+
+# fail on 32bit with the xenial kernel, working with bionic and focal
+ifneq (,$(filter $(config-machine)-$(config-os), arm-linux-gnueabihf arm-linux-gnueabi i686-linux-gnu))
+test-xfail-test-sysvmsg = yes
+test-xfail-test-sysvsem = yes
+test-xfail-test-sysvshm = yes
 endif

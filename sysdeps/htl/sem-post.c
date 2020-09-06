@@ -26,10 +26,17 @@ __sem_post (sem_t *sem)
 {
   struct __pthread *wakeup;
 
-  __pthread_spin_lock (&sem->__lock);
+  __pthread_spin_wait (&sem->__lock);
   if (sem->__value > 0)
     /* Do a quick up.  */
     {
+      if (sem->__value == SEM_VALUE_MAX)
+	{
+	  __pthread_spin_unlock (&sem->__lock);
+	  errno = EOVERFLOW;
+	  return -1;
+	}
+
       assert (sem->__queue == NULL);
       sem->__value++;
       __pthread_spin_unlock (&sem->__lock);
@@ -57,5 +64,5 @@ __sem_post (sem_t *sem)
 
   return 0;
 }
-
+libpthread_hidden_def (__sem_post)
 strong_alias (__sem_post, sem_post);

@@ -1,9 +1,7 @@
 To be pushed upstream once glibc 2.32 is out.
 
-Index: glibc-2.31/hurd/Versions
-===================================================================
---- glibc-2.31.orig/hurd/Versions
-+++ glibc-2.31/hurd/Versions
+--- a/hurd/Versions
++++ b/hurd/Versions
 @@ -1,8 +1,5 @@
  libc {
    GLIBC_2.0 {
@@ -13,10 +11,8 @@ Index: glibc-2.31/hurd/Versions
      # variables used in macros & inline functions
      __hurd_threadvar_stack_mask; __hurd_threadvar_stack_offset;
  
-Index: glibc-2.31/sysdeps/mach/hurd/brk.c
-===================================================================
---- glibc-2.31.orig/sysdeps/mach/hurd/brk.c
-+++ glibc-2.31/sysdeps/mach/hurd/brk.c
+--- a/sysdeps/mach/hurd/brk.c
++++ b/sysdeps/mach/hurd/brk.c
 @@ -19,6 +19,7 @@
  #include <hurd.h>
  #include <hurd/resource.h>
@@ -25,7 +21,7 @@ Index: glibc-2.31/sysdeps/mach/hurd/brk.c
  
  
  /* Initial maximum size of the data segment (this is arbitrary).  */
-@@ -39,9 +40,7 @@ weak_alias (_hurd_brk, ___brk_addr)
+@@ -39,9 +40,7 @@
  
  struct mutex _hurd_brk_lock;
  
@@ -36,7 +32,7 @@ Index: glibc-2.31/sysdeps/mach/hurd/brk.c
  
  
  /* Set the end of the process's data space to INADDR.
-@@ -92,7 +90,7 @@ _hurd_set_brk (vm_address_t addr)
+@@ -91,7 +90,7 @@
    rlimit = _hurd_rlimits[RLIMIT_DATA].rlim_cur;
    __mutex_unlock (&_hurd_rlimit_lock);
  
@@ -45,7 +41,7 @@ Index: glibc-2.31/sysdeps/mach/hurd/brk.c
      {
        /* Need to increase the resource limit.  */
        errno = ENOMEM;
-@@ -139,21 +137,18 @@ init_brk (void)
+@@ -138,21 +137,18 @@
  
    __mutex_init (&_hurd_brk_lock);
  
@@ -70,11 +66,9 @@ Index: glibc-2.31/sysdeps/mach/hurd/brk.c
  
    if (pagend < _hurd_data_end)
      {
-Index: glibc-2.31/sysdeps/mach/hurd/i386/libc.abilist
-===================================================================
---- glibc-2.31.orig/sysdeps/mach/hurd/i386/libc.abilist
-+++ glibc-2.31/sysdeps/mach/hurd/i386/libc.abilist
-@@ -554,7 +554,6 @@ GLIBC_2.2.6 __xstat64 F
+--- a/sysdeps/mach/hurd/i386/libc.abilist
++++ b/sysdeps/mach/hurd/i386/libc.abilist
+@@ -554,7 +554,6 @@
  GLIBC_2.2.6 _authenticate F
  GLIBC_2.2.6 _dl_mcount_wrapper F
  GLIBC_2.2.6 _dl_mcount_wrapper_check F
@@ -82,10 +76,8 @@ Index: glibc-2.31/sysdeps/mach/hurd/i386/libc.abilist
  GLIBC_2.2.6 _environ D 0x4
  GLIBC_2.2.6 _exit F
  GLIBC_2.2.6 _flushlbf F
-Index: glibc-2.31/sysdeps/mach/hurd/i386/vm_param.h
-===================================================================
 --- /dev/null
-+++ glibc-2.31/sysdeps/mach/hurd/i386/vm_param.h
++++ b/sysdeps/mach/hurd/i386/vm_param.h
 @@ -0,0 +1,24 @@
 +/* Copyright (C) 2020 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.

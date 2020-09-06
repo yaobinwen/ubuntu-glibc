@@ -1,6 +1,6 @@
 --- a/sysdeps/posix/getaddrinfo.c
 +++ b/sysdeps/posix/getaddrinfo.c
-@@ -2522,8 +2522,21 @@
+@@ -2346,8 +2346,21 @@
  		}
  
  	      socklen_t sl = sizeof (results[i].source_addr);

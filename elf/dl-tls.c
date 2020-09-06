@@ -29,10 +29,89 @@
 #include <dl-tls.h>
 #include <ldsodefs.h>
 
-/* Amount of excess space to allocate in the static TLS area
-   to allow dynamic loading of modules defining IE-model TLS data.  */
-#define TLS_STATIC_SURPLUS	64 + DL_NNS * 100
+#define TUNABLE_NAMESPACE rtld
+#include <dl-tunables.h>
 
+/* Surplus static TLS, GLRO(dl_tls_static_surplus), is used for
+
+   - IE TLS in libc.so for all dlmopen namespaces except in the initial
+     one where libc.so is not loaded dynamically but at startup time,
+   - IE TLS in other libraries which may be dynamically loaded even in the
+     initial namespace,
+   - and optionally for optimizing dynamic TLS access.
+
+   The maximum number of namespaces is DL_NNS, but to support that many
+   namespaces correctly the static TLS allocation should be significantly
+   increased, which may cause problems with small thread stacks due to the
+   way static TLS is accounted (bug 11787).
+
+   So there is a rtld.nns tunable limit on the number of supported namespaces
+   that affects the size of the static TLS and by default it's small enough
+   not to cause problems with existing applications. The limit is not
+   enforced or checked: it is the user's responsibility to increase rtld.nns
+   if more dlmopen namespaces are used.
+
+   Audit modules use their own namespaces, they are not included in rtld.nns,
+   but come on top when computing the number of namespaces.  */
+
+/* Size of initial-exec TLS in libc.so.  This should be the maximum of
+   observed PT_GNU_TLS sizes across all architectures.  Some
+   architectures have lower values due to differences in type sizes
+   and link editor capabilities.  */
+#define LIBC_IE_TLS 144
+
+/* Size of initial-exec TLS in libraries other than libc.so.
+   This should be large enough to cover runtime libraries of the
+   compiler such as libgomp and libraries in libc other than libc.so.  */
+#define OTHER_IE_TLS 144
+
+/* Default number of namespaces.  */
+#define DEFAULT_NNS 4
+
+/* Default for dl_tls_static_optional.  */
+#define OPTIONAL_TLS 512
+
+/* Compute the static TLS surplus based on the namespace count and the
+   TLS space that can be used for optimizations.  */
+static inline int
+tls_static_surplus (int nns, int opt_tls)
+{
+  return (nns - 1) * LIBC_IE_TLS + nns * OTHER_IE_TLS + opt_tls;
+}
+
+/* This value is chosen so that with default values for the tunables,
+   the computation of dl_tls_static_surplus in
+   _dl_tls_static_surplus_init yields the historic value 1664, for
+   backwards compatibility.  */
+#define LEGACY_TLS (1664 - tls_static_surplus (DEFAULT_NNS, OPTIONAL_TLS))
+
+/* Calculate the size of the static TLS surplus, when the given
+   number of audit modules are loaded.  Must be called after the
+   number of audit modules is known and before static TLS allocation.  */
+void
+_dl_tls_static_surplus_init (size_t naudit)
+{
+  size_t nns, opt_tls;
+
+#if HAVE_TUNABLES
+  nns = TUNABLE_GET (nns, size_t, NULL);
+  opt_tls = TUNABLE_GET (optional_static_tls, size_t, NULL);
+#else
+  /* Default values of the tunables.  */
+  nns = DEFAULT_NNS;
+  opt_tls = OPTIONAL_TLS;
+#endif
+  if (nns > DL_NNS)
+    nns = DL_NNS;
+  if (DL_NNS - nns < naudit)
+    _dl_fatal_printf ("Failed loading %lu audit modules, %lu are supported.\n",
+		      (unsigned long) naudit, (unsigned long) (DL_NNS - nns));
+  nns += naudit;
+
+  GL(dl_tls_static_optional) = opt_tls;
+  assert (LEGACY_TLS >= 0);
+  GLRO(dl_tls_static_surplus) = tls_static_surplus (nns, opt_tls) + LEGACY_TLS;
+}
 
 /* Out-of-memory handler.  */
 static void
@@ -218,7 +297,8 @@ _dl_determine_tlsoffset (void)
     }
 
   GL(dl_tls_static_used) = offset;
-  GL(dl_tls_static_size) = (roundup (offset + TLS_STATIC_SURPLUS, max_align)
+  GL(dl_tls_static_size) = (roundup (offset + GLRO(dl_tls_static_surplus),
+				     max_align)
 			    + TLS_TCB_SIZE);
 #elif TLS_DTV_AT_TP
   /* The TLS blocks start right after the TCB.  */
@@ -262,7 +342,7 @@ _dl_determine_tlsoffset (void)
     }
 
   GL(dl_tls_static_used) = offset;
-  GL(dl_tls_static_size) = roundup (offset + TLS_STATIC_SURPLUS,
+  GL(dl_tls_static_size) = roundup (offset + GLRO(dl_tls_static_surplus),
 				    TLS_TCB_ALIGN);
 #else
 # error "Either TLS_TCB_AT_TP or TLS_DTV_AT_TP must be defined"
