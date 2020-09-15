@@ -278,6 +278,10 @@ test-xfail-tst-thread-exit-clobber = yes
 # "/lib/ld-linux-armhf.so.3 binary"
 # (https://sourceware.org/bugzilla/show_bug.cgi?id=23293).
 test-xfail-tst-getpw = yes
+
+# sleep vs child's clock seems to be even less accurate than expected on
+# armhf testbeds (LP: #1895687)
+test-xfail-tst-cpuclock1 = yes
 endif
 
 

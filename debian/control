@@ -141,7 +141,7 @@ Architecture: amd64 arm64 armel armhf hppa i386 m68k mips mipsel mipsn32 mipsn32
 Section: libs
 Priority: optional
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, libnss-nis, libnss-nisplus
+Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
 Recommends: libidn2-0 (>= 2.0.5~)
 Suggests: glibc-doc, debconf | debconf-2.0, locales [!hurd-i386]
 Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf]
@@ -174,7 +174,7 @@ Architecture: amd64 arm64 armel armhf hppa i386 m68k mips mipsel mipsn32 mipsn32
 Section: libdevel
 Priority: optional
 Multi-Arch: same
-Depends: libc6 (= ${binary:Version}) <!stage1>, libc-dev-bin (= ${binary:Version}), ${misc:Depends}, linux-libc-dev [linux-any], kfreebsd-kernel-headers (>= 0.11) [kfreebsd-any], gnumach-dev [hurd-i386], hurd-dev (>= 20080607-3) [hurd-i386] | hurd-headers-dev [hurd-i386], ${libcrypt-dev:Depends}, rpcsvc-proto, libtirpc-dev, libnsl-dev
+Depends: libc6 (= ${binary:Version}) <!stage1>, libc-dev-bin (= ${binary:Version}), ${misc:Depends}, linux-libc-dev [linux-any], kfreebsd-kernel-headers (>= 0.11) [kfreebsd-any], gnumach-dev [hurd-i386], hurd-dev (>= 20080607-3) [hurd-i386] | hurd-headers-dev [hurd-i386], ${libcrypt-dev:Depends}, ${rpcsvc-proto:Depends}, ${libtirpc-dev:Depends}, ${libnsl-dev:Depends}
 Replaces: hurd-dev (<< 20120408-3) [hurd-i386], kfreebsd-kernel-headers (<< 10.3~4) [kfreebsd-amd64 kfreebsd-i386]
 Suggests: glibc-doc, manpages-dev
 Provides: libc-dev, libc6-dev [alpha ia64 hurd-i386 kfreebsd-i386 kfreebsd-amd64], libc6-dev-armel [armel], libc6-dev-armhf [armhf]
@@ -217,7 +217,7 @@ Architecture: alpha ia64
 Section: libs
 Priority: optional
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, libnss-nis, libnss-nisplus
+Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
 Recommends: libidn2-0 (>= 2.0.5~)
 Suggests: glibc-doc, debconf | debconf-2.0, locales [!hurd-i386]
 Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf]
@@ -250,7 +250,7 @@ Architecture: alpha ia64
 Section: libdevel
 Priority: optional
 Multi-Arch: same
-Depends: libc6.1 (= ${binary:Version}) <!stage1>, libc-dev-bin (= ${binary:Version}), ${misc:Depends}, linux-libc-dev [linux-any], kfreebsd-kernel-headers (>= 0.11) [kfreebsd-any], gnumach-dev [hurd-i386], hurd-dev (>= 20080607-3) [hurd-i386] | hurd-headers-dev [hurd-i386], ${libcrypt-dev:Depends}, rpcsvc-proto, libtirpc-dev, libnsl-dev
+Depends: libc6.1 (= ${binary:Version}) <!stage1>, libc-dev-bin (= ${binary:Version}), ${misc:Depends}, linux-libc-dev [linux-any], kfreebsd-kernel-headers (>= 0.11) [kfreebsd-any], gnumach-dev [hurd-i386], hurd-dev (>= 20080607-3) [hurd-i386] | hurd-headers-dev [hurd-i386], ${libcrypt-dev:Depends}, ${rpcsvc-proto:Depends}, ${libtirpc-dev:Depends}, ${libnsl-dev:Depends}
 Replaces: hurd-dev (<< 20120408-3) [hurd-i386], kfreebsd-kernel-headers (<< 10.3~4) [kfreebsd-amd64 kfreebsd-i386]
 Suggests: glibc-doc, manpages-dev
 Provides: libc-dev, libc6-dev [alpha ia64 hurd-i386 kfreebsd-i386 kfreebsd-amd64], libc6-dev-armel [armel], libc6-dev-armhf [armhf]
@@ -293,7 +293,7 @@ Architecture: hurd-i386
 Section: libs
 Priority: optional
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, libnss-nis, libnss-nisplus
+Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
 Recommends: libidn2-0 (>= 2.0.5~)
 Suggests: glibc-doc, debconf | debconf-2.0, locales [!hurd-i386]
 Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf]
@@ -326,7 +326,7 @@ Architecture: hurd-i386
 Section: libdevel
 Priority: optional
 Multi-Arch: same
-Depends: libc0.3 (= ${binary:Version}) <!stage1>, libc-dev-bin (= ${binary:Version}), ${misc:Depends}, linux-libc-dev [linux-any], kfreebsd-kernel-headers (>= 0.11) [kfreebsd-any], gnumach-dev [hurd-i386], hurd-dev (>= 20080607-3) [hurd-i386] | hurd-headers-dev [hurd-i386], ${libcrypt-dev:Depends}, rpcsvc-proto, libtirpc-dev, libnsl-dev
+Depends: libc0.3 (= ${binary:Version}) <!stage1>, libc-dev-bin (= ${binary:Version}), ${misc:Depends}, linux-libc-dev [linux-any], kfreebsd-kernel-headers (>= 0.11) [kfreebsd-any], gnumach-dev [hurd-i386], hurd-dev (>= 20080607-3) [hurd-i386] | hurd-headers-dev [hurd-i386], ${libcrypt-dev:Depends}, ${rpcsvc-proto:Depends}, ${libtirpc-dev:Depends}, ${libnsl-dev:Depends}
 Replaces: hurd-dev (<< 20120408-3) [hurd-i386], kfreebsd-kernel-headers (<< 10.3~4) [kfreebsd-amd64 kfreebsd-i386]
 Suggests: glibc-doc, manpages-dev
 Provides: libc-dev, libc6-dev [alpha ia64 hurd-i386 kfreebsd-i386 kfreebsd-amd64], libc6-dev-armel [armel], libc6-dev-armhf [armhf]
@@ -369,7 +369,7 @@ Architecture: kfreebsd-amd64 kfreebsd-i386
 Section: libs
 Priority: optional
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, libnss-nis, libnss-nisplus
+Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
 Recommends: libidn2-0 (>= 2.0.5~)
 Suggests: glibc-doc, debconf | debconf-2.0, locales [!hurd-i386]
 Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf]
@@ -402,7 +402,7 @@ Architecture: kfreebsd-amd64 kfreebsd-i386
 Section: libdevel
 Priority: optional
 Multi-Arch: same
-Depends: libc0.1 (= ${binary:Version}) <!stage1>, libc-dev-bin (= ${binary:Version}), ${misc:Depends}, linux-libc-dev [linux-any], kfreebsd-kernel-headers (>= 0.11) [kfreebsd-any], gnumach-dev [hurd-i386], hurd-dev (>= 20080607-3) [hurd-i386] | hurd-headers-dev [hurd-i386], ${libcrypt-dev:Depends}, rpcsvc-proto, libtirpc-dev, libnsl-dev
+Depends: libc0.1 (= ${binary:Version}) <!stage1>, libc-dev-bin (= ${binary:Version}), ${misc:Depends}, linux-libc-dev [linux-any], kfreebsd-kernel-headers (>= 0.11) [kfreebsd-any], gnumach-dev [hurd-i386], hurd-dev (>= 20080607-3) [hurd-i386] | hurd-headers-dev [hurd-i386], ${libcrypt-dev:Depends}, ${rpcsvc-proto:Depends}, ${libtirpc-dev:Depends}, ${libnsl-dev:Depends}
 Replaces: hurd-dev (<< 20120408-3) [hurd-i386], kfreebsd-kernel-headers (<< 10.3~4) [kfreebsd-amd64 kfreebsd-i386]
 Suggests: glibc-doc, manpages-dev
 Provides: libc-dev, libc6-dev [alpha ia64 hurd-i386 kfreebsd-i386 kfreebsd-amd64], libc6-dev-armel [armel], libc6-dev-armhf [armhf]

@@ -1,3 +1,12 @@
+glibc (2.32-0ubuntu3) groovy; urgency=medium
+
+  * Fix cross-toolchain-base.
+    Use ${Depends:foo=foo} magic to not create cross packages for
+    libnss-nis*, rpcsvc-proto, libtirpc-dev and libnsl-dev (LP: #1895632)
+  * XFAIL time/tst-cpuclock1 (LP: #1895687)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Tue, 15 Sep 2020 17:13:26 +0200
+
 glibc (2.32-0ubuntu2) groovy; urgency=medium
 
   * Merge from Debian unstable
