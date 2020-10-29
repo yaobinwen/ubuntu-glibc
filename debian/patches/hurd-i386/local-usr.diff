@@ -1,4 +1,4 @@
-Upstream uses prefix=/ while we use prefix=/usr
+Upstream uses prefix= while we use prefix=/usr
 
 --- a/sysdeps/mach/hurd/i386/libc.abilist
 +++ b/sysdeps/mach/hurd/i386/libc.abilist

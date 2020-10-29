@@ -246,6 +246,9 @@ test-xfail-tst-minsigstksz-4 = yes
 test-xfail-tst-xsigstack = yes
 endif
 
+# sleep vs child's clock seems to be even less accurate than expected on
+# armhf testbeds (LP: #1895687)
+test-xfail-tst-cpuclock1 = yes
 
 ######################################################################
 # armhf
@@ -500,6 +503,11 @@ test-xfail-tst-cleanupx4 = yes
 # https://bugzilla.kernel.org/show_bug.cgi?id=153531
 test-xfail-tst-minsigstksz-1 = yes
 test-xfail-tst-minsigstksz-2 = yes
+
+# Fails with 32 bit userspace on 64 bit kernel:
+# https://sourceware.org/bugzilla/show_bug.cgi?id=26736
+test-xfail-tst-sysvshm-linux = yes
+
 endif
 
 
@@ -1111,6 +1119,9 @@ endif
 ######################################################################
 ifeq ($(config-machine)-$(config-os),x86_64-linux-gnux32)
 test-xfail-tst-platform-1 = yes
+
+# Fails on x32 https://sourceware.org/bugzilla/show_bug.cgi?id=26736
+test-xfail-tst-sysvshm-linux = yes
 endif
 
 ######################################################################

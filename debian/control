@@ -141,12 +141,12 @@ Architecture: amd64 arm64 armel armhf hppa i386 m68k mips mipsel mipsn32 mipsn32
 Section: libs
 Priority: optional
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
-Recommends: libidn2-0 (>= 2.0.5~)
+Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}
+Recommends: libidn2-0 (>= 2.0.5~), ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
 Suggests: glibc-doc, debconf | debconf-2.0, locales [!hurd-i386]
-Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf]
+Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf], libc6-lse [arm64]
 Conflicts: libc0.1-i686 [kfreebsd-i386], libc6-i686 [i386]
-Breaks: nscd (<< 2.32), locales (<< 2.32), locales-all (<< 2.32), hurd (<< 1:0.9.git20170910-1), libtirpc1 (<< 0.2.3), r-cran-later (<< 0.7.5+dfsg-2), nocache (<< 1.1-1~), iraf-fitsutil (<< 2018.07.06-4), wcc (<< 0.0.2+dfsg-3), openssh-server (<< 1:8.2p1-4), macs (<< 2.2.7.1-3~), openarena (<< 0.8.8+dfsg-4~), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~)
+Breaks: nscd (<< 2.32), locales (<< 2.32), locales-all (<< 2.32), hurd (<< 1:0.9.git20170910-1), libtirpc1 (<< 0.2.3), r-cran-later (<< 0.7.5+dfsg-2), nocache (<< 1.1-1~), iraf-fitsutil (<< 2018.07.06-4), wcc (<< 0.0.2+dfsg-3), openssh-server (<< 1:8.2p1-4), macs (<< 2.2.7.1-3~), openarena (<< 0.8.8+dfsg-4~), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~), libgegl-0.4-0 (<< 0.4.18), busybox (<< 1.30.1-6)
 Replaces: libc6-amd64 [amd64],
           libc6-i386 [i386],
           libc0.1-i686 [kfreebsd-i386],
@@ -217,12 +217,12 @@ Architecture: alpha ia64
 Section: libs
 Priority: optional
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
-Recommends: libidn2-0 (>= 2.0.5~)
+Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}
+Recommends: libidn2-0 (>= 2.0.5~), ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
 Suggests: glibc-doc, debconf | debconf-2.0, locales [!hurd-i386]
-Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf]
+Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf], libc6-lse [arm64]
 Conflicts: libc0.1-i686 [kfreebsd-i386], libc6-i686 [i386]
-Breaks: nscd (<< 2.32), locales (<< 2.32), locales-all (<< 2.32), hurd (<< 1:0.9.git20170910-1), libtirpc1 (<< 0.2.3), r-cran-later (<< 0.7.5+dfsg-2), nocache (<< 1.1-1~), iraf-fitsutil (<< 2018.07.06-4), wcc (<< 0.0.2+dfsg-3), openssh-server (<< 1:8.2p1-4), macs (<< 2.2.7.1-3~), openarena (<< 0.8.8+dfsg-4~), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~)
+Breaks: nscd (<< 2.32), locales (<< 2.32), locales-all (<< 2.32), hurd (<< 1:0.9.git20170910-1), libtirpc1 (<< 0.2.3), r-cran-later (<< 0.7.5+dfsg-2), nocache (<< 1.1-1~), iraf-fitsutil (<< 2018.07.06-4), wcc (<< 0.0.2+dfsg-3), openssh-server (<< 1:8.2p1-4), macs (<< 2.2.7.1-3~), openarena (<< 0.8.8+dfsg-4~), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~), libgegl-0.4-0 (<< 0.4.18), busybox (<< 1.30.1-6)
 Replaces: libc6-amd64 [amd64],
           libc6-i386 [i386],
           libc0.1-i686 [kfreebsd-i386],
@@ -293,12 +293,12 @@ Architecture: hurd-i386
 Section: libs
 Priority: optional
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
-Recommends: libidn2-0 (>= 2.0.5~)
+Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}
+Recommends: libidn2-0 (>= 2.0.5~), ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
 Suggests: glibc-doc, debconf | debconf-2.0, locales [!hurd-i386]
-Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf]
+Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf], libc6-lse [arm64]
 Conflicts: libc0.1-i686 [kfreebsd-i386], libc6-i686 [i386]
-Breaks: nscd (<< 2.32), locales (<< 2.32), locales-all (<< 2.32), hurd (<< 1:0.9.git20170910-1), libtirpc1 (<< 0.2.3), r-cran-later (<< 0.7.5+dfsg-2), nocache (<< 1.1-1~), iraf-fitsutil (<< 2018.07.06-4), wcc (<< 0.0.2+dfsg-3), openssh-server (<< 1:8.2p1-4), macs (<< 2.2.7.1-3~), openarena (<< 0.8.8+dfsg-4~), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~)
+Breaks: nscd (<< 2.32), locales (<< 2.32), locales-all (<< 2.32), hurd (<< 1:0.9.git20170910-1), libtirpc1 (<< 0.2.3), r-cran-later (<< 0.7.5+dfsg-2), nocache (<< 1.1-1~), iraf-fitsutil (<< 2018.07.06-4), wcc (<< 0.0.2+dfsg-3), openssh-server (<< 1:8.2p1-4), macs (<< 2.2.7.1-3~), openarena (<< 0.8.8+dfsg-4~), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~), libgegl-0.4-0 (<< 0.4.18), busybox (<< 1.30.1-6)
 Replaces: libc6-amd64 [amd64],
           libc6-i386 [i386],
           libc0.1-i686 [kfreebsd-i386],
@@ -369,12 +369,12 @@ Architecture: kfreebsd-amd64 kfreebsd-i386
 Section: libs
 Priority: optional
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}, ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
-Recommends: libidn2-0 (>= 2.0.5~)
+Depends: ${shlibs:Depends}, ${libgcc:Depends}, ${libcrypt:Depends}
+Recommends: libidn2-0 (>= 2.0.5~), ${libnss-nis:Depends}, ${libnss-nisplus:Depends}
 Suggests: glibc-doc, debconf | debconf-2.0, locales [!hurd-i386]
-Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf]
+Provides: libc6-sparcv9b [sparc sparc64], libc0.1-i686 [kfreebsd-i386], libc0.3-i686 [hurd-i386], libc6-i686 [i386], libc6-xen [i386], libc6-armel [armel], libc6-armhf [armhf], libc6-lse [arm64]
 Conflicts: libc0.1-i686 [kfreebsd-i386], libc6-i686 [i386]
-Breaks: nscd (<< 2.32), locales (<< 2.32), locales-all (<< 2.32), hurd (<< 1:0.9.git20170910-1), libtirpc1 (<< 0.2.3), r-cran-later (<< 0.7.5+dfsg-2), nocache (<< 1.1-1~), iraf-fitsutil (<< 2018.07.06-4), wcc (<< 0.0.2+dfsg-3), openssh-server (<< 1:8.2p1-4), macs (<< 2.2.7.1-3~), openarena (<< 0.8.8+dfsg-4~), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~)
+Breaks: nscd (<< 2.32), locales (<< 2.32), locales-all (<< 2.32), hurd (<< 1:0.9.git20170910-1), libtirpc1 (<< 0.2.3), r-cran-later (<< 0.7.5+dfsg-2), nocache (<< 1.1-1~), iraf-fitsutil (<< 2018.07.06-4), wcc (<< 0.0.2+dfsg-3), openssh-server (<< 1:8.2p1-4), macs (<< 2.2.7.1-3~), openarena (<< 0.8.8+dfsg-4~), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~), libgegl-0.4-0 (<< 0.4.18), busybox (<< 1.30.1-6)
 Replaces: libc6-amd64 [amd64],
           libc6-i386 [i386],
           libc0.1-i686 [kfreebsd-i386],
@@ -838,19 +838,18 @@ Description: GNU C Library: Shared libraries (EV67 optimized)
  needs to be installed on Alpha EV67/68 and EV7 machines. If you install
  this on an older machine, it won't even be used.
 
-Package: libc6-lse
-Architecture: arm64
+Package: libc6-prof
+Architecture: amd64 arm64 armhf ppc64el
 Section: libs
 Priority: optional
 Multi-Arch: same
 Depends: libc6 (= ${binary:Version}), ${misc:Depends}
+Suggests: bpftrace
 Build-Profiles: <!stage1>
 Description: GNU C Library: Shared Libraries
  Contains the standard libraries that are used by nearly all programs on
  the system. This package includes shared versions of the standard C library
  and the standard math library, as well as many others.
  .
- This set of libraries is optimized to support Large System Extensions (LSE).
- It only needs to be installed on ARM machine supporting LSE. If you install
- this on an machine without LSE support, it won't be used.
+ This package contains all libraries compiled for profiling.
 
