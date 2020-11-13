@@ -1,3 +1,17 @@
+glibc (2.32-0ubuntu5) hirsute; urgency=medium
+
+  * debian/gbp.conf: Set debian-tag and debian-tag-msg to follow Ubuntu format
+  * Don't build libc6-prof in stage1 and stage2
+  * Ship libc6-prof on riscv64, too.
+    This fixes FTBFS on riscv64 due to the the flavour being built but not
+    shipped in a package.
+  * Detect debconf consistently in libc6.preinst and do not crash if it is not used
+    (LP: #1902955)
+  * Prevent rare deadlock in pthread_cond_signal (LP: #1899800)
+  * debian/patches/git-updates.diff: update from upstream stable branch
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Fri, 13 Nov 2020 18:54:38 +0100
+
 glibc (2.32-0ubuntu4) hirsute; urgency=medium
 
   * tests: XFAIL time/tst-cpuclock1 on armel, too. (LP: #1895687)

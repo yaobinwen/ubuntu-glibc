@@ -260,7 +260,7 @@ then
             # NSS services check:
             __NSS_CHECK__
             if [ -n "$services" ]; then
-                if [ -f /usr/share/debconf/confmodule ] ; then
+                if [ "$USE_DEBCONF" ] ; then
                     db_version 2.0
                     if [ "$RELEASE_UPGRADE_MODE" = desktop ]; then
                         db_input medium libraries/restart-without-asking || true
