@@ -197,6 +197,7 @@ test-xfail-tst-waitid = yes
 # This test is currently known to fail under lxc, where we run our ARM
 # regression tests, so pretend it fails on ARM:
 test-xfail-tst-ttyname = yes
+test-xfail-tst-support_descriptors = yes
 
 # There is not support for protection key on Alpha yet, and there is a
 # disagreement between kernel and glibc how to report that.

@@ -1,3 +1,17 @@
+glibc (2.27-3ubuntu1.4) bionic; urgency=medium
+
+  [ Balint Reczey ]
+  * tests: XFAIL new tst-support_descriptors on armel, too.
+    The armhf build builds for armel, too, thus this fixes the armhf autopkgtest.
+    (LP: #1895920)
+
+  [ Adam Conrad ]
+  * debian/patches/arm/unsubmitted-ldso-abi-check.diff: Fix rtld segv in dl_open()
+    introduced via merge with upstream at 2.28 and when backporting upstream's
+    2.27/master changes. (LP: #1821677)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Mon, 07 Dec 2020 17:38:09 +0100
+
 glibc (2.27-3ubuntu1.3) bionic; urgency=medium
 
   [ Balint Reczey ]
