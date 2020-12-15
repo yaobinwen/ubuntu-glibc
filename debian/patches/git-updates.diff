@@ -1,13 +1,15 @@
 diff --git a/NEWS b/NEWS
-index 485b8ddffa..1c1f270784 100644
+index 485b8ddffa..4da2a0cbda 100644
 --- a/NEWS
 +++ b/NEWS
-@@ -5,6 +5,19 @@ See the end for copying conditions.
+@@ -5,6 +5,22 @@ See the end for copying conditions.
  Please send GNU C library bug reports via <https://sourceware.org/bugzilla/>
  using `glibc' in the "product" field.
  
 +The following bugs are resolved with this release:
 +
++  [26224] iconv hangs when converting some invalid inputs from several IBM
++    character sets (CVE-2020-27618)
 +  [26534] libm.so 2.32 SIGILL in pow() due to FMA4 instruction on non-FMA4
 +    system
 +  [26555] string: strerrorname_np does not return the documented value
@@ -18,10 +20,22 @@ index 485b8ddffa..1c1f270784 100644
 +    by the caller to the kernel
 +  [26639] libc: msgctl IPC_INFO and MSG_INFO return garbage
 +  [26853] aarch64: Missing unwind information in statically linked startup code
++  [26932] libc: sh: Multiple floating point functions defined as stubs only
 +
  Version 2.32
  
  Major new features:
+@@ -185,6 +201,10 @@ Security related changes:
+   Dytrych of the Cisco Security Assessment and Penetration Team (See
+   TALOS-2020-1019).
+ 
++  CVE-2020-27618: An infinite loop has been fixed in the iconv program when
++  invoked with input containing redundant shift sequences in the IBM1364,
++  IBM1371, IBM1388, IBM1390, or IBM1399 character sets.
++
+ The following bugs are resolved with this release:
+ 
+   [9809] localedata: ckb_IQ: new Kurdish Sorani locale
 diff --git a/debug/Makefile b/debug/Makefile
 index 3a60d7af7a..0036edd187 100644
 --- a/debug/Makefile
@@ -240,6 +254,64 @@ index b4334faa57..d59979759c 100644
  
        if (res != __GCONV_OK)
  	{
+diff --git a/iconv/tst-iconv_prog.sh b/iconv/tst-iconv_prog.sh
+index 8298136b7f..d8db7b335c 100644
+--- a/iconv/tst-iconv_prog.sh
++++ b/iconv/tst-iconv_prog.sh
+@@ -102,12 +102,16 @@ hangarray=(
+ "\x00\x80;-c;IBM1161;UTF-8//TRANSLIT//IGNORE"
+ "\x00\xdb;-c;IBM1162;UTF-8//TRANSLIT//IGNORE"
+ "\x00\x70;-c;IBM12712;UTF-8//TRANSLIT//IGNORE"
+-# These are known hangs that are yet to be fixed:
+-# "\x00\x0f;-c;IBM1364;UTF-8"
+-# "\x00\x0f;-c;IBM1371;UTF-8"
+-# "\x00\x0f;-c;IBM1388;UTF-8"
+-# "\x00\x0f;-c;IBM1390;UTF-8"
+-# "\x00\x0f;-c;IBM1399;UTF-8"
++"\x00\x0f;-c;IBM1364;UTF-8"
++"\x0e\x0e;-c;IBM1364;UTF-8"
++"\x00\x0f;-c;IBM1371;UTF-8"
++"\x0e\x0e;-c;IBM1371;UTF-8"
++"\x00\x0f;-c;IBM1388;UTF-8"
++"\x0e\x0e;-c;IBM1388;UTF-8"
++"\x00\x0f;-c;IBM1390;UTF-8"
++"\x0e\x0e;-c;IBM1390;UTF-8"
++"\x00\x0f;-c;IBM1399;UTF-8"
++"\x0e\x0e;-c;IBM1399;UTF-8"
+ "\x00\x53;-c;IBM16804;UTF-8//TRANSLIT//IGNORE"
+ "\x00\x41;-c;IBM274;UTF-8//TRANSLIT//IGNORE"
+ "\x00\x41;-c;IBM275;UTF-8//TRANSLIT//IGNORE"
+diff --git a/iconvdata/ibm1364.c b/iconvdata/ibm1364.c
+index 49e7267ab4..521f0825b7 100644
+--- a/iconvdata/ibm1364.c
++++ b/iconvdata/ibm1364.c
+@@ -158,24 +158,14 @@ enum
+ 									      \
+     if (__builtin_expect (ch, 0) == SO)					      \
+       {									      \
+-	/* Shift OUT, change to DBCS converter.  */			      \
+-	if (curcs == db)						      \
+-	  {								      \
+-	    result = __GCONV_ILLEGAL_INPUT;				      \
+-	    break;							      \
+-	  }								      \
++	/* Shift OUT, change to DBCS converter (redundant escape okay).  */   \
+ 	curcs = db;							      \
+ 	++inptr;							      \
+ 	continue;							      \
+       }									      \
+     if (__builtin_expect (ch, 0) == SI)					      \
+       {									      \
+-	/* Shift IN, change to SBCS converter.  */			      \
+-	if (curcs == sb)						      \
+-	  {								      \
+-	    result = __GCONV_ILLEGAL_INPUT;				      \
+-	    break;							      \
+-	  }								      \
++	/* Shift IN, change to SBCS converter (redundant escape okay).  */    \
+ 	curcs = sb;							      \
+ 	++inptr;							      \
+ 	continue;							      \
 diff --git a/intl/dcigettext.c b/intl/dcigettext.c
 index 2e7c662bc7..bd332e71da 100644
 --- a/intl/dcigettext.c
@@ -2014,6 +2086,41 @@ index 75393e1c18..108f602721 100644
  
  	/* Define a symbol for the first piece of initialized data.  */
  	.data
+diff --git a/sysdeps/generic/unwind.h b/sysdeps/generic/unwind.h
+index b667a5b652..c229603af3 100644
+--- a/sysdeps/generic/unwind.h
++++ b/sysdeps/generic/unwind.h
+@@ -75,15 +75,21 @@ typedef void (*_Unwind_Exception_Cleanup_Fn) (_Unwind_Reason_Code,
+ 
+ struct _Unwind_Exception
+ {
+-  _Unwind_Exception_Class exception_class;
+-  _Unwind_Exception_Cleanup_Fn exception_cleanup;
+-  _Unwind_Word private_1;
+-  _Unwind_Word private_2;
+-
+-  /* @@@ The IA-64 ABI says that this structure must be double-word aligned.
+-     Taking that literally does not make much sense generically.  Instead we
+-     provide the maximum alignment required by any type for the machine.  */
+-} __attribute__((__aligned__));
++  union
++  {
++    struct
++    {
++      _Unwind_Exception_Class exception_class;
++      _Unwind_Exception_Cleanup_Fn exception_cleanup;
++      _Unwind_Word private_1;
++      _Unwind_Word private_2;
++    };
++
++    /* The IA-64 ABI says that this structure must be double-word aligned.  */
++    _Unwind_Word unwind_exception_align[2]
++      __attribute__ ((__aligned__ (2 * sizeof (_Unwind_Word))));
++  };
++};
+ 
+ 
+ /* The ACTIONS argument to the personality routine is a bitwise OR of one
 diff --git a/sysdeps/gnu/errlist.h b/sysdeps/gnu/errlist.h
 index 5d11ed723d..6329e5f393 100644
 --- a/sysdeps/gnu/errlist.h
@@ -2903,6 +3010,20 @@ index 5d11ed723d..6329e5f393 100644
 -_S(ERR_MAP(EPROGUNAVAIL), N_("RPC program not available"))
 +_S(EPROGUNAVAIL, N_("RPC program not available"))
  #endif
+diff --git a/sysdeps/sh/be/sh4/fpu/Implies b/sysdeps/sh/be/sh4/fpu/Implies
+new file mode 100644
+index 0000000000..71b28ee1a4
+--- /dev/null
++++ b/sysdeps/sh/be/sh4/fpu/Implies
+@@ -0,0 +1 @@
++sh/sh4/fpu
+diff --git a/sysdeps/sh/le/sh4/fpu/Implies b/sysdeps/sh/le/sh4/fpu/Implies
+new file mode 100644
+index 0000000000..71b28ee1a4
+--- /dev/null
++++ b/sysdeps/sh/le/sh4/fpu/Implies
+@@ -0,0 +1 @@
++sh/sh4/fpu
 diff --git a/sysdeps/unix/sysv/linux/Makefile b/sysdeps/unix/sysv/linux/Makefile
 index 9b2a253032..34748ffcd1 100644
 --- a/sysdeps/unix/sysv/linux/Makefile
@@ -3023,6 +3144,20 @@ index f131a26fc7..1cdabde8f2 100644
      case IPC_INFO:      /* arg.__buf */
      case SEM_INFO:
        va_start (ap, cmd);
+diff --git a/sysdeps/unix/sysv/linux/sh/be/sh4/fpu/Implies b/sysdeps/unix/sysv/linux/sh/be/sh4/fpu/Implies
+new file mode 100644
+index 0000000000..7eeaf15a5a
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/sh/be/sh4/fpu/Implies
+@@ -0,0 +1 @@
++unix/sysv/linux/sh/sh4/fpu
+diff --git a/sysdeps/unix/sysv/linux/sh/le/sh4/fpu/Implies b/sysdeps/unix/sysv/linux/sh/le/sh4/fpu/Implies
+new file mode 100644
+index 0000000000..7eeaf15a5a
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/sh/le/sh4/fpu/Implies
+@@ -0,0 +1 @@
++unix/sysv/linux/sh/sh4/fpu
 diff --git a/sysdeps/unix/sysv/linux/shmctl.c b/sysdeps/unix/sysv/linux/shmctl.c
 index 76d88441f1..1d19a798b1 100644
 --- a/sysdeps/unix/sysv/linux/shmctl.c
