@@ -140,3 +140,4 @@ ubuntu/localedata/sd_PK.diff
 ubuntu/localedata/ug_CN@latin.diff
 ubuntu/local-pldd-root.diff
 ubuntu/local-fallback-to-monotonic.diff
+ubuntu/git-elf-Add-endianness-markup-to-ld.so.cache-bug-27008.patch

@@ -1,3 +1,13 @@
+glibc (2.31-0ubuntu9.2) focal; urgency=medium
+
+  * Drop check preventing using float128 which breaks new icc (LP: #1895358)
+  * Detect debconf consistently in libc6.preinst and do not crash if it is
+    not used (LP: #1902955)
+  * Ship libc variant compiled for profiling in libc6-prof (LP: #1908307)
+  * elf: Add endianness markup to ld.so.cache (Closes: #731082) (LP: #1906250)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Wed, 16 Dec 2020 12:04:55 +0100
+
 glibc (2.31-0ubuntu9.1) focal; urgency=medium
 
   [ Michael Hudson-Doyle ]

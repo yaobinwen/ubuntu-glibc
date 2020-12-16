@@ -162,6 +162,7 @@ standard-add-ons = libidn,
 
 -include debian/sysdeps/$(DEB_HOST_ARCH_OS).mk
 -include debian/sysdeps/$(DEB_HOST_ARCH).mk
+include debian/sysdeps/prof.mk
 
 ifneq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
 DEB_ARCH_REGULAR_PACKAGES += $(foreach p,$(DEB_ARCH_MULTILIB_PACKAGES), $(if $(findstring -dev,$(p)), $(p)))
@@ -177,6 +178,7 @@ DEBUG_$(libc) = 1
 DEBUG_libc6-xen = 1
 DEBUG_libc6.1-alphaev67 = 1
 DEBUG_libc6-lse = 1
+DEBUG_libc6-prof = 1
 
 ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
   ifeq ($(threads),yes)
