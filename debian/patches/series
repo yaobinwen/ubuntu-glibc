@@ -128,3 +128,8 @@ ubuntu/localedata/sd_PK.diff
 ubuntu/localedata/ug_CN@latin.diff
 ubuntu/local-pldd-root.diff
 ubuntu/local-fallback-to-monotonic.diff
+ubuntu/git-elf-Add-endianness-markup-to-ld.so.cache-bug-27008.patch
+ubuntu/git-sysvipc-Fix-SEM_STAT_ANY-kernel-argument-pass-BZ-266.patch
+ubuntu/git-sysvipc-Fix-IPC_INFO-and-MSG_INFO-handling-BZ-26639.patch
+ubuntu/git-sysvipc-Fix-IPC_INFO-and-SHM_INFO-handling-BZ-26636.patch
+ubuntu/submitted-broadcast-to-prevent-deadlock.diff

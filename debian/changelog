@@ -1,3 +1,20 @@
+glibc (2.32-0ubuntu3.1) groovy; urgency=medium
+
+  * Drop check preventing using float128 which breaks new icc (LP: #1895358)
+  * Detect debconf consistently in libc6.preinst and do not crash if it is not
+    used (LP: #1902955)
+  * Ship libc variant compiled for profiling in libc6-prof (LP: #1908307)
+  * Don't build libc6-prof in stage1 and stage2
+  * Ship libc6-prof on riscv64, too.
+    This fixes FTBFS on riscv64 due to the the flavour being built but not
+    shipped in a package.
+  * elf: Add endianness markup to ld.so.cache (Closes: #731082) (LP: #1906250)
+  * Fix shmctl, msgctl and semctl regressions in glibc 2.31 (LP: #1904419)
+    - Also XFAIL tst-sysvshm-linux on i386 and x32
+  * Prevent rare deadlock in pthread_cond_signal (LP: #1899800)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Wed, 16 Dec 2020 13:30:09 +0100
+
 glibc (2.32-0ubuntu3) groovy; urgency=medium
 
   * Fix cross-toolchain-base.
