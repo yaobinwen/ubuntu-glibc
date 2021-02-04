@@ -1,4 +1,4 @@
-git-updates.diff
+# git-updates.diff
 
 locale/check-unknown-symbols.diff
 locale/locale-print-LANGUAGE.diff
@@ -17,7 +17,7 @@ localedata/submitted-es_MX-decimal_point.diff
 
 alpha/local-gcc4.1.diff
 alpha/submitted-dl-support.diff
-alpha/local-string-functions.diff
+# alpha/local-string-functions.diff
 alpha/submitted-fts64.diff
 alpha/submitted-makecontext.diff
 
@@ -30,43 +30,68 @@ arm/local-arm-futex.diff
 
 hppa/local-inlining.diff
 
-hurd-i386/git-posix_openpt.diff
-hurd-i386/local-enable-ldconfig.diff
-hurd-i386/tg-sysvshm.diff
-hurd-i386/tg-thread-cancel.diff
-hurd-i386/tg-bigmem.diff
-hurd-i386/local-disable-ioctls.diff
-hurd-i386/tg-sendmsg-SCM_CREDS.diff
-hurd-i386/tg-mach-hurd-link.diff
-hurd-i386/local-ED.diff
-hurd-i386/local-madvise_warn.diff
-hurd-i386/tg-hurdsig-SA_SIGINFO.diff
-hurd-i386/tg-hooks.diff
-hurd-i386/local-usr.diff
-hurd-i386/git-sbrk-end.diff
-hurd-i386/tg-ifaddrs_v6.diff
-hurd-i386/unsubmitted-clock_t_centiseconds.diff
-hurd-i386/submitted-path_mounted.diff
-hurd-i386/submitted-bind_umask2.diff
-hurd-i386/tg-bootstrap.diff
-hurd-i386/local-mach_print.diff
-hurd-i386/tg-eintr.diff
-hurd-i386/tg-libc_rwlock_recursive.diff
-hurd-i386/local-no_unsupported_ioctls.diff
-hurd-i386/local-exec_filename.diff
-hurd-i386/local-tls-ie-align.diff
-hurd-i386/git-sched_sets.diff
-hurd-i386/git-bsd4.3-ioctls.diff
-hurd-i386/git-clock-cputime.diff
-hurd-i386/git-WAIT.diff
+# hurd-i386/git-posix_openpt.diff
+# hurd-i386/local-enable-ldconfig.diff
+# hurd-i386/tg-sysvshm.diff
+# hurd-i386/tg-thread-cancel.diff
+# hurd-i386/tg-bigmem.diff
+# hurd-i386/local-disable-ioctls.diff
+# hurd-i386/tg-sendmsg-SCM_CREDS.diff
+# hurd-i386/tg-mach-hurd-link.diff
+# hurd-i386/local-ED.diff
+# hurd-i386/local-madvise_warn.diff
+# hurd-i386/git-hurdsig-SA_SIGINFO.diff
+# hurd-i386/tg-hooks.diff
+# hurd-i386/local-usr.diff
+# hurd-i386/git-sbrk-end.diff
+# hurd-i386/tg-ifaddrs_v6.diff
+# hurd-i386/unsubmitted-clock_t_centiseconds.diff
+# hurd-i386/submitted-path_mounted.diff
+# hurd-i386/submitted-bind_umask2.diff
+# hurd-i386/tg-bootstrap.diff
+# hurd-i386/local-mach_print.diff
+# hurd-i386/tg-eintr.diff
+# hurd-i386/tg-libc_rwlock_recursive.diff
+# hurd-i386/local-no_unsupported_ioctls.diff
+# hurd-i386/local-exec_filename.diff
+# hurd-i386/local-tls-ie-align.diff
+# hurd-i386/git-sched_sets.diff
+# hurd-i386/git-bsd4.3-ioctls.diff
+# hurd-i386/git-clock-cputime.diff
+# hurd-i386/git-WAIT.diff
+# hurd-i386/git-pthread_link_tests.diff
+# hurd-i386/git-libpthread_syms.diff
+# hurd-i386/git-libpthread-nodelete.diff
+# hurd-i386/git-cthreads.diff
+# hurd-i386/git-cthreads-symbols.diff
+# hurd-i386/git-libpthread_plt.diff
+# hurd-i386/git-lll-initializer.diff
+# hurd-i386/sysvshm-lll.diff
+# hurd-i386/git-lll-ptr.diff
+# hurd-i386/git-ld-library-path-checks.diff
+# hurd-i386/git-lll-wait-intr.diff
+# hurd-i386/git-lll-private.diff
+# hurd-i386/git-futex-internal.diff
+# hurd-i386/git-libc-open.diff
+# hurd-i386/git-pthread_get_cleanup_stack.diff
+# hurd-i386/git-libpthread-testcancel.diff
+# hurd-i386/git-SEM_VALUE_MAX.diff
+# hurd-i386/git-sem-pshared.diff
+# hurd-i386/git-sem-open-init.diff
+# hurd-i386/git-sem-open.diff
+# hurd-i386/git-siginfo_uesp.diff
+# hurd-i386/git-mmap-EINVAL.diff
+# hurd-i386/git-waitid.diff
+# hurd-i386/git-hurd-version.diff
+# hurd-i386/git-mmap_addr.diff
 
 i386/local-biarch.diff
 i386/unsubmitted-quiet-ldconfig.diff
 
 riscv64/local-asin-acos-raise-invalid.diff
 
-kfreebsd/submitted-waitid.diff
-kfreebsd/submitted-auxv.diff
+# kfreebsd/submitted-waitid.diff
+# kfreebsd/submitted-auxv.diff
 kfreebsd/local-config_h_in.patch
 kfreebsd/local-grantpt.diff
 kfreebsd/local-sysdeps.diff
@@ -90,7 +115,6 @@ all/local-alias-et_EE.diff
 all/local-remove-manual.diff
 all/local-ru_RU.diff
 all/local-ldd.diff
-all/local-nis-shadow.diff
 all/submitted-po-fr-fixes.diff
 
 any/local-rtlddir-cross.diff
@@ -130,4 +154,4 @@ ubuntu/localedata/ug_CN@latin.diff
 ubuntu/local-pldd-root.diff
 ubuntu/local-fallback-to-monotonic.diff
 ubuntu/submitted-broadcast-to-prevent-deadlock.diff
-ubuntu/git-elf-Add-endianness-markup-to-ld.so.cache-bug-27008.patch
+

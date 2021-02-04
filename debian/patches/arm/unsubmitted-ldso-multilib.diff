@@ -1,6 +1,6 @@
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -1699,6 +1699,15 @@
+@@ -1710,6 +1710,15 @@
  	      *found_other_class = true;
  	      goto close_and_out;
  	    }

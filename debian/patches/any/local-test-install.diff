@@ -5,7 +5,7 @@ Last-Update: 2020-02-08
 
 --- a/Makefile
 +++ b/Makefile
-@@ -638,7 +638,7 @@
+@@ -647,7 +647,7 @@
  	# Setting INSTALL_UNCOMPRESSED causes localedata/Makefile to
  	# install the charmaps uncompressed, as the testroot does not
  	# provide a gunzip program.

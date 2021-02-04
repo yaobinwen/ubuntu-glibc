@@ -1,3 +1,52 @@
+glibc (2.33-0ubuntu1) hirsute; urgency=medium
+
+  [ Balint Reczey ]
+  * XFAIL tst-sigcontext-get_pc on ppc64el (LP: #1907298)
+  * Merge 2.31-9 changes from Debian unstable:
+    - Build memusage and memusagestat in the libc pass and ship them into
+      libc-devtools. Move mtrace, sotruss and sprof into that package.
+      Closes: #91815.
+    - debian/sysdeps/arm64.mk: enable static PIE support on arm64.
+      Closes: #973430.
+    - debian/debhelper.in/*.lintian-overrides: update for recent lintian
+      versions.
+    - other changes less interesting for Ubuntu users
+  * Support disabling hwcaps on amd64 and arm64, too
+  * Optimize checking /etc/ld.so.nohwcap
+  * New upstream release 2.33
+    - security fixes:
+      - CVE-2021-3326: An assertion failure during conversion from the
+        ISO-20220-JP-3 character set using the iconv function has been fixed.
+        This assertion was triggered by certain valid inputs in which the
+        converted output contains a combined sequence of two wide characters
+        crossing a buffer boundary.  Reported by Tavis Ormandy.
+      - CVE-2020-29562: An assertion failure has been fixed in the iconv
+        function when invoked with UCS4 input containing an invalid character.
+      - CVE-2019-25013: A buffer overflow has been fixed in the iconv function
+        when invoked with EUC-KR input containing invalid multibyte input
+        sequences.
+  * Refresh patches
+  * debian/symbols.wildcards: Update for 2.33
+  * Don't ship /etc/default/nss.
+    It set only ADJUNCT_AS_SHADOW=TRUE to change NSS module behaviour to be
+    more secure, but upstream disagrees that the default (FALSE) value poses
+    a security problem since the data leaked by NSS is made available by
+    other tools as well.
+    See: https://sourceware.org/bugzilla/show_bug.cgi?id=11134
+  * debian/debhelper.in/libc-bin.install: Keep installing zdump
+    adjust .install to upstream's changes
+  * XFAIL rounding test failures on armhf (and armel)
+  * XFAIL elf/tst-cpu-features-cpuinfo on amd64 and i386
+  * XFAIL nptl/tst-cancel28 on i386
+  * debian/copyright: Add GFDL for the manual sources.
+    Override the Lintian error about GFDL, Ubuntu ships the documentation
+    in main already.
+
+  [ Dimitri John Ledkov ]
+  * Don't try restarting services if needrestart is installed
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Thu, 04 Feb 2021 13:40:19 +0100
+
 glibc (2.32-0ubuntu6) hirsute; urgency=medium
 
   * Merge 2.31-5 changes from Debian unstable:
@@ -85,6 +134,105 @@ glibc (2.32-0ubuntu2) groovy; urgency=medium
     autopkgtest
 
  -- Balint Reczey <rbalint@ubuntu.com>  Sun, 06 Sep 2020 22:08:44 +0200
+
+glibc (2.31-9) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update tests.
+  * debian/patches/hurd-i386/git-mmap_addr.diff: Fix long-running ghc processes.
+
+  [ Aurelien Jarno ]
+  * Upload to unstable.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix a buffer over-read when processing invalid multi-byte input
+      sequences in the EUC-KR encoding (CVE-2019-25013).  Closes: #979273.
+  * debian/control.in/libc: add a Breaks: against libgegl-0.4-0 (<< 0.4.18).
+    Closes: #968349.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 05 Jan 2021 06:47:42 +0100
+
+glibc (2.31-8) experimental; urgency=medium
+
+  [ Stephen Kitt ]
+  * Build memusage and memusagestat in the libc pass and ship them into
+    libc-devtools. Move mtrace, sotruss and sprof into that package.
+    Closes: #91815.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 03 Jan 2021 18:55:16 +0100
+
+glibc (2.31-7) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update with 2.33 tests.
+  * debian/patches/hurd-i386/local-clock_gettime_MONOTONIC.diff: Also accept
+    CLOCK_MONOTONIC_RAW, CLOCK_REALTIME_COARSE, CLOCK_MONOTONIC_COARSE.
+  * debian/patches/hurd-i386/tg-hurdsig-SA_SIGINFO.diff: Rename to
+    git-hurdsig-SA_SIGINFO.diff.
+  * debian/patches/hurd-i386/tg-sigstate_thread_reference.diff: Rename to
+    git-sigstate_thread_reference.diff.
+  * debian/patches/hurd-i386/git-siginfo_uesp.diff: Fix ss_sp field in
+    siginfo.
+  * debian/patches/hurd-i386/git-mmap-EINVAL.diff: Fix mmap EINVAL return value.
+  * debian/patches/hurd-i386/git-waitid.diff: Support
+    WEXITED/WCONTINUED/WSTOPPED/WNOWAIT.
+  * debian/patches/hurd-i386/git-hurd-version.diff: Accept including
+    hurd/version.h.
+  * debian/patches/kfreebsd/submitted-waitid.diff: Refresh.
+  * debian/control: Bump hurd-dev build-dep to get proc_waitid RPC.
+  * debian/libc0.3.symbols.hurd-i386: Add proc_waitid RPC.
+  * debian/debhelper.in/libc-dev.install.hurd-i386: Add missing
+    libpthread_syms.a.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix assertion failure in iconv when converting invalid UCS4
+      (CVE-2020-29562).  Closes: #976391.
+  * debian/sysdeps/arm64.mk: enable static PIE support on arm64.  Closes:
+    #973430.
+  * debian/patches/localedata/git-unicode-13-support.diff: backport Unicode 13
+    support from upstream.  Closes: #977691.
+  * debian/local/manpages/po/pt_BR.po: recode to UTF-8 to make lintian happy.
+  * debian/debhelper.in/*.lintian-overrides: update for recent lintian
+    versions.
+  * debian/patches/any/git-ld.so-cache-endianness-markup.diff: backport ld.so
+    cache endianness support from upstream.  Closes: #731082.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 03 Jan 2021 17:01:18 +0100
+
+glibc (2.31-6) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update with 2.33 tests.
+  * debian/patches/hurd-i386/git-pthread_link_tests.diff: Fix linking static
+    tests with the build libpthread.a.
+  * debian/patches/hurd-i386/git-libpthread_syms.diff: Fix linking static tests
+    by factorizing the symbols list.
+  * debian/patches/hurd-i386/git-libpthread-nodelete.diff: initialize
+    libpthread.so first and prevent from unloading.
+  * debian/patches/hurd-i386/git-cthreads.diff: Fix build without cthreads.h.
+  * debian/patches/hurd-i386/git-cthreads-symbols.diff: Fix libpthread
+    detection from libc.
+  * debian/patches/hurd-i386/git-libpthread_plt.diff: Fix spurious PLT.
+  * debian/patches/hurd-i386/git-lll-initializer.diff,
+    debian/patches/hurd-i386/sysvshm-lll.diff,
+    debian/patches/hurd-i386/git-lll-ptr.diff,
+    debian/patches/hurd-i386/git-ld-library-path-checks.diff,
+    debian/patches/hurd-i386/git-lll-wait-intr.diff,
+    debian/patches/hurd-i386/git-lll-private.diff,
+    debian/patches/hurd-i386/git-futex-internal.diff,
+    debian/patches/hurd-i386/git-libc-open.diff,
+    debian/patches/hurd-i386/git-pthread_get_cleanup_stack.diff,
+    debian/patches/hurd-i386/git-libpthread-testcancel.diff,
+    debian/patches/hurd-i386/git-SEM_VALUE_MAX.diff,
+    debian/patches/hurd-i386/git-sem-pshared.diff,
+    debian/patches/hurd-i386/git-sem-open-init.diff,
+    debian/patches/hurd-i386/git-sem-open.diff: Add sem_open support.
+
+  [ Aurelien Jarno ]
+  * debian/debhelper.in/libc.NEWS: fix the name if the libnss-nis package,
+    thanks to Diederik de Haas for the hint.
+
+ -- Samuel Thibault <sthibault@debian.org>  Wed, 16 Dec 2020 22:33:25 +0100
 
 glibc (2.31-5) unstable; urgency=medium
 

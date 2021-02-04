@@ -24,17 +24,14 @@
  
  #include <dl-procinfo.h>
  #include <dl-hwcaps.h>
-@@ -37,6 +40,7 @@
-   size_t cnt = platform != NULL;
+@@ -175,10 +178,27 @@
+   uint64_t masked = GLRO(dl_hwcap) & hwcap_mask;
+   size_t cnt = GLRO (dl_platform) != NULL;
    size_t n, m;
-   size_t total;
 +  struct r_strlenpair *temp;
    struct r_strlenpair *result;
    struct r_strlenpair *rp;
    char *cp;
-@@ -49,8 +53,24 @@
-   /* For TLS enabled builds always add 'tls'.  */
-   ++cnt;
  
 +#ifdef NEED_LD_SO_NOHWCAP
 +  if (__access_noerrno ("/etc/ld.so.nohwcap", F_OK) == 0)
@@ -52,69 +49,64 @@
 +    }
 +#endif
 +
+   /* glibc-hwcaps subdirectories.  These are exempted from the power
+      set construction below.  */
+   uint32_t hwcaps_subdirs_active = _dl_hwcaps_subdirs_active ();
+@@ -205,7 +225,7 @@
+   ++cnt;
+ 
    /* Create temporary data structure to generate result table.  */
 -  struct r_strlenpair temp[cnt];
 +  temp = (struct r_strlenpair *) alloca (cnt * sizeof (*temp));
    m = 0;
    for (n = 0; masked != 0; ++n)
      if ((masked & (1ULL << n)) != 0)
-@@ -100,8 +120,13 @@
-   *sz = 1 << cnt;
-   result = (struct r_strlenpair *) malloc (*sz * sizeof (*result) + total);
-   if (result == NULL)
--    _dl_signal_error (ENOMEM, NULL, NULL,
--		      N_("cannot create capability list"));
-+    {
+@@ -243,6 +263,9 @@
+ 	      && (cnt >= sizeof (size_t) * 8
+ 		  || total + (sizeof (*result) << 3)
+ 		     >= (1UL << (sizeof (size_t) * 8 - cnt + 3))))
 +#ifdef NEED_LD_SO_NOHWCAP
-+    no_memory:
++            no_memory:
 +#endif
-+      _dl_signal_error (ENOMEM, NULL, NULL,
-+		     	N_("cannot create capability list"));
-+    }
+ 	    _dl_signal_error (ENOMEM, NULL, NULL,
+ 			      N_("cannot create capability list"));
  
-   if (cnt == 1)
-     {
 --- a/elf/dl-cache.c
 +++ b/elf/dl-cache.c
-@@ -25,6 +25,9 @@
- #include <stdint.h>
+@@ -26,6 +26,9 @@
  #include <_itoa.h>
  #include <dl-hwcaps.h>
+ #include <dl-isa-level.h>
 +#include <fcntl.h>
 +#include <sysdep.h>
 +#include <not-errno.h>
  
  #ifndef _DL_PLATFORMS_COUNT
  # define _DL_PLATFORMS_COUNT 0
-@@ -252,6 +255,7 @@
-   if (cache_new != (void *) -1)
-     {
-       uint64_t platform;
-+      int disable_hwcap = 0;
- 
-       /* This is where the strings start.  */
-       cache_data = (const char *) cache_new;
-@@ -265,6 +269,11 @@
- 
-       uint64_t hwcap_mask = GET_HWCAP_MASK();
- 
+@@ -203,9 +206,14 @@
+ {
+   /* Used by the HWCAP check in the struct file_entry_new case.  */
+   uint64_t platform = _dl_string_platform (GLRO (dl_platform));
++  int disable_hwcap = 0;
+   if (platform != (uint64_t) -1)
+     platform = 1ULL << platform;
+   uint64_t hwcap_mask = GET_HWCAP_MASK ();
 +#ifdef NEED_LD_SO_NOHWCAP
-+      if (__access_noerrno ("/etc/ld.so.nohwcap", F_OK) == 0)
-+	disable_hwcap = 1;
++  if (__access_noerrno ("/etc/ld.so.nohwcap", F_OK) == 0)
++    disable_hwcap = 1;
 +#endif
-+
  #define _DL_HWCAP_TLS_MASK (1LL << 63)
-       uint64_t hwcap_exclude = ~((GLRO(dl_hwcap) & hwcap_mask)
- 				 | _DL_HWCAP_PLATFORM | _DL_HWCAP_TLS_MASK);
-@@ -275,6 +284,8 @@
- 	continue;							      \
-       if (GLRO(dl_osversion) && lib->osversion > GLRO(dl_osversion))	      \
- 	continue;							      \
-+      if (disable_hwcap && lib->hwcap != 0)				      \
-+	continue;							      \
-       if (_DL_PLATFORMS_COUNT						      \
- 	  && (lib->hwcap & _DL_HWCAP_PLATFORM) != 0			      \
- 	  && (lib->hwcap & _DL_HWCAP_PLATFORM) != platform)		      \
+   uint64_t hwcap_exclude = ~((GLRO (dl_hwcap) & hwcap_mask)
+ 			     | _DL_HWCAP_PLATFORM | _DL_HWCAP_TLS_MASK);
+@@ -302,6 +310,8 @@
+ 			  if (GLRO (dl_osversion)
+ 			      && libnew->osversion > GLRO (dl_osversion))
+ 			    continue;
++                          if (disable_hwcap && libnew->hwcap != 0)
++                            continue;
+ 			  if (_DL_PLATFORMS_COUNT
+ 			      && (libnew->hwcap & _DL_HWCAP_PLATFORM) != 0
+ 			      && ((libnew->hwcap & _DL_HWCAP_PLATFORM)
 --- a/sysdeps/alpha/ldsodefs.h
 +++ b/sysdeps/alpha/ldsodefs.h
 @@ -37,6 +37,8 @@
@@ -128,6 +120,27 @@
  #endif
 --- /dev/null
 +++ b/sysdeps/i386/ldsodefs.h
+@@ -0,0 +1,7 @@
++#ifndef __LDSODEFS_H
++
++#define NEED_LD_SO_NOHWCAP
++
++#include_next <ldsodefs.h>
++
++#endif
+--- a/sysdeps/aarch64/ldsodefs.h
++++ b/sysdeps/aarch64/ldsodefs.h
+@@ -44,6 +44,8 @@
+ 				       struct La_aarch64_retval *,	\
+ 				       const char *)
+ 
++#define NEED_LD_SO_NOHWCAP
++
+ #include_next <ldsodefs.h>
+ 
+ #endif
+--- /dev/null
++++ b/sysdeps/x86_64/ldsodefs.h
 @@ -0,0 +1,7 @@
 +#ifndef __LDSODEFS_H
 +

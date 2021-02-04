@@ -8,11 +8,9 @@ so that no target depends on manual/*.texi files.
  sysdeps/mach/hurd/Makefile | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/stdio-common/Makefile b/stdio-common/Makefile
-index 8475fd1f09..4bc168f172 100644
 --- a/stdio-common/Makefile
 +++ b/stdio-common/Makefile
-@@ -91,7 +91,7 @@
+@@ -92,7 +92,7 @@
  	     tst-printf-fp-leak.mtrace tst-printf-fp-leak-mem.out
  endif
  
@@ -21,10 +19,8 @@ index 8475fd1f09..4bc168f172 100644
  
  include ../Rules
  
-Index: b/sysdeps/mach/hurd/Makefile
-===================================================================
---- a/sysdeps/mach/hurd/Makefile	2012-10-16 09:25:03.000000000 -0700
-+++ b/sysdeps/mach/hurd/Makefile	2012-10-16 09:25:03.000000000 -0700
+--- a/sysdeps/mach/hurd/Makefile
++++ b/sysdeps/mach/hurd/Makefile
 @@ -88,7 +88,7 @@
  	    -e 's, \.\./, $(..),g' > $@t
  	mv -f $@t $@

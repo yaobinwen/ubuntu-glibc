@@ -9,7 +9,7 @@
 
 --- a/nptl/pthreadP.h
 +++ b/nptl/pthreadP.h
-@@ -255,8 +255,8 @@
+@@ -248,8 +248,8 @@
  /* Simplified test.  This will not catch all invalid descriptors but
     is better than nothing.  And if the test triggers the thread
     descriptor is guaranteed to be invalid.  */

@@ -259,7 +259,7 @@ then
             # and returns results in the services variable
             # NSS services check:
             __NSS_CHECK__
-            if [ -n "$services" ]; then
+            if [ -n "$services" ] && [ ! -x /usr/lib/needrestart/apt-pinvoke ]; then
                 if [ "$USE_DEBCONF" ] ; then
                     db_version 2.0
                     if [ "$RELEASE_UPGRADE_MODE" = desktop ]; then

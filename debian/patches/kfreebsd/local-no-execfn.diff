@@ -3,7 +3,7 @@ AT_EXECFN is Linux specific
 
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -1379,9 +1379,11 @@
+@@ -1419,9 +1419,11 @@
  	  case AT_ENTRY:
  	    av->a_un.a_val = *user_entry;
  	    break;
@@ -14,4 +14,4 @@ AT_EXECFN is Linux specific
 +# endif	    
  	  }
  #endif
-     }
+ 

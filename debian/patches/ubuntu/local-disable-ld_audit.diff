@@ -7,7 +7,7 @@ Author: Adam Conrad <adconrad@0c3.net>
 
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -292,7 +292,7 @@
+@@ -260,7 +260,7 @@
  	++list->current_tail;
  
        /* If the name is valid, return it.  */

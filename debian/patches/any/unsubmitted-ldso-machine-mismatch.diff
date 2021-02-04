@@ -1,6 +1,6 @@
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -1708,6 +1708,12 @@
+@@ -1719,6 +1719,12 @@
  	      goto close_and_out;
  	    }
  #endif

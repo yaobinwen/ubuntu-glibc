@@ -2,32 +2,28 @@
 # DP: running daemons having NSS modules upgraded out from under them.
 
 ---
- nss/nsswitch.c |   17 ++++++++++++++---
+ nss/nss_module.c |   17 ++++++++++++++---
  1 file changed, 14 insertions(+), 3 deletions(-)
 
---- a/nss/nsswitch.c
-+++ b/nss/nsswitch.c
-@@ -351,9 +351,20 @@
-       ni->library->lib_handle = __libc_dlopen (shlib_name);
-       if (ni->library->lib_handle == NULL)
- 	{
--	  /* Failed to load the library.  */
--	  ni->library->lib_handle = (void *) -1l;
--	  __set_errno (saved_errno);
-+	  /* Failed to load the library. Try a fallback.  */
-+	  int n = __snprintf(shlib_name, shlen, "libnss_%s.so.%d.%d",
-+			   ni->library->name, __GLIBC__, __GLIBC_MINOR__);
-+	  if (n >= shlen)
-+	    ni->library->lib_handle = NULL;
-+	  else
-+	    ni->library->lib_handle = __libc_dlopen (shlib_name);
+--- a/nss/nss_module.c
++++ b/nss/nss_module.c
+@@ -134,6 +134,19 @@
+ 
+     handle = __libc_dlopen (shlib_name);
+     free (shlib_name);
++    if (handle == NULL)
++      /* Failed to load the library. Try a fallback.  */
++      {
++        if (__asprintf (&shlib_name, "libnss_%s-%d.%d.so",
++                        module->name, __GLIBC__, __GLIBC_MINOR__) < 0)
++          /* This is definitely a temporary failure.  Do not update
++             module->state.  This will trigger another attempt at the next
++             call.  */
++          return false;
 +
-+	  if (ni->library->lib_handle == NULL)
-+	    {
-+	      /* Ok, really fail now.  */
-+	      ni->library->lib_handle = (void *) -1l;
-+	      __set_errno (saved_errno);
-+	    }
- 	}
- # ifdef USE_NSCD
-       else if (is_nscd)
++        handle = __libc_dlopen (shlib_name);
++        free (shlib_name);
++      }
+   }
+ 
+   /* Failing to load the module can be caused by several different

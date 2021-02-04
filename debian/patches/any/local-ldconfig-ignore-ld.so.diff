@@ -1,6 +1,6 @@
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
-@@ -477,6 +477,25 @@
+@@ -569,6 +569,25 @@
    return ret;
  }
  
@@ -26,7 +26,7 @@
  /* Create a symbolic link from soname to libname in directory path.  */
  static void
  create_links (const char *real_path, const char *path, const char *libname,
-@@ -487,6 +506,7 @@
+@@ -579,6 +598,7 @@
    struct stat64 stat_lib, stat_so, lstat_so;
    int do_link = 1;
    int do_remove = 1;
@@ -34,7 +34,7 @@
    /* XXX: The logics in this function should be simplified.  */
  
    /* Get complete path.  */
-@@ -515,6 +535,18 @@
+@@ -607,6 +627,18 @@
  	  error (0, 0, _("Can't stat %s\n"), full_libname);
  	  return;
  	}

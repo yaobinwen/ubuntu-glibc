@@ -4,11 +4,9 @@ Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=25847
 Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/glibc/+bug/1899800
 Author: Qin Li <qin.li@thetradedesk.com>
 
-diff --git a/nptl/pthread_cond_wait.c b/nptl/pthread_cond_wait.c
-index cf372bc017..88ac0be6e1 100644
 --- a/nptl/pthread_cond_wait.c
 +++ b/nptl/pthread_cond_wait.c
-@@ -608,6 +608,15 @@ __pthread_cond_wait_common (pthread_cond_t *cond, pthread_mutex_t *mutex,
+@@ -589,6 +589,15 @@
  		     the signal from, which cause it to block using the
  		     futex).  */
  		  futex_wake (cond->__data.__g_signals + g, 1, private);
