@@ -1,3 +1,10 @@
+glibc (2.33-0ubuntu2) hirsute; urgency=medium
+
+  * debian/patches/all/local-ldd.diff: Adjust extra safety check
+    for changed ld-linux.so return value. LP: #1914860.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 06 Feb 2021 13:32:05 +0100
+
 glibc (2.33-0ubuntu1) hirsute; urgency=medium
 
   [ Balint Reczey ]
