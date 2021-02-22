@@ -1,3 +1,9 @@
+glibc (2.33-0ubuntu3) hirsute; urgency=medium
+
+  * No-change rebuild to drop the udeb package.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 22 Feb 2021 10:33:25 +0100
+
 glibc (2.33-0ubuntu2) hirsute; urgency=medium
 
   * debian/patches/all/local-ldd.diff: Adjust extra safety check
