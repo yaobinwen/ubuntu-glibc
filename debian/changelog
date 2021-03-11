@@ -1,3 +1,18 @@
+glibc (2.33-0ubuntu4) hirsute; urgency=medium
+
+  [ Matthias Klose ]
+  * Run checks for every pass before failing the build.
+  * Regenerate the control file.
+
+  [ Balint Reczey ]
+  * XFAIL new tests not setting up their container properly
+  * Add Breaks: against fakeroot (<< 1.25.3-1.1ubuntu2~) (LP: #1915250)
+  * debian/patches/git-updates.diff: update from upstream stable branch
+    (LP: #1916541)
+  * debian/tests/rebuild: Print cpuinfo to help triaging CPU-specific failures
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Thu, 11 Mar 2021 17:29:21 +0100
+
 glibc (2.33-0ubuntu2) hirsute; urgency=medium
 
   * debian/patches/all/local-ldd.diff: Adjust extra safety check

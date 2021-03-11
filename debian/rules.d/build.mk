@@ -170,12 +170,13 @@ $(stamp)check_%: $(stamp)build_%
 	    echo "+---------------------------------------------------------------------+" ; \
 	    grep -E '^FAIL:' $(DEB_BUILDDIR)/tests.sum | sort ; \
 	    if ! dpkg-parsechangelog | egrep -q '^Version:.*\+deb[0-9]+u[0-9]+' ; then \
-	        exit 1 ; \
+	        touch $@_failed ; \
 	    fi ; \
 	  else \
 	    echo "+---------------------------------------------------------------------+" ; \
 	    echo "| Passed regression testing.  Give yourself a hearty pat on the back. |" ; \
 	    echo "+---------------------------------------------------------------------+" ; \
+	    touch $@_passed ; \
 	  fi ; \
 	fi
 	touch $@

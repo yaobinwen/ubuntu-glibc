@@ -1,0 +1,1639 @@
+diff --git a/NEWS b/NEWS
+index 71f5d20324a..11cd7c7069f 100644
+--- a/NEWS
++++ b/NEWS
+@@ -4,6 +4,15 @@ See the end for copying conditions.
+ 
+ Please send GNU C library bug reports via <https://sourceware.org/bugzilla/>
+ using `glibc' in the "product" field.
++
++Version 2.33.1
++
++Major new features:
++
++* The dynamic linker implements the --list-diagnostics option, printing
++  a dump of information related to IFUNC resolver operation and
++  glibc-hwcaps subdirectory selection.
++
+ 
+ Version 2.33
+ 
+diff --git a/config.h.in b/config.h.in
+index 06ee8ae26a0..f21bf04e479 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -275,4 +275,10 @@
+ /* Define if x86 ISA level should be included in shared libraries.  */
+ #undef INCLUDE_X86_ISA_LEVEL
+ 
++/* Define if -msahf is enabled by default on x86.  */
++#undef HAVE_X86_LAHF_SAHF
++
++/* Define if -mmovbe is enabled by default on x86.  */
++#undef HAVE_X86_MOVBE
++
+ #endif
+diff --git a/elf/Makefile b/elf/Makefile
+index 5d666b1b0c7..7610fa080f3 100644
+--- a/elf/Makefile
++++ b/elf/Makefile
+@@ -66,7 +66,7 @@ elide-routines.os = $(all-dl-routines) dl-support enbl-secure dl-origin \
+ # interpreter and operating independent of libc.
+ rtld-routines	= rtld $(all-dl-routines) dl-sysdep dl-environ dl-minimal \
+   dl-error-minimal dl-conflict dl-hwcaps dl-hwcaps_split dl-hwcaps-subdirs \
+-  dl-usage
++  dl-usage dl-diagnostics dl-diagnostics-kernel dl-diagnostics-cpu
+ all-rtld-routines = $(rtld-routines) $(sysdep-rtld-routines)
+ 
+ CFLAGS-dl-runtime.c += -fexceptions -fasynchronous-unwind-tables
+@@ -678,6 +678,9 @@ CFLAGS-cache.c += $(SYSCONF-FLAGS)
+ CFLAGS-rtld.c += $(SYSCONF-FLAGS)
+ CFLAGS-dl-usage.c += $(SYSCONF-FLAGS) \
+   -D'RTLD="$(rtlddir)/$(rtld-installed-name)"'
++CFLAGS-dl-diagnostics.c += $(SYSCONF-FLAGS) \
++  -D'PREFIX="$(prefix)"' \
++  -D'RTLD="$(rtlddir)/$(rtld-installed-name)"'
+ 
+ cpp-srcs-left := $(all-rtld-routines:=.os)
+ lib := rtld
+diff --git a/elf/dl-diagnostics-cpu.c b/elf/dl-diagnostics-cpu.c
+new file mode 100644
+index 00000000000..f7d149764bc
+--- /dev/null
++++ b/elf/dl-diagnostics-cpu.c
+@@ -0,0 +1,24 @@
++/* Print CPU diagnostics data in ld.so.  Stub version.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#include <dl-diagnostics.h>
++
++void
++_dl_diagnostics_cpu (void)
++{
++}
+diff --git a/elf/dl-diagnostics-kernel.c b/elf/dl-diagnostics-kernel.c
+new file mode 100644
+index 00000000000..831c358f146
+--- /dev/null
++++ b/elf/dl-diagnostics-kernel.c
+@@ -0,0 +1,24 @@
++/* Print kernel diagnostics data in ld.so.  Stub version.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#include <dl-diagnostics.h>
++
++void
++_dl_diagnostics_kernel (void)
++{
++}
+diff --git a/elf/dl-diagnostics.c b/elf/dl-diagnostics.c
+new file mode 100644
+index 00000000000..bef224b36cb
+--- /dev/null
++++ b/elf/dl-diagnostics.c
+@@ -0,0 +1,265 @@
++/* Print diagnostics data in ld.so.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#include <gnu/lib-names.h>
++#include <stdbool.h>
++#include <stddef.h>
++#include <unistd.h>
++
++#include <dl-diagnostics.h>
++#include <dl-hwcaps.h>
++#include <dl-main.h>
++#include <dl-procinfo.h>
++#include <dl-sysdep.h>
++#include <ldsodefs.h>
++#include "trusted-dirs.h"
++#include "version.h"
++
++/* Write CH to standard output.  */
++static void
++_dl_putc (char ch)
++{
++  _dl_write (STDOUT_FILENO, &ch, 1);
++}
++
++/* Print CH to standard output, quoting it if necessary.  */
++static void
++print_quoted_char (char ch)
++{
++  if (ch < ' ' || ch > '~')
++    {
++      char buf[4];
++      buf[0] = '\\';
++      buf[1] = '0' + ((ch >> 6) & 7);
++      buf[2] = '0' + ((ch >> 6) & 7);
++      buf[3] = '0' + (ch & 7);
++      _dl_write (STDOUT_FILENO, buf, 4);
++    }
++  else
++    {
++      if (ch == '\\' || ch == '"')
++        _dl_putc ('\\');
++      _dl_putc (ch);
++    }
++}
++
++/* Print S of LEN bytes to standard output, quoting characters as
++   needed.  */
++static void
++print_string_length (const char *s, size_t len)
++{
++  _dl_putc ('"');
++  for (size_t i = 0; i < len; ++i)
++    print_quoted_char (s[i]);
++  _dl_putc ('"');
++}
++
++void
++_dl_diagnostics_print_string (const char *s)
++{
++  if (s == NULL)
++    {
++      _dl_printf ("0x0");
++      return;
++    }
++
++  _dl_putc ('"');
++  while (*s != '\0')
++    {
++      print_quoted_char (*s);
++      ++s;
++    }
++  _dl_putc ('"');
++}
++
++void
++_dl_diagnostics_print_labeled_string (const char *label, const char *s)
++{
++  _dl_printf ("%s=", label);
++  _dl_diagnostics_print_string (s);
++  _dl_putc ('\n');
++}
++
++void
++_dl_diagnostics_print_labeled_value (const char *label, uint64_t value)
++{
++  if (sizeof (value) == sizeof (unsigned long int))
++    /* _dl_printf can print 64-bit values directly.  */
++    _dl_printf ("%s=0x%lx\n", label, (unsigned long int) value);
++  else
++    {
++      uint32_t high = value >> 32;
++      uint32_t low = value;
++      if (high == 0)
++        _dl_printf ("%s=0x%x\n", label, low);
++      else
++        _dl_printf ("%s=0x%x%08x\n", label, high, low);
++    }
++}
++
++/* Return true if ENV is an unfiltered environment variable.  */
++static bool
++unfiltered_envvar (const char *env, size_t *name_length)
++{
++  char *env_equal = strchr (env, '=');
++  if (env_equal == NULL)
++    {
++      /* Always dump malformed entries.  */
++      *name_length = strlen (env);
++      return true;
++    }
++  size_t envname_length = env_equal - env;
++  *name_length = envname_length;
++
++  /* LC_ and LD_ variables.  */
++  if (env[0] == 'L' && (env[1] == 'C' || env[1] == 'D')
++      && env[2] == '_')
++    return true;
++
++  /* MALLOC_ variables.  */
++  if (strncmp (env, "MALLOC_", strlen ("MALLOC_")) == 0)
++    return true;
++
++  static const char unfiltered[] =
++    "DATEMSK\0"
++    "GCONV_PATH\0"
++    "GETCONF_DIR\0"
++    "GETCONF_DIR\0"
++    "GLIBC_TUNABLES\0"
++    "GMON_OUTPUT_PREFIX\0"
++    "HESIOD_CONFIG\0"
++    "HES_DOMAIN\0"
++    "HOSTALIASES\0"
++    "I18NPATH\0"
++    "IFS\0"
++    "LANG\0"
++    "LOCALDOMAIN\0"
++    "LOCPATH\0"
++    "MSGVERB\0"
++    "NIS_DEFAULTS\0"
++    "NIS_GROUP\0"
++    "NIS_PATH\0"
++    "NLSPATH\0"
++    "PATH\0"
++    "POSIXLY_CORRECT\0"
++    "RESOLV_HOST_CONF\0"
++    "RES_OPTIONS\0"
++    "SEV_LEVEL\0"
++    "TMPDIR\0"
++    "TZ\0"
++    "TZDIR\0"
++    /* Two null bytes at the end to mark the end of the list via an
++       empty substring.  */
++    ;
++  for (const char *candidate = unfiltered; *candidate != '\0'; )
++    {
++      size_t candidate_length = strlen (candidate);
++      if (candidate_length == envname_length
++          && memcmp (candidate, env, candidate_length) == 0)
++        return true;
++      candidate += candidate_length + 1;
++    }
++
++  return false;
++}
++
++/* Dump the process environment.  */
++static void
++print_environ (char **environ)
++{
++  unsigned int index = 0;
++  for (char **envp = environ; *envp != NULL; ++envp)
++    {
++      char *env = *envp;
++      size_t name_length;
++      bool unfiltered = unfiltered_envvar (env, &name_length);
++      _dl_printf ("env%s[0x%x]=",
++                  unfiltered ? "" : "_filtered", index);
++      if (unfiltered)
++        _dl_diagnostics_print_string (env);
++      else
++        print_string_length (env, name_length);
++      _dl_putc ('\n');
++      ++index;
++    }
++}
++
++/* Print configured paths and the built-in search path.  */
++static void
++print_paths (void)
++{
++  _dl_diagnostics_print_labeled_string ("path.prefix", PREFIX);
++  _dl_diagnostics_print_labeled_string ("path.rtld", RTLD);
++  _dl_diagnostics_print_labeled_string ("path.sysconfdir", SYSCONFDIR);
++
++  unsigned int index = 0;
++  static const char *system_dirs = SYSTEM_DIRS "\0";
++  for (const char *e = system_dirs; *e != '\0'; )
++    {
++      size_t len = strlen (e);
++      _dl_printf ("path.system_dirs[0x%x]=", index);
++      print_string_length (e, len);
++      _dl_putc ('\n');
++      ++index;
++      e += len + 1;
++    }
++}
++
++/* Print information about the glibc version.  */
++static void
++print_version (void)
++{
++  _dl_diagnostics_print_labeled_string ("version.release", RELEASE);
++  _dl_diagnostics_print_labeled_string ("version.version", VERSION);
++}
++
++void
++_dl_print_diagnostics (char **environ)
++{
++#ifdef HAVE_DL_DISCOVER_OSVERSION
++  _dl_diagnostics_print_labeled_value
++    ("dl_discover_osversion", _dl_discover_osversion ());
++#endif
++  _dl_diagnostics_print_labeled_string ("dl_dst_lib", DL_DST_LIB);
++  _dl_diagnostics_print_labeled_value ("dl_hwcap", GLRO (dl_hwcap));
++  _dl_diagnostics_print_labeled_value ("dl_hwcap_important", HWCAP_IMPORTANT);
++  _dl_diagnostics_print_labeled_value ("dl_hwcap2", GLRO (dl_hwcap2));
++  _dl_diagnostics_print_labeled_string
++    ("dl_hwcaps_subdirs", _dl_hwcaps_subdirs);
++  _dl_diagnostics_print_labeled_value
++    ("dl_hwcaps_subdirs_active", _dl_hwcaps_subdirs_active ());
++  _dl_diagnostics_print_labeled_value ("dl_osversion", GLRO (dl_osversion));
++  _dl_diagnostics_print_labeled_value ("dl_pagesize", GLRO (dl_pagesize));
++  _dl_diagnostics_print_labeled_string ("dl_platform", GLRO (dl_platform));
++  _dl_diagnostics_print_labeled_string
++    ("dl_profile_output", GLRO (dl_profile_output));
++  _dl_diagnostics_print_labeled_value
++    ("dl_string_platform", _dl_string_platform ( GLRO (dl_platform)));
++
++  _dl_diagnostics_print_labeled_string ("dso.ld", LD_SO);
++  _dl_diagnostics_print_labeled_string ("dso.libc", LIBC_SO);
++
++  print_environ (environ);
++  print_paths ();
++  print_version ();
++
++  _dl_diagnostics_kernel ();
++  _dl_diagnostics_cpu ();
++
++  _exit (EXIT_SUCCESS);
++}
+diff --git a/elf/dl-diagnostics.h b/elf/dl-diagnostics.h
+new file mode 100644
+index 00000000000..27dcb12bca1
+--- /dev/null
++++ b/elf/dl-diagnostics.h
+@@ -0,0 +1,46 @@
++/* Interfaces for printing diagnostics in ld.so.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#ifndef _DL_DIAGNOSTICS_H
++#define _DL_DIAGNOSTICS_H
++
++#include <stdint.h>
++
++/* Write the null-terminated string to standard output, surrounded in
++   quotation marks.  */
++void _dl_diagnostics_print_string (const char *s) attribute_hidden;
++
++/* Like _dl_diagnostics_print_string, but add a LABEL= prefix, and a
++   newline character as a suffix.  */
++void _dl_diagnostics_print_labeled_string (const char *label, const char *s)
++  attribute_hidden;
++
++/* Print LABEL=VALUE to standard output, followed by a newline
++   character.  */
++void _dl_diagnostics_print_labeled_value (const char *label, uint64_t value)
++  attribute_hidden;
++
++/* Print diagnostics data for the kernel.  Called from
++   _dl_print_diagnostics.  */
++void _dl_diagnostics_kernel (void) attribute_hidden;
++
++/* Print diagnostics data for the CPU(s).  Called from
++   _dl_print_diagnostics.  */
++void _dl_diagnostics_cpu (void) attribute_hidden;
++
++#endif /* _DL_DIAGNOSTICS_H */
+diff --git a/elf/dl-main.h b/elf/dl-main.h
+index 3a5e13c7392..d3820e00631 100644
+--- a/elf/dl-main.h
++++ b/elf/dl-main.h
+@@ -63,7 +63,7 @@ struct audit_list
+ enum rtld_mode
+   {
+     rtld_mode_normal, rtld_mode_list, rtld_mode_verify, rtld_mode_trace,
+-    rtld_mode_list_tunables, rtld_mode_help,
++    rtld_mode_list_tunables, rtld_mode_list_diagnostics, rtld_mode_help,
+   };
+ 
+ /* Aggregated state information extracted from environment variables
+@@ -121,4 +121,7 @@ _Noreturn void _dl_version (void) attribute_hidden;
+ _Noreturn void _dl_help (const char *argv0, struct dl_main_state *state)
+   attribute_hidden;
+ 
++/* Print a diagnostics dump.  */
++_Noreturn void _dl_print_diagnostics (char **environ) attribute_hidden;
++
+ #endif /* _DL_MAIN */
+diff --git a/elf/dl-tunable-types.h b/elf/dl-tunable-types.h
+index 3fcc0806f5f..626ca334be1 100644
+--- a/elf/dl-tunable-types.h
++++ b/elf/dl-tunable-types.h
+@@ -38,8 +38,8 @@ typedef enum
+ typedef struct
+ {
+   tunable_type_code_t type_code;
+-  int64_t min;
+-  int64_t max;
++  tunable_num_t min;
++  tunable_num_t max;
+ } tunable_type_t;
+ 
+ /* Security level for tunables.  This decides what to do with individual
+diff --git a/elf/dl-tunables.c b/elf/dl-tunables.c
+index b1a50b84693..a2be9cde2f7 100644
+--- a/elf/dl-tunables.c
++++ b/elf/dl-tunables.c
+@@ -93,87 +93,45 @@ get_next_env (char **envp, char **name, size_t *namelen, char **val,
+   return NULL;
+ }
+ 
+-#define TUNABLE_SET_VAL_IF_VALID_RANGE(__cur, __val, __type)		      \
+-({									      \
+-  __type min = (__cur)->type.min;					      \
+-  __type max = (__cur)->type.max;					      \
+-									      \
+-  if ((__type) (__val) >= min && (__type) (__val) <= max)		      \
+-    {									      \
+-      (__cur)->val.numval = (__val);					      \
+-      (__cur)->initialized = true;					      \
+-    }									      \
+-})
+-
+-#define TUNABLE_SET_BOUNDS_IF_VALID(__cur, __minp, __maxp, __type)	      \
+-({									      \
+-  if (__minp != NULL)							      \
+-    {									      \
+-      /* MIN is specified.  */						      \
+-      __type min = *((__type *) __minp);				      \
+-      if (__maxp != NULL)						      \
+-	{								      \
+-	   /* Both MIN and MAX are specified.  */			      \
+-	    __type max = *((__type *) __maxp);				      \
+-	  if (max >= min						      \
+-	      && max <= (__cur)->type.max				      \
+-	      && min >= (__cur)->type.min)				      \
+-	    {								      \
+-	      (__cur)->type.min = min;					      \
+-	      (__cur)->type.max = max;					      \
+-	    }								      \
+-	}								      \
+-      else if (min > (__cur)->type.min && min <= (__cur)->type.max)	      \
+-	{								      \
+-	  /* Only MIN is specified.  */					      \
+-	  (__cur)->type.min = min;					      \
+-	}								      \
+-    }									      \
+-  else if (__maxp != NULL)						      \
+-    {									      \
+-      /* Only MAX is specified.  */					      \
+-      __type max = *((__type *) __maxp);				      \
+-      if (max < (__cur)->type.max && max >= (__cur)->type.min)		      \
+-	(__cur)->type.max = max;					      \
+-    }									      \
+-})
+-
+ static void
+-do_tunable_update_val (tunable_t *cur, const void *valp,
+-		       const void *minp, const void *maxp)
++do_tunable_update_val (tunable_t *cur, const tunable_val_t *valp,
++		       const tunable_num_t *minp,
++		       const tunable_num_t *maxp)
+ {
+-  uint64_t val;
++  tunable_num_t val, min, max;
+ 
+-  if (cur->type.type_code != TUNABLE_TYPE_STRING)
+-    val = *((int64_t *) valp);
++  if (cur->type.type_code == TUNABLE_TYPE_STRING)
++    {
++      cur->val.strval = valp->strval;
++      cur->initialized = true;
++      return;
++    }
+ 
+-  switch (cur->type.type_code)
++  val = valp->numval;
++  min = minp != NULL ? *minp : cur->type.min;
++  max = maxp != NULL ? *maxp : cur->type.max;
++
++  /* We allow only increasingly restrictive bounds.  */
++  if (min < cur->type.min)
++    min = cur->type.min;
++
++  if (max > cur->type.max)
++    max = cur->type.max;
++
++  /* Skip both bounds if they're inconsistent.  */
++  if (min > max)
+     {
+-    case TUNABLE_TYPE_INT_32:
+-	{
+-	  TUNABLE_SET_BOUNDS_IF_VALID (cur, minp, maxp, int64_t);
+-	  TUNABLE_SET_VAL_IF_VALID_RANGE (cur, val, int64_t);
+-	  break;
+-	}
+-    case TUNABLE_TYPE_UINT_64:
+-	{
+-	  TUNABLE_SET_BOUNDS_IF_VALID (cur, minp, maxp, uint64_t);
+-	  TUNABLE_SET_VAL_IF_VALID_RANGE (cur, val, uint64_t);
+-	  break;
+-	}
+-    case TUNABLE_TYPE_SIZE_T:
+-	{
+-	  TUNABLE_SET_BOUNDS_IF_VALID (cur, minp, maxp, uint64_t);
+-	  TUNABLE_SET_VAL_IF_VALID_RANGE (cur, val, uint64_t);
+-	  break;
+-	}
+-    case TUNABLE_TYPE_STRING:
+-	{
+-	  cur->val.strval = valp;
+-	  break;
+-	}
+-    default:
+-      __builtin_unreachable ();
++      min = cur->type.min;
++      max = cur->type.max;
++    }
++
++  /* Write everything out if the value and the bounds are valid.  */
++  if (min <= val && val <= max)
++    {
++      cur->val.numval = val;
++      cur->type.min = min;
++      cur->type.max = max;
++      cur->initialized = true;
+     }
+ }
+ 
+@@ -182,24 +140,18 @@ do_tunable_update_val (tunable_t *cur, const void *valp,
+ static void
+ tunable_initialize (tunable_t *cur, const char *strval)
+ {
+-  uint64_t val;
+-  const void *valp;
++  tunable_val_t val;
+ 
+   if (cur->type.type_code != TUNABLE_TYPE_STRING)
+-    {
+-      val = _dl_strtoul (strval, NULL);
+-      valp = &val;
+-    }
++    val.numval = (tunable_num_t) _dl_strtoul (strval, NULL);
+   else
+-    {
+-      cur->initialized = true;
+-      valp = strval;
+-    }
+-  do_tunable_update_val (cur, valp, NULL, NULL);
++    val.strval = strval;
++  do_tunable_update_val (cur, &val, NULL, NULL);
+ }
+ 
+ void
+-__tunable_set_val (tunable_id_t id, void *valp, void *minp, void *maxp)
++__tunable_set_val (tunable_id_t id, tunable_val_t *valp, tunable_num_t *minp,
++		   tunable_num_t *maxp)
+ {
+   tunable_t *cur = &tunable_list[id];
+ 
+diff --git a/elf/dl-tunables.h b/elf/dl-tunables.h
+index 971376ba8d3..ba7ae6b52ec 100644
+--- a/elf/dl-tunables.h
++++ b/elf/dl-tunables.h
+@@ -33,9 +33,11 @@ __tunables_init (char **unused __attribute__ ((unused)))
+ # include <stddef.h>
+ # include <stdint.h>
+ 
++typedef intmax_t tunable_num_t;
++
+ typedef union
+ {
+-  int64_t numval;
++  tunable_num_t numval;
+   const char *strval;
+ } tunable_val_t;
+ 
+@@ -52,7 +54,8 @@ typedef void (*tunable_callback_t) (tunable_val_t *);
+ extern void __tunables_init (char **);
+ extern void __tunables_print (void);
+ extern void __tunable_get_val (tunable_id_t, void *, tunable_callback_t);
+-extern void __tunable_set_val (tunable_id_t, void *, void *, void *);
++extern void __tunable_set_val (tunable_id_t, tunable_val_t *, tunable_num_t *,
++			       tunable_num_t *);
+ rtld_hidden_proto (__tunables_init)
+ rtld_hidden_proto (__tunables_print)
+ rtld_hidden_proto (__tunable_get_val)
+@@ -64,20 +67,18 @@ rtld_hidden_proto (__tunable_set_val)
+ #if defined TOP_NAMESPACE && defined TUNABLE_NAMESPACE
+ # define TUNABLE_GET(__id, __type, __cb) \
+   TUNABLE_GET_FULL (TOP_NAMESPACE, TUNABLE_NAMESPACE, __id, __type, __cb)
+-# define TUNABLE_SET(__id, __type, __val) \
+-  TUNABLE_SET_FULL (TOP_NAMESPACE, TUNABLE_NAMESPACE, __id, __type, __val)
+-# define TUNABLE_SET_WITH_BOUNDS(__id, __type, __val, __min, __max) \
++# define TUNABLE_SET(__id, __val) \
++  TUNABLE_SET_FULL (TOP_NAMESPACE, TUNABLE_NAMESPACE, __id, __val)
++# define TUNABLE_SET_WITH_BOUNDS(__id, __val, __min, __max) \
+   TUNABLE_SET_WITH_BOUNDS_FULL (TOP_NAMESPACE, TUNABLE_NAMESPACE, __id, \
+-				__type, __val, __min, __max)
++				__val, __min, __max)
+ #else
+ # define TUNABLE_GET(__top, __ns, __id, __type, __cb) \
+   TUNABLE_GET_FULL (__top, __ns, __id, __type, __cb)
+-# define TUNABLE_SET(__top, __ns, __id, __type, __val) \
+-  TUNABLE_SET_FULL (__top, __ns, __id, __type, __val)
+-# define TUNABLE_SET_WITH_BOUNDS(__top, __ns, __id, __type, __val, \
+-				 __min, __max) \
+-  TUNABLE_SET_WITH_BOUNDS_FULL (__top, __ns, __id, __type, __val, \
+-				__min, __max)
++# define TUNABLE_SET(__top, __ns, __id, __val) \
++  TUNABLE_SET_FULL (__top, __ns, __id, __val)
++# define TUNABLE_SET_WITH_BOUNDS(__top, __ns, __id, __val, __min, __max) \
++  TUNABLE_SET_WITH_BOUNDS_FULL (__top, __ns, __id, __val, __min, __max)
+ #endif
+ 
+ /* Get and return a tunable value.  If the tunable was set externally and __CB
+@@ -91,19 +92,19 @@ rtld_hidden_proto (__tunable_set_val)
+ })
+ 
+ /* Set a tunable value.  */
+-# define TUNABLE_SET_FULL(__top, __ns, __id, __type, __val) \
++# define TUNABLE_SET_FULL(__top, __ns, __id, __val) \
+ ({									      \
+   __tunable_set_val (TUNABLE_ENUM_NAME (__top, __ns, __id),		      \
+-		     & (__type) {__val}, NULL, NULL);			      \
++		     & (tunable_val_t) {.numval = __val}, NULL, NULL);	      \
+ })
+ 
+ /* Set a tunable value together with min/max values.  */
+-# define TUNABLE_SET_WITH_BOUNDS_FULL(__top, __ns, __id, __type, __val,	      \
+-				      __min, __max)			      \
++# define TUNABLE_SET_WITH_BOUNDS_FULL(__top, __ns, __id,__val, __min, __max)  \
+ ({									      \
+   __tunable_set_val (TUNABLE_ENUM_NAME (__top, __ns, __id),		      \
+-		     & (__type) {__val},  & (__type) {__min},		      \
+-		     & (__type) {__max});				      \
++		     & (tunable_val_t) {.numval = __val},		      \
++		     & (tunable_num_t) {__min},				      \
++		     & (tunable_num_t) {__max});			      \
+ })
+ 
+ /* Namespace sanity for callback functions.  Use this macro to keep the
+diff --git a/elf/dl-tunables.list b/elf/dl-tunables.list
+index 3cf0ad83eca..8ddd4a23142 100644
+--- a/elf/dl-tunables.list
++++ b/elf/dl-tunables.list
+@@ -64,6 +64,7 @@ glibc {
+       type: INT_32
+       env_alias: MALLOC_MMAP_MAX_
+       security_level: SXID_IGNORE
++      minval: 0
+     }
+     arena_max {
+       type: SIZE_T
+@@ -109,22 +110,27 @@ glibc {
+     skip_lock_busy {
+       type: INT_32
+       default: 3
++      minval: 0
+     }
+     skip_lock_internal_abort {
+       type: INT_32
+       default: 3
++      minval: 0
+     }
+     skip_lock_after_retries {
+       type: INT_32
+       default: 3
++      minval: 0
+     }
+     tries {
+       type: INT_32
+       default: 3
++      minval: 0
+     }
+     skip_trylock_internal_abort {
+       type: INT_32
+       default: 3
++      minval: 0
+     }
+   }
+ 
+diff --git a/elf/dl-usage.c b/elf/dl-usage.c
+index 6e26818bd75..5ad3a72559c 100644
+--- a/elf/dl-usage.c
++++ b/elf/dl-usage.c
+@@ -261,6 +261,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
+   --list-tunables       list all tunables with minimum and maximum values\n"
+ #endif
+ "\
++  --list-diagnostics    list diagnostics information\n\
+   --help                display this help and exit\n\
+   --version             output version information and exit\n\
+ \n\
+diff --git a/elf/rtld.c b/elf/rtld.c
+index 596b6ac3d99..94a00e20490 100644
+--- a/elf/rtld.c
++++ b/elf/rtld.c
+@@ -141,6 +141,7 @@ static void dl_main_state_init (struct dl_main_state *state);
+ /* Process all environments variables the dynamic linker must recognize.
+    Since all of them start with `LD_' we are a bit smarter while finding
+    all the entries.  */
++extern char **_environ attribute_hidden;
+ static void process_envvars (struct dl_main_state *state);
+ 
+ #ifdef DL_ARGV_NOT_RELRO
+@@ -1287,6 +1288,14 @@ dl_main (const ElfW(Phdr) *phdr,
+ 	    ++_dl_argv;
+ 	  }
+ #endif
++	else if (! strcmp (_dl_argv[1], "--list-diagnostics"))
++	  {
++	    state.mode = rtld_mode_list_diagnostics;
++
++	    ++_dl_skip_args;
++	    --_dl_argc;
++	    ++_dl_argv;
++	  }
+ 	else if (strcmp (_dl_argv[1], "--help") == 0)
+ 	  {
+ 	    state.mode = rtld_mode_help;
+@@ -1315,6 +1324,9 @@ dl_main (const ElfW(Phdr) *phdr,
+ 	}
+ #endif
+ 
++      if (state.mode == rtld_mode_list_diagnostics)
++	_dl_print_diagnostics (_environ);
++
+       /* If we have no further argument the program was called incorrectly.
+ 	 Grant the user some education.  */
+       if (_dl_argc < 2)
+@@ -2649,12 +2661,6 @@ a filename can be specified using the LD_DEBUG_OUTPUT environment variable.\n");
+     }
+ }
+ 
+-/* Process all environments variables the dynamic linker must recognize.
+-   Since all of them start with `LD_' we are a bit smarter while finding
+-   all the entries.  */
+-extern char **_environ attribute_hidden;
+-
+-
+ static void
+ process_envvars (struct dl_main_state *state)
+ {
+diff --git a/elf/tst-rtld-list-tunables.exp b/elf/tst-rtld-list-tunables.exp
+index 4f3f7ee4e30..9f66c528855 100644
+--- a/elf/tst-rtld-list-tunables.exp
++++ b/elf/tst-rtld-list-tunables.exp
+@@ -1,7 +1,7 @@
+ glibc.malloc.arena_max: 0x0 (min: 0x1, max: 0x[f]+)
+ glibc.malloc.arena_test: 0x0 (min: 0x1, max: 0x[f]+)
+ glibc.malloc.check: 0 (min: 0, max: 3)
+-glibc.malloc.mmap_max: 0 (min: -2147483648, max: 2147483647)
++glibc.malloc.mmap_max: 0 (min: 0, max: 2147483647)
+ glibc.malloc.mmap_threshold: 0x0 (min: 0x0, max: 0x[f]+)
+ glibc.malloc.mxfast: 0x0 (min: 0x0, max: 0x[f]+)
+ glibc.malloc.perturb: 0 (min: 0, max: 255)
+diff --git a/manual/README.tunables b/manual/README.tunables
+index d8c768abcc7..605ddd78cd5 100644
+--- a/manual/README.tunables
++++ b/manual/README.tunables
+@@ -98,17 +98,16 @@ where it can expect the tunable value to be passed in VALP.
+ 
+ Tunables in the module can be updated using:
+ 
+-  TUNABLE_SET (check, int32_t, val)
++  TUNABLE_SET (check, val)
+ 
+-where 'check' is the tunable name, 'int32_t' is the C type of the tunable and
+-'val' is a value of same type.
++where 'check' is the tunable name and 'val' is a value of same type.
+ 
+ To get and set tunables in a different namespace from that module, use the full
+ form of the macros as follows:
+ 
+   val = TUNABLE_GET_FULL (glibc, cpu, hwcap_mask, uint64_t, NULL)
+ 
+-  TUNABLE_SET_FULL (glibc, cpu, hwcap_mask, uint64_t, val)
++  TUNABLE_SET_FULL (glibc, cpu, hwcap_mask, val)
+ 
+ where 'glibc' is the top namespace, 'cpu' is the tunable namespace and the
+ remaining arguments are the same as the short form macros.
+@@ -116,18 +115,17 @@ remaining arguments are the same as the short form macros.
+ The minimum and maximum values can updated together with the tunable value
+ using:
+ 
+-  TUNABLE_SET_WITH_BOUNDS (check, int32_t, val, min, max)
++  TUNABLE_SET_WITH_BOUNDS (check, val, min, max)
+ 
+-where 'check' is the tunable name, 'int32_t' is the C type of the tunable,
+-'val' is a value of same type, 'min' and 'max' are the minimum and maximum
+-values of the tunable.
++where 'check' is the tunable name, 'val' is a value of same type, 'min' and
++'max' are the minimum and maximum values of the tunable.
+ 
+ To set the minimum and maximum values of tunables in a different namespace
+ from that module, use the full form of the macros as follows:
+ 
+   val = TUNABLE_GET_FULL (glibc, cpu, hwcap_mask, uint64_t, NULL)
+ 
+-  TUNABLE_SET_WITH_BOUNDS_FULL (glibc, cpu, hwcap_mask, uint64_t, val, min, max)
++  TUNABLE_SET_WITH_BOUNDS_FULL (glibc, cpu, hwcap_mask, val, min, max)
+ 
+ where 'glibc' is the top namespace, 'cpu' is the tunable namespace and the
+ remaining arguments are the same as the short form macros.
+diff --git a/nscd/netgroupcache.c b/nscd/netgroupcache.c
+index dba6ceec1be..ad2daddafdc 100644
+--- a/nscd/netgroupcache.c
++++ b/nscd/netgroupcache.c
+@@ -248,7 +248,7 @@ addgetnetgrentX (struct database_dyn *db, int fd, request_header *req,
+ 					     : NULL);
+ 				    ndomain = (ndomain ? newbuf + ndomaindiff
+ 					       : NULL);
+-				    buffer = newbuf;
++				    *tofreep = buffer = newbuf;
+ 				  }
+ 
+ 				nhost = memcpy (buffer + bufused,
+@@ -319,7 +319,7 @@ addgetnetgrentX (struct database_dyn *db, int fd, request_header *req,
+ 		    else if (status == NSS_STATUS_TRYAGAIN && e == ERANGE)
+ 		      {
+ 			buflen *= 2;
+-			buffer = xrealloc (buffer, buflen);
++			*tofreep = buffer = xrealloc (buffer, buflen);
+ 		      }
+ 		    else if (status == NSS_STATUS_RETURN
+ 			     || status == NSS_STATUS_NOTFOUND
+diff --git a/nss/nss_database.c b/nss/nss_database.c
+index cf0306adc47..fb72d0cc03d 100644
+--- a/nss/nss_database.c
++++ b/nss/nss_database.c
+@@ -398,10 +398,10 @@ nss_database_check_reload_and_get (struct nss_database_state *local,
+ 	  && (str.st_ino != local->root_ino
+ 	      ||  str.st_dev != local->root_dev)))
+     {
+-      /* Change detected; disable reloading.  */
++      /* Change detected; disable reloading and return current state.  */
+       atomic_store_release (&local->data.reload_disabled, 1);
++      *result = local->data.services[database_index];
+       __libc_lock_unlock (local->lock);
+-      __nss_module_disable_loading ();
+       return true;
+     }
+   local->root_ino = str.st_ino;
+diff --git a/nss/tst-reload2.c b/nss/tst-reload2.c
+index 5dae16b4f05..5ecb032e9fc 100644
+--- a/nss/tst-reload2.c
++++ b/nss/tst-reload2.c
+@@ -26,6 +26,7 @@
+ #include <pwd.h>
+ #include <grp.h>
+ #include <unistd.h>
++#include <netdb.h>
+ 
+ #include <support/support.h>
+ #include <support/check.h>
+@@ -48,7 +49,7 @@ static const char *group_4[] = {
+   "alpha", "beta", "gamma", "fred", NULL
+ };
+ 
+-static struct group group_table_data[] =
++static struct group group_table_data1[] =
+   {
+    GRP (4),
+    GRP_LAST ()
+@@ -58,7 +59,7 @@ void
+ _nss_test1_init_hook (test_tables *t)
+ {
+   t->pwd_table = pwd_table1;
+-  t->grp_table = group_table_data;
++  t->grp_table = group_table_data1;
+ }
+ 
+ static struct passwd pwd_table2[] =
+@@ -68,10 +69,21 @@ static struct passwd pwd_table2[] =
+    PWD_LAST ()
+   };
+ 
++static const char *group_5[] = {
++  "fred", NULL
++};
++
++static struct group group_table_data2[] =
++  {
++   GRP (5),
++   GRP_LAST ()
++  };
++
+ void
+ _nss_test2_init_hook (test_tables *t)
+ {
+   t->pwd_table = pwd_table2;
++  t->grp_table = group_table_data2;
+ }
+ 
+ static int
+@@ -79,6 +91,7 @@ do_test (void)
+ {
+   struct passwd *pw;
+   struct group *gr;
++  struct hostent *he;
+   char buf1[PATH_MAX];
+   char buf2[PATH_MAX];
+ 
+@@ -99,7 +112,9 @@ do_test (void)
+     TEST_COMPARE (pw->pw_uid, 1234);
+ 
+   /* This just loads the test2 DSO.  */
+-  gr = getgrnam ("name4");
++  gr = getgrgid (5);
++  TEST_VERIFY (gr != NULL);
++
+ 
+   /* Change the root dir.  */
+ 
+@@ -114,15 +129,21 @@ do_test (void)
+   if (pw)
+     TEST_VERIFY (pw->pw_uid != 2468);
+ 
+-  /* The "files" DSO should not be loaded.  */
+-  gr = getgrnam ("test3");
+-  TEST_VERIFY (gr == NULL);
+-
+   /* We should still be using the old configuration.  */
+   pw = getpwnam ("test1");
+   TEST_VERIFY (pw != NULL);
+   if (pw)
+     TEST_COMPARE (pw->pw_uid, 1234);
++  gr = getgrgid (5);
++  TEST_VERIFY (gr != NULL);
++  gr = getgrnam ("name4");
++  TEST_VERIFY (gr == NULL);
++
++  /* hosts in the outer nsswitch is files; the inner one is test1.
++     Verify that we're still using the outer nsswitch *and* that we
++     can load the files DSO. */
++  he = gethostbyname ("test2");
++  TEST_VERIFY (he != NULL);
+ 
+   return 0;
+ }
+diff --git a/nss/tst-reload2.root/etc/hosts b/nss/tst-reload2.root/etc/hosts
+new file mode 100644
+index 00000000000..bbd9e494ef3
+--- /dev/null
++++ b/nss/tst-reload2.root/etc/hosts
+@@ -0,0 +1 @@
++1.2.3.4 test1
+diff --git a/nss/tst-reload2.root/etc/nsswitch.conf b/nss/tst-reload2.root/etc/nsswitch.conf
+index 570795ae22d..688a5895191 100644
+--- a/nss/tst-reload2.root/etc/nsswitch.conf
++++ b/nss/tst-reload2.root/etc/nsswitch.conf
+@@ -1,2 +1,3 @@
+ passwd: test1
+ group: test2
++hosts: files
+diff --git a/nss/tst-reload2.root/subdir/etc/hosts b/nss/tst-reload2.root/subdir/etc/hosts
+new file mode 100644
+index 00000000000..0a2cbd4337f
+--- /dev/null
++++ b/nss/tst-reload2.root/subdir/etc/hosts
+@@ -0,0 +1 @@
++1.2.3.4 test2
+diff --git a/nss/tst-reload2.root/subdir/etc/nsswitch.conf b/nss/tst-reload2.root/subdir/etc/nsswitch.conf
+index f1d73f87651..fea271869ef 100644
+--- a/nss/tst-reload2.root/subdir/etc/nsswitch.conf
++++ b/nss/tst-reload2.root/subdir/etc/nsswitch.conf
+@@ -1,2 +1,3 @@
+ passwd: test2
+ group: files
++hosts: test1
+diff --git a/string/rawmemchr.c b/string/rawmemchr.c
+index 59bbeeaa42e..b8523118e5b 100644
+--- a/string/rawmemchr.c
++++ b/string/rawmemchr.c
+@@ -22,24 +22,28 @@
+ # define RAWMEMCHR __rawmemchr
+ #endif
+ 
+-/* Find the first occurrence of C in S.  */
+-void *
+-RAWMEMCHR (const void *s, int c)
+-{
+-  DIAG_PUSH_NEEDS_COMMENT;
++/* The pragmata should be nested inside RAWMEMCHR below, but that
++   triggers GCC PR 98512.  */
++DIAG_PUSH_NEEDS_COMMENT;
+ #if __GNUC_PREREQ (7, 0)
+-  /* GCC 8 warns about the size passed to memchr being larger than
+-     PTRDIFF_MAX; the use of SIZE_MAX is deliberate here.  */
+-  DIAG_IGNORE_NEEDS_COMMENT (8, "-Wstringop-overflow=");
++/* GCC 8 warns about the size passed to memchr being larger than
++   PTRDIFF_MAX; the use of SIZE_MAX is deliberate here.  */
++DIAG_IGNORE_NEEDS_COMMENT (8, "-Wstringop-overflow=");
+ #endif
+ #if __GNUC_PREREQ (11, 0)
+-  /* Likewise GCC 11, with a different warning option.  */
+-  DIAG_IGNORE_NEEDS_COMMENT (11, "-Wstringop-overread");
++/* Likewise GCC 11, with a different warning option.  */
++DIAG_IGNORE_NEEDS_COMMENT (11, "-Wstringop-overread");
+ #endif
++
++/* Find the first occurrence of C in S.  */
++void *
++RAWMEMCHR (const void *s, int c)
++{
+   if (c != '\0')
+     return memchr (s, c, (size_t)-1);
+-  DIAG_POP_NEEDS_COMMENT;
+   return (char *)s + strlen (s);
+ }
+ libc_hidden_def (__rawmemchr)
+ weak_alias (__rawmemchr, rawmemchr)
++
++DIAG_POP_NEEDS_COMMENT;
+diff --git a/sysdeps/s390/dl-procinfo.c b/sysdeps/s390/dl-procinfo.c
+index 0c334a2551c..c174e27b355 100644
+--- a/sysdeps/s390/dl-procinfo.c
++++ b/sysdeps/s390/dl-procinfo.c
+@@ -46,12 +46,13 @@
+ #if !defined PROCINFO_DECL && defined SHARED
+   ._dl_s390_cap_flags
+ #else
+-PROCINFO_CLASS const char _dl_s390_cap_flags[19][9]
++PROCINFO_CLASS const char _dl_s390_cap_flags[21][9]
+ #endif
+ #ifndef PROCINFO_DECL
+ = {
+      "esan3", "zarch", "stfle", "msa", "ldisp", "eimm", "dfp", "edat", "etf3eh",
+-     "highgprs", "te", "vx", "vxd", "vxe", "gs", "vxe2", "vxp", "sort", "dflt"
++     "highgprs", "te", "vx", "vxd", "vxe", "gs", "vxe2", "vxp", "sort", "dflt",
++     "vxp2", "nnpa"
+   }
+ #endif
+ #if !defined SHARED || defined PROCINFO_DECL
+diff --git a/sysdeps/s390/dl-procinfo.h b/sysdeps/s390/dl-procinfo.h
+index 9e1a8c7ba9b..2d9c3058083 100644
+--- a/sysdeps/s390/dl-procinfo.h
++++ b/sysdeps/s390/dl-procinfo.h
+@@ -21,7 +21,7 @@
+ #define _DL_PROCINFO_H	1
+ #include <ldsodefs.h>
+ 
+-#define _DL_HWCAP_COUNT 19
++#define _DL_HWCAP_COUNT 21
+ 
+ #define _DL_PLATFORMS_COUNT	10
+ 
+@@ -61,6 +61,8 @@ enum
+   HWCAP_S390_VXRS_PDE = 1 << 16,
+   HWCAP_S390_SORT = 1 << 17,
+   HWCAP_S390_DFLT = 1 << 18,
++  HWCAP_S390_VXRS_PDE2 = 1 << 19,
++  HWCAP_S390_NNPA = 1 << 20,
+ };
+ 
+ #define HWCAP_IMPORTANT (HWCAP_S390_ZARCH | HWCAP_S390_LDISP \
+diff --git a/sysdeps/unix/sysv/linux/aarch64/cpu-features.c b/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
+index fe52b6308ee..db6aa3516c1 100644
+--- a/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
++++ b/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
+@@ -104,7 +104,7 @@ init_cpu_features (struct cpu_features *cpu_features)
+   cpu_features->mte_state = (GLRO (dl_hwcap2) & HWCAP2_MTE) ? mte_state : 0;
+   /* If we lack the MTE feature, disable the tunable, since it will
+      otherwise cause instructions that won't run on this CPU to be used.  */
+-  TUNABLE_SET (glibc, mem, tagging, unsigned, cpu_features->mte_state);
++  TUNABLE_SET (glibc, mem, tagging, cpu_features->mte_state);
+ # endif
+ 
+   if (cpu_features->mte_state & 2)
+diff --git a/sysdeps/unix/sysv/linux/dl-diagnostics-kernel.c b/sysdeps/unix/sysv/linux/dl-diagnostics-kernel.c
+new file mode 100644
+index 00000000000..59f6402c547
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/dl-diagnostics-kernel.c
+@@ -0,0 +1,77 @@
++/* Print kernel diagnostics data in ld.so.  Linux version.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#include <dl-diagnostics.h>
++#include <ldsodefs.h>
++#include <sys/utsname.h>
++
++/* Dump the auxiliary vector to standard output.  */
++static void
++print_auxv (void)
++{
++  /* See _dl_show_auxv.  The code below follows the general output
++     format for diagnostic dumps.  */
++  unsigned int index = 0;
++  for (ElfW(auxv_t) *av = GLRO(dl_auxv); av->a_type != AT_NULL; ++av)
++    {
++      _dl_printf ("auxv[0x%x].a_type=0x%lx\n"
++                  "auxv[0x%x].a_val=",
++                  index, (unsigned long int) av->a_type, index);
++      if (av->a_type == AT_EXECFN
++          || av->a_type == AT_PLATFORM
++          || av->a_type == AT_BASE_PLATFORM)
++        /* The address of the strings is not useful at all, so print
++           the strings themselvs.  */
++        _dl_diagnostics_print_string ((const char *) av->a_un.a_val);
++      else
++        _dl_printf ("0x%lx", (unsigned long int) av->a_un.a_val);
++      _dl_printf ("\n");
++      ++index;
++    }
++}
++
++/* Print one uname entry.  */
++static void
++print_utsname_entry (const char *field, const char *value)
++{
++  _dl_printf ("uname.");
++  _dl_diagnostics_print_labeled_string (field, value);
++}
++
++/* Print information from uname, including the kernel version.  */
++static void
++print_uname (void)
++{
++  struct utsname uts;
++  if (__uname (&uts) == 0)
++    {
++      print_utsname_entry ("sysname", uts.sysname);
++      print_utsname_entry ("nodename", uts.nodename);
++      print_utsname_entry ("release", uts.release);
++      print_utsname_entry ("version", uts.version);
++      print_utsname_entry ("machine", uts.machine);
++      print_utsname_entry ("domainname", uts.domainname);
++    }
++}
++
++void
++_dl_diagnostics_kernel (void)
++{
++  print_auxv ();
++  print_uname ();
++}
+diff --git a/sysdeps/unix/sysv/linux/s390/bits/hwcap.h b/sysdeps/unix/sysv/linux/s390/bits/hwcap.h
+index 696616e7792..e9bd3684db8 100644
+--- a/sysdeps/unix/sysv/linux/s390/bits/hwcap.h
++++ b/sysdeps/unix/sysv/linux/s390/bits/hwcap.h
+@@ -46,3 +46,5 @@
+ #define HWCAP_S390_VXRS_PDE     65536
+ #define HWCAP_S390_SORT         131072
+ #define HWCAP_S390_DFLT         262144
++#define HWCAP_S390_VXRS_PDE2    524288
++#define HWCAP_S390_NNPA         1048576
+diff --git a/sysdeps/x86/configure b/sysdeps/x86/configure
+index 5e32dc62b33..ead1295c38c 100644
+--- a/sysdeps/x86/configure
++++ b/sysdeps/x86/configure
+@@ -126,6 +126,8 @@ cat > conftest2.S <<EOF
+ 4:
+ EOF
+ libc_cv_include_x86_isa_level=no
++libc_cv_have_x86_lahf_sahf=no
++libc_cv_have_x86_movbe=no
+ if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS -nostartfiles -nostdlib -r -o conftest conftest1.S conftest2.S'
+   { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+   (eval $ac_try) 2>&5
+@@ -135,6 +137,24 @@ if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS -nostartfiles -nostdlib -r -o conftest c
+   count=`LC_ALL=C $READELF -n conftest | grep NT_GNU_PROPERTY_TYPE_0 | wc -l`
+   if test "$count" = 1; then
+     libc_cv_include_x86_isa_level=yes
++    cat > conftest.c <<EOF
++EOF
++    if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS -fverbose-asm -S -o - conftest.c'
++  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
++  (eval $ac_try) 2>&5
++  ac_status=$?
++  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
++  test $ac_status = 0; }; } | grep -q "\-msahf"; then
++      libc_cv_have_x86_lahf_sahf=yes
++    fi
++    if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS -fverbose-asm -S -o - conftest.c'
++  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
++  (eval $ac_try) 2>&5
++  ac_status=$?
++  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
++  test $ac_status = 0; }; } | grep -q "\-mmovbe"; then
++      libc_cv_have_x86_movbe=yes
++    fi
+   fi
+ fi
+ rm -f conftest*
+@@ -144,6 +164,14 @@ $as_echo "$libc_cv_include_x86_isa_level" >&6; }
+ if test $libc_cv_include_x86_isa_level = yes; then
+   $as_echo "#define INCLUDE_X86_ISA_LEVEL 1" >>confdefs.h
+ 
++fi
++if test $libc_cv_have_x86_lahf_sahf = yes; then
++  $as_echo "#define HAVE_X86_LAHF_SAHF 1" >>confdefs.h
++
++fi
++if test $libc_cv_have_x86_movbe = yes; then
++  $as_echo "#define HAVE_X86_MOVBE 1" >>confdefs.h
++
+ fi
+ config_vars="$config_vars
+ enable-x86-isa-level = $libc_cv_include_x86_isa_level"
+diff --git a/sysdeps/x86/configure.ac b/sysdeps/x86/configure.ac
+index f94088f377e..bca97fdc2f1 100644
+--- a/sysdeps/x86/configure.ac
++++ b/sysdeps/x86/configure.ac
+@@ -98,14 +98,30 @@ cat > conftest2.S <<EOF
+ 4:
+ EOF
+ libc_cv_include_x86_isa_level=no
++libc_cv_have_x86_lahf_sahf=no
++libc_cv_have_x86_movbe=no
+ if AC_TRY_COMMAND(${CC-cc} $CFLAGS $CPPFLAGS -nostartfiles -nostdlib -r -o conftest conftest1.S conftest2.S); then
+   count=`LC_ALL=C $READELF -n conftest | grep NT_GNU_PROPERTY_TYPE_0 | wc -l`
+   if test "$count" = 1; then
+     libc_cv_include_x86_isa_level=yes
++    cat > conftest.c <<EOF
++EOF
++    if AC_TRY_COMMAND(${CC-cc} $CFLAGS $CPPFLAGS -fverbose-asm -S -o - conftest.c) | grep -q "\-msahf"; then
++      libc_cv_have_x86_lahf_sahf=yes
++    fi
++    if AC_TRY_COMMAND(${CC-cc} $CFLAGS $CPPFLAGS -fverbose-asm -S -o - conftest.c) | grep -q "\-mmovbe"; then
++      libc_cv_have_x86_movbe=yes
++    fi
+   fi
+ fi
+ rm -f conftest*])
+ if test $libc_cv_include_x86_isa_level = yes; then
+   AC_DEFINE(INCLUDE_X86_ISA_LEVEL)
+ fi
++if test $libc_cv_have_x86_lahf_sahf = yes; then
++  AC_DEFINE(HAVE_X86_LAHF_SAHF)
++fi
++if test $libc_cv_have_x86_movbe = yes; then
++  AC_DEFINE(HAVE_X86_MOVBE)
++fi
+ LIBC_CONFIG_VAR([enable-x86-isa-level], [$libc_cv_include_x86_isa_level])
+diff --git a/sysdeps/x86/dl-cacheinfo.h b/sysdeps/x86/dl-cacheinfo.h
+index a31fa0783a2..6f91651f0da 100644
+--- a/sysdeps/x86/dl-cacheinfo.h
++++ b/sysdeps/x86/dl-cacheinfo.h
+@@ -917,17 +917,14 @@ dl_init_cacheinfo (struct cpu_features *cpu_features)
+   rep_stosb_threshold = TUNABLE_GET (x86_rep_stosb_threshold,
+ 				     long int, NULL);
+ 
+-  TUNABLE_SET_WITH_BOUNDS (x86_data_cache_size, long int, data,
+-			   0, (long int) -1);
+-  TUNABLE_SET_WITH_BOUNDS (x86_shared_cache_size, long int, shared,
+-			   0, (long int) -1);
+-  TUNABLE_SET_WITH_BOUNDS (x86_non_temporal_threshold, long int,
+-			   non_temporal_threshold, 0, (long int) -1);
+-  TUNABLE_SET_WITH_BOUNDS (x86_rep_movsb_threshold, long int,
+-			   rep_movsb_threshold,
+-			   minimum_rep_movsb_threshold, (long int) -1);
+-  TUNABLE_SET_WITH_BOUNDS (x86_rep_stosb_threshold, long int,
+-			   rep_stosb_threshold, 1, (long int) -1);
++  TUNABLE_SET_WITH_BOUNDS (x86_data_cache_size, data, 0, SIZE_MAX);
++  TUNABLE_SET_WITH_BOUNDS (x86_shared_cache_size, shared, 0, SIZE_MAX);
++  TUNABLE_SET_WITH_BOUNDS (x86_non_temporal_threshold, non_temporal_threshold,
++			   0, SIZE_MAX);
++  TUNABLE_SET_WITH_BOUNDS (x86_rep_movsb_threshold, rep_movsb_threshold,
++			   minimum_rep_movsb_threshold, SIZE_MAX);
++  TUNABLE_SET_WITH_BOUNDS (x86_rep_stosb_threshold, rep_stosb_threshold, 1,
++			   SIZE_MAX);
+ #endif
+ 
+   cpu_features->data_cache_size = data;
+diff --git a/sysdeps/x86/dl-diagnostics-cpu.c b/sysdeps/x86/dl-diagnostics-cpu.c
+new file mode 100644
+index 00000000000..55c6f35c7ca
+--- /dev/null
++++ b/sysdeps/x86/dl-diagnostics-cpu.c
+@@ -0,0 +1,116 @@
++/* Print CPU diagnostics data in ld.so.  x86 version.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#include <dl-diagnostics.h>
++#include <ldsodefs.h>
++
++static void
++print_cpu_features_value (const char *label, uint64_t value)
++{
++  _dl_printf ("x86.cpu_features.");
++  _dl_diagnostics_print_labeled_value (label, value);
++}
++
++static void
++print_cpu_feature_internal (unsigned int index, const char *kind,
++                            unsigned int reg, uint32_t value)
++{
++  _dl_printf ("x86.cpu_features.features[0x%x].%s[0x%x]=0x%x\n",
++              index, kind, reg, value);
++}
++
++static void
++print_cpu_feature_preferred (const char *label, unsigned int flag)
++{
++  _dl_printf("x86.cpu_features.preferred.%s=0x%x\n", label, flag);
++}
++
++void
++_dl_diagnostics_cpu (void)
++{
++  const struct cpu_features *cpu_features = __get_cpu_features ();
++
++  print_cpu_features_value ("basic.kind", cpu_features->basic.kind);
++  print_cpu_features_value ("basic.max_cpuid", cpu_features->basic.max_cpuid);
++  print_cpu_features_value ("basic.family", cpu_features->basic.family);
++  print_cpu_features_value ("basic.model", cpu_features->basic.model);
++  print_cpu_features_value ("basic.stepping", cpu_features->basic.stepping);
++
++  for (unsigned int index = 0; index < CPUID_INDEX_MAX; ++index)
++    {
++      /* The index values are part of the ABI via
++         <sys/platform/x86.h>, so translating them to strings is not
++         necessary.  */
++      for (unsigned int reg = 0; reg < 4; ++reg)
++        print_cpu_feature_internal
++          (index, "cpuid", reg,
++           cpu_features->features[index].cpuid_array[reg]);
++      for (unsigned int reg = 0; reg < 4; ++reg)
++        print_cpu_feature_internal
++          (index, "usable", reg,
++           cpu_features->features[index].usable_array[reg]);
++    }
++
++  /* The preferred indicators are not part of the ABI and need to be
++     translated.  */
++#define BIT(x) \
++  print_cpu_feature_preferred (#x, CPU_FEATURE_PREFERRED_P (cpu_features, x));
++#include "cpu-features-preferred_feature_index_1.def"
++#undef BIT
++
++  print_cpu_features_value ("isa_1", cpu_features->isa_1);
++  print_cpu_features_value ("xsave_state_size",
++                            cpu_features->xsave_state_size);
++  print_cpu_features_value ("xsave_state_full_size",
++                            cpu_features->xsave_state_full_size);
++  print_cpu_features_value ("data_cache_size", cpu_features->data_cache_size);
++  print_cpu_features_value ("shared_cache_size",
++                            cpu_features->shared_cache_size);
++  print_cpu_features_value ("non_temporal_threshold",
++                            cpu_features->non_temporal_threshold);
++  print_cpu_features_value ("rep_movsb_threshold",
++                            cpu_features->rep_movsb_threshold);
++  print_cpu_features_value ("rep_stosb_threshold",
++                            cpu_features->rep_stosb_threshold);
++  print_cpu_features_value ("level1_icache_size",
++                            cpu_features->level1_icache_size);
++  print_cpu_features_value ("level1_dcache_size",
++                            cpu_features->level1_dcache_size);
++  print_cpu_features_value ("level1_dcache_assoc",
++                            cpu_features->level1_dcache_assoc);
++  print_cpu_features_value ("level1_dcache_linesize",
++                            cpu_features->level1_dcache_linesize);
++  print_cpu_features_value ("level2_cache_size",
++                            cpu_features->level2_cache_size);
++  print_cpu_features_value ("level2_cache_assoc",
++                            cpu_features->level2_cache_assoc);
++  print_cpu_features_value ("level2_cache_linesize",
++                            cpu_features->level2_cache_linesize);
++  print_cpu_features_value ("level3_cache_size",
++                            cpu_features->level3_cache_size);
++  print_cpu_features_value ("level3_cache_assoc",
++                            cpu_features->level3_cache_assoc);
++  print_cpu_features_value ("level3_cache_linesize",
++                            cpu_features->level3_cache_linesize);
++  print_cpu_features_value ("level4_cache_size",
++                            cpu_features->level4_cache_size);
++  _Static_assert (offsetof (struct cpu_features, level4_cache_size)
++                  + sizeof (cpu_features->level4_cache_size)
++                  == sizeof (*cpu_features),
++                  "last cpu_features field has been printed");
++}
+diff --git a/sysdeps/x86/include/cpu-features-preferred_feature_index_1.def b/sysdeps/x86/include/cpu-features-preferred_feature_index_1.def
+new file mode 100644
+index 00000000000..06af1a8dd5c
+--- /dev/null
++++ b/sysdeps/x86/include/cpu-features-preferred_feature_index_1.def
+@@ -0,0 +1,34 @@
++/* Bits in the PREFERRED_FEATURE_INDEX_1 bitfield of <cpu-features.h>.
++   Copyright (C) 2020-2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++BIT (Fast_Rep_String)
++BIT (Fast_Copy_Backward)
++BIT (Slow_BSF)
++BIT (Fast_Unaligned_Load)
++BIT (Prefer_PMINUB_for_stringop)
++BIT (Fast_Unaligned_Copy)
++BIT (I586)
++BIT (I686)
++BIT (Slow_SSE4_2)
++BIT (AVX_Fast_Unaligned_Load)
++BIT (Prefer_MAP_32BIT_EXEC)
++BIT (Prefer_No_VZEROUPPER)
++BIT (Prefer_ERMS)
++BIT (Prefer_No_AVX512)
++BIT (MathVec_Prefer_No_AVX512)
++BIT (Prefer_FSRM)
+diff --git a/sysdeps/x86/include/cpu-features.h b/sysdeps/x86/include/cpu-features.h
+index 624736b40eb..184dc93c699 100644
+--- a/sysdeps/x86/include/cpu-features.h
++++ b/sysdeps/x86/include/cpu-features.h
+@@ -757,40 +757,23 @@ enum
+ #define reg_AESKLE		ebx
+ #define reg_WIDE_KL		ebx
+ 
+-/* PREFERRED_FEATURE_INDEX_1.  */
+-#define bit_arch_I586				(1u << 0)
+-#define bit_arch_I686				(1u << 1)
+-#define bit_arch_Fast_Rep_String		(1u << 2)
+-#define bit_arch_Fast_Copy_Backward		(1u << 3)
+-#define bit_arch_Fast_Unaligned_Load		(1u << 4)
+-#define bit_arch_Fast_Unaligned_Copy		(1u << 5)
+-#define bit_arch_Slow_BSF			(1u << 6)
+-#define bit_arch_Slow_SSE4_2			(1u << 7)
+-#define bit_arch_AVX_Fast_Unaligned_Load	(1u << 8)
+-#define bit_arch_Prefer_MAP_32BIT_EXEC		(1u << 9)
+-#define bit_arch_Prefer_PMINUB_for_stringop	(1u << 10)
+-#define bit_arch_Prefer_No_VZEROUPPER		(1u << 11)
+-#define bit_arch_Prefer_ERMS			(1u << 12)
+-#define bit_arch_Prefer_FSRM			(1u << 13)
+-#define bit_arch_Prefer_No_AVX512		(1u << 14)
+-#define bit_arch_MathVec_Prefer_No_AVX512	(1u << 15)
+-
+-#define index_arch_Fast_Rep_String		PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Fast_Copy_Backward		PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Slow_BSF			PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Fast_Unaligned_Load		PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Prefer_PMINUB_for_stringop 	PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Fast_Unaligned_Copy		PREFERRED_FEATURE_INDEX_1
+-#define index_arch_I586				PREFERRED_FEATURE_INDEX_1
+-#define index_arch_I686				PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Slow_SSE4_2			PREFERRED_FEATURE_INDEX_1
+-#define index_arch_AVX_Fast_Unaligned_Load	PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Prefer_MAP_32BIT_EXEC	PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Prefer_No_VZEROUPPER		PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Prefer_ERMS			PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Prefer_No_AVX512		PREFERRED_FEATURE_INDEX_1
+-#define index_arch_MathVec_Prefer_No_AVX512	PREFERRED_FEATURE_INDEX_1
+-#define index_arch_Prefer_FSRM			PREFERRED_FEATURE_INDEX_1
++/* PREFERRED_FEATURE_INDEX_1.  First define the bitindex values
++   sequentially, then define the bit_arch* and index_arch_* lookup
++   constants.  */
++enum
++  {
++#define BIT(x) _bitindex_arch_##x ,
++#include "cpu-features-preferred_feature_index_1.def"
++#undef BIT
++  };
++enum
++  {
++#define BIT(x)					\
++    bit_arch_##x = 1u << _bitindex_arch_##x ,	\
++    index_arch_##x = PREFERRED_FEATURE_INDEX_1,
++#include "cpu-features-preferred_feature_index_1.def"
++#undef BIT
++  };
+ 
+ /* XCR0 Feature flags.  */
+ #define bit_XMM_state		(1u << 1)
+@@ -841,6 +824,8 @@ struct cpuid_feature_internal
+     };
+ };
+ 
++/* NB: When adding new fields, update sysdeps/x86/dl-diagnostics-cpu.c
++   to print them.  */
+ struct cpu_features
+ {
+   struct cpu_features_basic basic;
+diff --git a/sysdeps/x86/isa-level.c b/sysdeps/x86/isa-level.c
+index aaf524cb56c..49ef4aa6122 100644
+--- a/sysdeps/x86/isa-level.c
++++ b/sysdeps/x86/isa-level.c
+@@ -29,32 +29,35 @@
+ 
+ /* ELF program property for x86 ISA level.  */
+ #ifdef INCLUDE_X86_ISA_LEVEL
+-# if defined __x86_64__ || defined __FXSR__ || !defined _SOFT_FLOAT \
+-     || defined  __MMX__ || defined __SSE__ || defined __SSE2__
++# if defined __SSE__ && defined __SSE2__
++/* NB: ISAs, excluding MMX, in x86-64 ISA level baseline are used.  */
+ #  define ISA_BASELINE	GNU_PROPERTY_X86_ISA_1_BASELINE
+ # else
+ #  define ISA_BASELINE	0
+ # endif
+ 
+-# if defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 \
+-     || (defined __x86_64__ && defined __LAHF_SAHF__) \
+-     || defined __POPCNT__ || defined __SSE3__ \
+-     || defined __SSSE3__ || defined __SSE4_1__ || defined __SSE4_2__
++# if ISA_BASELINE && defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 \
++     && defined HAVE_X86_LAHF_SAHF && defined __POPCNT__ \
++     && defined __SSE3__ && defined __SSSE3__ && defined __SSE4_1__ \
++     && defined __SSE4_2__
++/* NB: ISAs in x86-64 ISA level v2 are used.  */
+ #  define ISA_V2	GNU_PROPERTY_X86_ISA_1_V2
+ # else
+ #  define ISA_V2	0
+ # endif
+ 
+-# if defined __AVX__ || defined __AVX2__ || defined __F16C__ \
+-     || defined __FMA__ || defined __LZCNT__ || defined __MOVBE__ \
+-     || defined __XSAVE__
++# if ISA_V2 && defined __AVX__ && defined __AVX2__ && defined __F16C__ \
++     && defined __FMA__ && defined __LZCNT__ && defined HAVE_X86_MOVBE
++/* NB: ISAs in x86-64 ISA level v3 are used.  */
+ #  define ISA_V3	GNU_PROPERTY_X86_ISA_1_V3
+ # else
+ #  define ISA_V3	0
+ # endif
+ 
+-# if defined __AVX512F__ || defined __AVX512BW__ || defined __AVX512CD__ \
+-     || defined __AVX512DQ__ || defined __AVX512VL__
++# if ISA_V3 && defined __AVX512F__ && defined __AVX512BW__ \
++     && defined __AVX512CD__ && defined __AVX512DQ__ \
++     && defined __AVX512VL__
++/* NB: ISAs in x86-64 ISA level v4 are used.  */
+ #  define ISA_V4	GNU_PROPERTY_X86_ISA_1_V4
+ # else
+ #  define ISA_V4	0

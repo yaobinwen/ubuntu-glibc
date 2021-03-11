@@ -203,7 +203,24 @@ clean:: unpatch
 # Required Debian targets
 build-arch: $(stamp)info \
 	$(patsubst %,$(stamp)build_%,$(GLIBC_PASSES)) \
-	$(patsubst %,$(stamp)check_%,$(GLIBC_PASSES))
+	$(patsubst %,$(stamp)check_%,$(GLIBC_PASSES)) \
+	post-check
+post-check: $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES))
+	@echo "CHECK SUMMARY"
+	@for pass in $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES)); do \
+	  if [ -f $${pass}_passed ]; then \
+	    echo "check for $$(basename $$pass) passed"; \
+	  fi; \
+	done
+	@fail=0; \
+	for pass in $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES)); do \
+	  if [ -f $${pass}_failed ]; then \
+	    echo "check for $$(basename $$pass) failed"; \
+	    fail=1; \
+	  fi; \
+	done; \
+	exit $$fail
+
 ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
 build-arch: $(stamp)build_C.UTF-8 \
 	$(stamp)build_locales-all
