@@ -1,3 +1,12 @@
+glibc (2.32-0ubuntu3.2) groovy; urgency=medium
+
+  * Make libc6 provide libc6-lse on arm64.
+    Libc6 is already compiled with -moutline-atomics thus the separate binary
+    package is dropped. (LP: #1912652)
+  * debian/control: Libc6 should Conflict and Replace libc6-lse
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Mon, 29 Mar 2021 22:03:14 +0200
+
 glibc (2.32-0ubuntu3.1) groovy; urgency=medium
 
   * Drop check preventing using float128 which breaks new icc (LP: #1895358)
