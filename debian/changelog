@@ -1,3 +1,20 @@
+glibc (2.31-0ubuntu9.3) focal; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/any/git-surplus-tls-accounting.diff: backport TLS surplus
+    accounting from upstream. (Closes: #964141) (LP: #1914044)
+
+  [ Balint Reczey ]
+  * Update debian/patches/ubuntu/local-disable-ld_audit.diff
+  * Prevent rare deadlock in pthread_cond_signal (LP: #1899800)
+  * Cherry-pick upstream patch to fix building with -moutline-atomics
+  * Make libc6 provide libc6-lse on arm64.
+    Libc6 is now compiled with -moutline-atomics thus the separate binary
+    package is dropped. (LP: #1912652)
+  * debian/control: Libc6 should Conflict and Replace libc6-lse
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Mon, 29 Mar 2021 22:11:32 +0200
+
 glibc (2.31-0ubuntu9.2) focal; urgency=medium
 
   * Drop check preventing using float128 which breaks new icc (LP: #1895358)
