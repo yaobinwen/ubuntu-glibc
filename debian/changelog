@@ -1,3 +1,21 @@
+glibc (2.33-0ubuntu5) hirsute; urgency=medium
+
+  * debian/tests/rebuild: Revert printing cpuinfo, this information is already
+    present in the log.
+  * debian/control: Libc6 should Conflict and Replace libc6-lse (LP: #1912652)
+  * Don't support disabling hwcaps on amd64 and arm64.
+    There is no need for it and it adds extra overhead.
+  * debian/patches/git-updates.diff: update from upstream stable branch
+    - [18435] pthread_once hangs when init routine throws an exception
+    - [23462] Static binary with dynamic string tokens ($LIB, $PLATFORM, $ORIGIN)
+              crashes
+    - [27304] pthread_cond_destroy does not pass private flag to futex system calls
+    - [27537] test-container: Always copy test-specific support files
+    - [27577] elf/ld.so --help doesn't work
+  * XFAIL io/tst-stat on s390
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Wed, 31 Mar 2021 15:44:28 +0200
+
 glibc (2.33-0ubuntu4) hirsute; urgency=medium
 
   [ Matthias Klose ]

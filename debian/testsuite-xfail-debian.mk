@@ -1142,6 +1142,10 @@ ifeq ($(config-machine)-$(config-os),s390-linux-gnu)
 # In some conditions the kernel might not provide a heap, causing
 # some tests to fail. See bug#889817 for details.
 test-xfail-tst-malloc-usable-tunables = yes
+
+# nanosecond field is zero on 31bit, fixed in upstream
+# glibc-2.33.9000-213-g1966f47a1e5
+test-xfail-tst-stat = yes
 endif
 
 

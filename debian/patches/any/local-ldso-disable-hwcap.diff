@@ -128,24 +128,3 @@
 +#include_next <ldsodefs.h>
 +
 +#endif
---- a/sysdeps/aarch64/ldsodefs.h
-+++ b/sysdeps/aarch64/ldsodefs.h
-@@ -44,6 +44,8 @@
- 				       struct La_aarch64_retval *,	\
- 				       const char *)
- 
-+#define NEED_LD_SO_NOHWCAP
-+
- #include_next <ldsodefs.h>
- 
- #endif
---- /dev/null
-+++ b/sysdeps/x86_64/ldsodefs.h
-@@ -0,0 +1,7 @@
-+#ifndef __LDSODEFS_H
-+
-+#define NEED_LD_SO_NOHWCAP
-+
-+#include_next <ldsodefs.h>
-+
-+#endif
