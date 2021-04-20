@@ -262,3 +262,6 @@ any/CVE-2019-19126.patch
 any/CVE-2020-1751.patch
 any/CVE-2020-1752.patch
 any/CVE-2020-10029.patch
+any/CVE-2009-5155.patch
+any/CVE-2020-6096-1.patch
+any/CVE-2020-6096-2.patch

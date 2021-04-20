@@ -1,3 +1,18 @@
+glibc (2.23-0ubuntu11.3) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: DoS via regular expression
+    - debian/patches/CVE-2009-5155.patch: diagnose invalid back-reference
+      in posix/regcomp.c, remove invalid test in posix/PCRE.tests.
+    - CVE-2009-5155
+  * SECURITY UPDATE: signed comparison vulnerability exists in ARM memcpy
+    - debian/patches/CVE-2020-6096-1.patch: fix multiarch memcpy for
+      negative length in sysdeps/arm/armv7/multiarch/memcpy_impl.S.
+    - debian/patches/CVE-2020-6096-2.patch: fix memcpy and memmove for
+      negative length in sysdeps/arm/memcpy.S, sysdeps/arm/memmove.S.
+    - CVE-2020-6096
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 20 Apr 2021 14:52:26 -0400
+
 glibc (2.23-0ubuntu11.2) xenial-security; urgency=medium
 
   * SECURITY UPDATE: Use-after-free in clntudp_call
