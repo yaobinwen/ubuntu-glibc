@@ -1,3 +1,11 @@
+glibc (2.33-0ubuntu6) impish; urgency=medium
+
+  * Revert: Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    Enables debugging of ld.so related issues.
+  * Stop building sf/hf multilibs on armel/armhf.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 25 Apr 2021 12:42:49 +0200
+
 glibc (2.33-0ubuntu5) hirsute; urgency=medium
 
   * debian/tests/rebuild: Revert printing cpuinfo, this information is already

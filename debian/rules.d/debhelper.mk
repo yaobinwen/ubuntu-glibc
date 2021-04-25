@@ -51,7 +51,7 @@ ifeq ($(filter nostrip,$(DEB_BUILD_OPTIONS)),)
 	# work even without that package installed.
 	if test "$(NOSTRIP_$(curpass))" != 1; then					\
 	  if test "$(DEBUG_$(curpass))" = 1; then					\
-	    DH_COMPAT=8 dh_strip -p$(curpass) -Xlibpthread $(DH_STRIP_DEBUG_PACKAGE);	\
+	    dh_strip -p$(curpass) -Xlibpthread $(DH_STRIP_DEBUG_PACKAGE);	\
 	    for f in $$(find debian/$(curpass) -name libpthread-\*.so) ; do		\
 	      dbgfile=$$(LC_ALL=C readelf -n $$f | sed -e '/Build ID:/!d'		\
 	        -e "s#^.*Build ID: \([0-9a-f]\{2\}\)\([0-9a-f]\+\)#\1/\2.debug#") ;	\
@@ -63,7 +63,7 @@ ifeq ($(filter nostrip,$(DEB_BUILD_OPTIONS)),)
 	                                 --remove-section=.note $$f ;			\
 	    done ;									\
 	  else										\
-	    DH_COMPAT=8 dh_strip -p$(curpass) -Xlibpthread;				\
+	    dh_strip -p$(curpass) -Xlibpthread;				\
 	  fi ;										\
 	  for f in $$(find debian/$(curpass) -name \*crt\*.o) ; do			\
 	    $(DEB_HOST_GNU_TYPE)-strip --strip-debug --remove-section=.comment		\

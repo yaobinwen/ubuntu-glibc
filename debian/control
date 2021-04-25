@@ -9,7 +9,7 @@ Build-Depends: gettext, dpkg (>= 1.18.7), dpkg-dev (>= 1.17.14), xz-utils, file,
  hurd-dev (>= 1:0.9.git20201127-4~) [hurd-i386] | hurd-headers-dev [hurd-i386],
  kfreebsd-kernel-headers [kfreebsd-any],
  binutils (>= 2.29),
- g++-10, g++-10-multilib [amd64 armel armhf i386 kfreebsd-amd64 mips mipsel mipsn32 mipsn32el mips64 mips64el mipsr6 mipsr6el mipsn32r6 mipsn32r6el mips64r6 mips64r6el powerpc ppc64 s390x sparc sparc64 x32] <!nobiarch>,
+ g++-10, g++-10-multilib [amd64 i386 kfreebsd-amd64 mips mipsel mipsn32 mipsn32el mips64 mips64el mipsr6 mipsr6el mipsn32r6 mipsn32r6el mips64r6 mips64r6el powerpc ppc64 s390x sparc sparc64 x32] <!nobiarch>,
  gcc-10 (>= 10-20200431) [arm64],
  gcc-10 (>= 10.1.0-3) [hurd-i386],
  python3:native,
@@ -720,52 +720,6 @@ Description: GNU C Library: 64bit Development Libraries for MIPS64
  Contains the symlinks and object files needed to compile and link programs
  which use the standard C library. This is the 64bit version of the
  library, meant for MIPS64 systems.
-
-Package: libc6-armhf
-Architecture: armel
-Section: libs
-Priority: optional
-Depends: libc6 (= ${binary:Version}), ${misc:Depends}
-Build-Profiles: <!stage1 !nobiarch>
-Description: GNU C Library: ARM hard float shared libraries for armel
- This package includes shared versions of the standard C
- library and the standard math library, as well as many others.
- This is the ARM hard float version of the library, meant for armel systems.
-
-Package: libc6-dev-armhf
-Architecture: armel
-Section: libdevel
-Priority: optional
-Depends: libc6-armhf (= ${binary:Version}) <!stage1>, libc6-dev (= ${binary:Version}), ${misc:Depends}
-Recommends: gcc-multilib
-Build-Profiles: <!nobiarch>
-Description: GNU C Library: ARM hard float development libraries for armel
- Contains the symlinks and object files needed to compile and link programs
- which use the standard C library. This is the ARM hard float version of the
- library, meant for armel systems.
-
-Package: libc6-armel
-Architecture: armhf
-Section: libs
-Priority: optional
-Depends: libc6 (= ${binary:Version}), ${misc:Depends}
-Build-Profiles: <!stage1 !nobiarch>
-Description: GNU C Library: ARM softfp shared libraries for armhf
- This package includes shared versions of the standard C
- library and the standard math library, as well as many others.
- This is the ARM softfp version of the library, meant for armhf systems.
-
-Package: libc6-dev-armel
-Architecture: armhf
-Section: libdevel
-Priority: optional
-Depends: libc6-armel (= ${binary:Version}) <!stage1>, libc6-dev (= ${binary:Version}), ${misc:Depends}
-Recommends: gcc-multilib
-Build-Profiles: <!nobiarch>
-Description: GNU C Library: ARM softfp development libraries for armhf
- Contains the symlinks and object files needed to compile and link programs
- which use the standard C library. This is the ARM softfp version of the
- library, meant for armhf systems.
 
 Package: libc0.1-i386
 Architecture: kfreebsd-amd64
