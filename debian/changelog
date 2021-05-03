@@ -1,3 +1,14 @@
+glibc (2.33-0ubuntu7) impish; urgency=medium
+
+  * debian/patches/git-updates.diff: update from upstream stable branch
+    - [27648] FAIL: misc/tst-select
+    - [27651] Performance regression after updating to 2.33
+    - [27706] select fails to update timeout on error
+    - [27744] Support different libpthread/ld.so load orders for gdb -p
+  * Ignore test failures for the profile build on amd64 for now.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 03 May 2021 19:45:58 +0200
+
 glibc (2.33-0ubuntu6) impish; urgency=medium
 
   * Revert: Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.

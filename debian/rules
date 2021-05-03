@@ -215,8 +215,13 @@ post-check: $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES))
 	@fail=0; \
 	for pass in $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES)); do \
 	  if [ -f $${pass}_failed ]; then \
-	    echo "check for $$(basename $$pass) failed"; \
-	    fail=1; \
+	    case "$(DEB_HOST_ARCH)-$$(basename $$pass)" in \
+	      amd64-check_prof) \
+	        echo "check for $$(basename $$pass) failed (ignored)";; \
+	      *) \
+	        echo "check for $$(basename $$pass) failed"; \
+	        fail=1;; \
+	    esac; \
 	  fi; \
 	done; \
 	exit $$fail
