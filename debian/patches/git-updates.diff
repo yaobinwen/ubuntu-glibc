@@ -1,10 +1,8 @@
-GIT update of https://sourceware.org/git/glibc.git/release/2.33/master from glibc-2.33
-
 diff --git a/NEWS b/NEWS
-index 71f5d20324..0877a13dae 100644
+index 71f5d20324..a6202ad058 100644
 --- a/NEWS
 +++ b/NEWS
-@@ -5,6 +5,27 @@ See the end for copying conditions.
+@@ -5,6 +5,28 @@ See the end for copying conditions.
  Please send GNU C library bug reports via <https://sourceware.org/bugzilla/>
  using `glibc' in the "product" field.
  
@@ -28,6 +26,7 @@ index 71f5d20324..0877a13dae 100644
 +  [27651] Performance regression after updating to 2.33
 +  [27706] select fails to update timeout on error
 +  [27744] Support different libpthread/ld.so load orders for gdb -p
++  [27892] powerpc: scv ABI error handling fails to check IS_ERR_VALUE
 +
  Version 2.33
  
@@ -1754,6 +1753,54 @@ index 1f4bbd8edf..8f8f12c276 100644
            _int_free (ar_ptr, oldp, 0);
          }
      }
+diff --git a/manual/README.tunables b/manual/README.tunables
+index d8c768abcc..605ddd78cd 100644
+--- a/manual/README.tunables
++++ b/manual/README.tunables
+@@ -98,17 +98,16 @@ where it can expect the tunable value to be passed in VALP.
+ 
+ Tunables in the module can be updated using:
+ 
+-  TUNABLE_SET (check, int32_t, val)
++  TUNABLE_SET (check, val)
+ 
+-where 'check' is the tunable name, 'int32_t' is the C type of the tunable and
+-'val' is a value of same type.
++where 'check' is the tunable name and 'val' is a value of same type.
+ 
+ To get and set tunables in a different namespace from that module, use the full
+ form of the macros as follows:
+ 
+   val = TUNABLE_GET_FULL (glibc, cpu, hwcap_mask, uint64_t, NULL)
+ 
+-  TUNABLE_SET_FULL (glibc, cpu, hwcap_mask, uint64_t, val)
++  TUNABLE_SET_FULL (glibc, cpu, hwcap_mask, val)
+ 
+ where 'glibc' is the top namespace, 'cpu' is the tunable namespace and the
+ remaining arguments are the same as the short form macros.
+@@ -116,18 +115,17 @@ remaining arguments are the same as the short form macros.
+ The minimum and maximum values can updated together with the tunable value
+ using:
+ 
+-  TUNABLE_SET_WITH_BOUNDS (check, int32_t, val, min, max)
++  TUNABLE_SET_WITH_BOUNDS (check, val, min, max)
+ 
+-where 'check' is the tunable name, 'int32_t' is the C type of the tunable,
+-'val' is a value of same type, 'min' and 'max' are the minimum and maximum
+-values of the tunable.
++where 'check' is the tunable name, 'val' is a value of same type, 'min' and
++'max' are the minimum and maximum values of the tunable.
+ 
+ To set the minimum and maximum values of tunables in a different namespace
+ from that module, use the full form of the macros as follows:
+ 
+   val = TUNABLE_GET_FULL (glibc, cpu, hwcap_mask, uint64_t, NULL)
+ 
+-  TUNABLE_SET_WITH_BOUNDS_FULL (glibc, cpu, hwcap_mask, uint64_t, val, min, max)
++  TUNABLE_SET_WITH_BOUNDS_FULL (glibc, cpu, hwcap_mask, val, min, max)
+ 
+ where 'glibc' is the top namespace, 'cpu' is the tunable namespace and the
+ remaining arguments are the same as the short form macros.
 diff --git a/misc/Makefile b/misc/Makefile
 index b08d7c68ab..05ad034baf 100644
 --- a/misc/Makefile
@@ -3364,6 +3411,22 @@ index ecb729da6b..ca96397a4a 100644
  
  # define lll_futex_syscall(nargs, futexp, op, ...)                      \
    ({                                                                    \
+diff --git a/sysdeps/powerpc/powerpc64/sysdep.h b/sysdeps/powerpc/powerpc64/sysdep.h
+index c57bb1c05d..1ea4c3b917 100644
+--- a/sysdeps/powerpc/powerpc64/sysdep.h
++++ b/sysdeps/powerpc/powerpc64/sysdep.h
+@@ -398,8 +398,9 @@ LT_LABELSUFFIX(name,_name_end): ; \
+ #endif
+ 
+ #define RET_SCV \
+-    cmpdi r3,0; \
+-    bgelr+; \
++    li r9,-4095; \
++    cmpld r3,r9; \
++    bltlr+; \
+     neg r3,r3;
+ 
+ #define RET_SC \
 diff --git a/sysdeps/pthread/Makefile b/sysdeps/pthread/Makefile
 index eeb64f9fb0..53b65ef349 100644
 --- a/sysdeps/pthread/Makefile

@@ -1,3 +1,50 @@
+glibc (2.33-0ubuntu8) impish; urgency=medium
+
+  [ Matthias Klose ]
+  * Don't strip ld.so (LP: #1927192)
+
+  [ Balint Reczey ]
+  * Don't use DH_COMPAT=8 for stripping udeb packages either
+  * Drop maintaner script delta cleaning up /var/lib/locales/supported.d/local
+    Those handled upgrades from Ubuntu << 16.04.
+  * debian/patches/hurd-i386/: Drop delta of Hurd patches, they are not applied anyway
+  * Merge 2.31-12 changes from Debian unstable:
+    - debian/po/de.po: fix encoding declaration.  Closes: #986450.
+    - debian/patches/any/local-rtlddir-cross.diff: drop patch, letting upstream
+      makefiles to install the dynamic linker symlink directly in the right
+      location. This fixes the temporary installation done by upstream makefiles
+      to run some tests in a container.  Closes: #973278, #985617.
+    - debian/rules.d/build.mk: do not create the dynamic linker manually.
+    - debian/sysdeps/*.mk: do not create the dynamic linker manually for
+      bi/tri-arch packages.
+    - debian/rules.d/build.mk: create the soname symlink for ld-2.xx.so, to
+      avoid its creation later by ldconfig.
+    - debian/debhelper.in/libc.install, debhelper.in/libc-alt.install,
+      debhelper.in/libc-udeb.install, debhelper.in/libc-udeb.install.hurd-i386:
+      adjust given that the dynamic linker symlink is now already at the correct
+      location.
+    - debian/patches/git-updates.diff: update from upstream stable branch:
+      - Fix GLIBC_TUNABLES parsing for AT_SECURE binaries.
+    - debian/rules.d/build.mk: escape EOL so that $configure_build is correctly
+      passed to the configure script.
+    - debian/debhelper.in/libc.preinst: handle the case where debconf
+      configuration has never been done.  Closes: #986180.
+    - debian/debhelper.in/libc.preinst: fallback to text mode in case 1) debconf
+      is about to use the dialog frontend with whiptail or frontend and 2) the
+      corresponding executable is unusable.  Closes: #984533.
+    - debian/rules.d/debhelper.mk: correctly strip libpthread.so for bi/triarch
+      builds.  Closes: #983457.
+    - debian/patches/hurd-i386/git-tiocflush.diff: Cope with
+      BSD 4.1-ish ioctl(..., TIOCFLUSH, NULL).
+    - debian/debhelper.in/libc-udeb.install.hurd-i386: Add missing
+      libmachuser/libhurduser.
+    - debian/testsuite-xfail-debian.mk: Update tests.
+  * debian/patches/git-updates.diff: update from upstream stable branch
+    - [27892] powerpc: scv ABI error handling fails to check IS_ERR_VALUE
+  * Keep only armhf ld.so unstripped (LP: #1927192)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Tue, 01 Jun 2021 18:41:50 +0200
+
 glibc (2.33-0ubuntu7) impish; urgency=medium
 
   * debian/patches/git-updates.diff: update from upstream stable branch
@@ -193,6 +240,62 @@ glibc (2.32-0ubuntu2) groovy; urgency=medium
     autopkgtest
 
  -- Balint Reczey <rbalint@ubuntu.com>  Sun, 06 Sep 2020 22:08:44 +0200
+
+glibc (2.31-12) unstable; urgency=medium
+
+  * debian/po/de.po: fix encoding declaration.  Closes: #986450.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - On s390x, check for vector support in memmove ifunc-selector in
+      addition to Miscellaneous-Instruction-Extensions.
+  * debian/patches/any/local-rtlddir-cross.diff: drop patch, letting upstream
+    makefiles to install the dynamic linker symlink directly in the right
+    location. This fixes the temporary installation done by upstream makefiles
+    to run some tests in a container.  Closes: #973278, #985617.
+  * debian/rules.d/build.mk: do not create the dynamic linker manually.
+  * debian/sysdeps/*.mk: do not create the dynamic linker manually for
+    bi/tri-arch packages.
+  * debian/rules.d/build.mk: create the soname symlink for ld-2.xx.so, to
+    avoid its creation later by ldconfig.
+  * debian/debhelper.in/libc.install, debhelper.in/libc-alt.install,
+    debhelper.in/libc-udeb.install, debhelper.in/libc-udeb.install.hurd-i386:
+    adjust given that the dynamic linker symlink is now already at the correct
+    location.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix GLIBC_TUNABLES parsing for AT_SECURE binaries.
+  * debian/rules.d/build.mk: escape EOL so that $configure_build is correctly
+    passed to the configure script.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 01 May 2021 22:56:06 +0200
+
+glibc (2.31-11) unstable; urgency=medium
+
+  * debian/debhelper.in/libc.preinst: handle the case where debconf
+    configuration has never been done.  Closes: #986180.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 31 Mar 2021 22:09:32 +0200
+
+glibc (2.31-10) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-tiocflush.diff: Cope with
+    BSD 4.1-ish ioctl(..., TIOCFLUSH, NULL).
+  * debian/debhelper.in/libc-udeb.install.hurd-i386: Add missing
+    libmachuser/libhurduser.
+  * debian/testsuite-xfail-debian.mk: Update tests.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix a possible assertion failure in iconv when converting
+      from ISO-2022-JP-3 to UTF-8 (CVE-2021-3326).  Closes: #981198.
+    - Fix a possible double-free in nscd when processing a request for netgroup
+      lookup (CVE-2021-27645).  Closes: #983479.
+  * debian/debhelper.in/libc.preinst: fallback to text mode in case 1) debconf
+    is about to use the dialog frontend with whiptail or frontend and 2) the
+    corresponding executable is unusable.  Closes: #984533.
+  * debian/rules.d/debhelper.mk: correctly strip libpthread.so for bi/triarch
+    builds.  Closes: #983457.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 21 Mar 2021 00:38:37 +0100
 
 glibc (2.31-9) unstable; urgency=medium
 

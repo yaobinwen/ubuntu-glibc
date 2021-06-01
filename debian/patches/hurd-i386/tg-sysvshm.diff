@@ -1,9 +1,5 @@
 From: Marcus Brinkmann <marcus@gnu.org>
-Date: Wed, 5 Aug 2020 22:02:42 +0200
 Subject: [PATCH] Implement SysV shared memory for GNU/Hurd.
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
 
 2005-07-11  Marcus Brinkmann  <marcus@gnu.org>
 
@@ -46,40 +42,29 @@ name-generation logic.
 
 Fix it.
 ”
----
- hurd/Makefile                      |   1 +
- hurd/sysvshm.c                     |  97 +++++++++++++++
- hurd/sysvshm.h                     |  47 +++++++
- sysdeps/mach/hurd/bits/posix_opt.h |   4 +-
- sysdeps/mach/hurd/ftok.c           |  41 +++++++
- sysdeps/mach/hurd/shmat.c          |  82 +++++++++++++
- sysdeps/mach/hurd/shmctl.c         | 132 ++++++++++++++++++++
- sysdeps/mach/hurd/shmdt.c          |  51 ++++++++
- sysdeps/mach/hurd/shmget.c         | 242 +++++++++++++++++++++++++++++++++++++
- 9 files changed, 695 insertions(+), 2 deletions(-)
- create mode 100644 hurd/sysvshm.c
- create mode 100644 hurd/sysvshm.h
- create mode 100644 sysdeps/mach/hurd/ftok.c
- create mode 100644 sysdeps/mach/hurd/shmat.c
- create mode 100644 sysdeps/mach/hurd/shmctl.c
- create mode 100644 sysdeps/mach/hurd/shmdt.c
- create mode 100644 sysdeps/mach/hurd/shmget.c
 
-diff --git a/hurd/Makefile b/hurd/Makefile
-index 861bbf7..3c62bf6 100644
+---
+ hurd/Makefile                      |    1 
+ hurd/sysvshm.c                     |   97 ++++++++++++++
+ hurd/sysvshm.h                     |   47 +++++++
+ sysdeps/mach/hurd/bits/posix_opt.h |    4 
+ sysdeps/mach/hurd/ftok.c           |   43 ++++++
+ sysdeps/mach/hurd/shmat.c          |   79 ++++++++++++
+ sysdeps/mach/hurd/shmctl.c         |  132 ++++++++++++++++++++
+ sysdeps/mach/hurd/shmdt.c          |   51 +++++++
+ sysdeps/mach/hurd/shmget.c         |  242 +++++++++++++++++++++++++++++++++++++
+ 9 files changed, 694 insertions(+), 2 deletions(-)
+
 --- a/hurd/Makefile
 +++ b/hurd/Makefile
-@@ -56,6 +56,7 @@ routines = hurdstartup hurdinit \
+@@ -55,6 +55,7 @@
  	   ports-get ports-set hurdports hurdmsg \
  	   errno-loc \
  	   hurdlock \
 +	   sysvshm \
- 	   $(sig) $(dtable) $(inlines) \
- 	   fd-cleanup port-cleanup report-wait xattr
+ 	   $(sig) $(dtable) $(inlines) port-cleanup report-wait xattr
  sig	= hurdsig hurdfault siginfo hurd-raise preempt-sig \
-diff --git a/hurd/sysvshm.c b/hurd/sysvshm.c
-new file mode 100644
-index 0000000..1c57705
+ 	  trampoline longjmp-ts catch-exc exc2signal hurdkill sigunwind \
 --- /dev/null
 +++ b/hurd/sysvshm.c
 @@ -0,0 +1,97 @@
@@ -180,9 +165,6 @@ index 0000000..1c57705
 +  __mutex_unlock (&sysvshm_lock);
 +  return EINVAL;
 +}
-diff --git a/hurd/sysvshm.h b/hurd/sysvshm.h
-new file mode 100644
-index 0000000..1204db8
 --- /dev/null
 +++ b/hurd/sysvshm.h
 @@ -0,0 +1,47 @@
@@ -233,24 +215,6 @@ index 0000000..1204db8
 +/* Removes a segment attachment.  Returns its size if found, or EINVAL
 +   otherwise.  */
 +error_t __sysvshm_remove (void *addr, size_t *size);
-diff --git a/sysdeps/mach/hurd/bits/posix_opt.h b/sysdeps/mach/hurd/bits/posix_opt.h
-index 0050151..b95097a 100644
---- a/sysdeps/mach/hurd/bits/posix_opt.h
-+++ b/sysdeps/mach/hurd/bits/posix_opt.h
-@@ -68,8 +68,8 @@
- /* X/Open thread realtime support is not supported.  */
- #undef _XOPEN_REALTIME_THREADS
- 
--/* XPG4.2 shared memory is not supported.  */
--#undef	_XOPEN_SHM
-+/* XPG4.2 shared memory is supported.  */
-+#define _XOPEN_SHM      1
- 
- /* Tell we have POSIX threads.  */
- #define _POSIX_THREADS	200809L
-diff --git a/sysdeps/mach/hurd/ftok.c b/sysdeps/mach/hurd/ftok.c
-new file mode 100644
-index 0000000..a9f6eec
 --- /dev/null
 +++ b/sysdeps/mach/hurd/ftok.c
 @@ -0,0 +1,41 @@
@@ -295,9 +259,6 @@ index 0000000..a9f6eec
 +
 +  return key;
 +}
-diff --git a/sysdeps/mach/hurd/shmat.c b/sysdeps/mach/hurd/shmat.c
-new file mode 100644
-index 0000000..d6e310e
 --- /dev/null
 +++ b/sysdeps/mach/hurd/shmat.c
 @@ -0,0 +1,82 @@
@@ -383,9 +344,6 @@ index 0000000..d6e310e
 +}
 +
 +weak_alias(__shmat, shmat)
-diff --git a/sysdeps/mach/hurd/shmctl.c b/sysdeps/mach/hurd/shmctl.c
-new file mode 100644
-index 0000000..d5e6bbe
 --- /dev/null
 +++ b/sysdeps/mach/hurd/shmctl.c
 @@ -0,0 +1,132 @@
@@ -521,9 +479,6 @@ index 0000000..d5e6bbe
 +}
 +
 +weak_alias(__shmctl, shmctl)
-diff --git a/sysdeps/mach/hurd/shmdt.c b/sysdeps/mach/hurd/shmdt.c
-new file mode 100644
-index 0000000..cdafef0
 --- /dev/null
 +++ b/sysdeps/mach/hurd/shmdt.c
 @@ -0,0 +1,51 @@
@@ -578,9 +533,6 @@ index 0000000..cdafef0
 +}
 +
 +weak_alias(__shmdt, shmdt)
-diff --git a/sysdeps/mach/hurd/shmget.c b/sysdeps/mach/hurd/shmget.c
-new file mode 100644
-index 0000000..79646e5
 --- /dev/null
 +++ b/sysdeps/mach/hurd/shmget.c
 @@ -0,0 +1,242 @@
@@ -826,3 +778,16 @@ index 0000000..79646e5
 +}
 +
 +weak_alias(__shmget, shmget)
+--- a/sysdeps/mach/hurd/bits/posix_opt.h
++++ b/sysdeps/mach/hurd/bits/posix_opt.h
+@@ -68,8 +68,8 @@
+ /* X/Open thread realtime support is not supported.  */
+ #undef _XOPEN_REALTIME_THREADS
+ 
+-/* XPG4.2 shared memory is not supported.  */
+-#undef	_XOPEN_SHM
++/* XPG4.2 shared memory is supported.  */
++#define _XOPEN_SHM      1
+ 
+ /* Tell we have POSIX threads.  */
+ #define _POSIX_THREADS	200809L
