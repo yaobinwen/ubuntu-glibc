@@ -1,3 +1,15 @@
+glibc (2.33-0ubuntu9) impish; urgency=medium
+
+  * debian/patches/git-updates.diff: update from upstream stable branch
+    - CVE-2021-33574: The mq_notify function has a potential use-after-free
+      issue when using a notification type of SIGEV_THREAD and a thread
+      attribute with a non-default affinity mask.
+    - [15271] dlfcn function failure after dlmopen terminates process.
+    - [27646] gethostbyname and NSS crashes after dlmopen.
+    - x86_64: Remove unneeded static PIE check for undefined weak diagnostic.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 13 Jul 2021 08:26:17 +0200
+
 glibc (2.33-0ubuntu8) impish; urgency=medium
 
   [ Matthias Klose ]
