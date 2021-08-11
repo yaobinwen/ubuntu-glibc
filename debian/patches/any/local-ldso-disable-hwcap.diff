@@ -98,15 +98,15 @@
  #define _DL_HWCAP_TLS_MASK (1LL << 63)
    uint64_t hwcap_exclude = ~((GLRO (dl_hwcap) & hwcap_mask)
  			     | _DL_HWCAP_PLATFORM | _DL_HWCAP_TLS_MASK);
-@@ -302,6 +310,8 @@
- 			  if (GLRO (dl_osversion)
- 			      && libnew->osversion > GLRO (dl_osversion))
- 			    continue;
-+                          if (disable_hwcap && libnew->hwcap != 0)
-+                            continue;
- 			  if (_DL_PLATFORMS_COUNT
- 			      && (libnew->hwcap & _DL_HWCAP_PLATFORM) != 0
- 			      && ((libnew->hwcap & _DL_HWCAP_PLATFORM)
+@@ -300,6 +308,8 @@
+ 		      if (GLRO (dl_osversion)
+ 			  && libnew->osversion > GLRO (dl_osversion))
+ 			continue;
++		      if (disable_hwcap && libnew->hwcap != 0)
++			      continue;
+ 		      if (_DL_PLATFORMS_COUNT
+ 			  && (libnew->hwcap & _DL_HWCAP_PLATFORM) != 0
+ 			  && ((libnew->hwcap & _DL_HWCAP_PLATFORM)
 --- a/sysdeps/alpha/ldsodefs.h
 +++ b/sysdeps/alpha/ldsodefs.h
 @@ -37,6 +37,8 @@

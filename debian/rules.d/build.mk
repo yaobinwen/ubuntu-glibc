@@ -312,15 +312,15 @@ ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
 	  esac; \
 	fi
 
-	# Create the ld.so symlink in the slibdir directory, otherwise it will get
-	# created later by ldconfig, leading to a dangling symlink when the package
-	# is removed
-	ld_so="$$(ls debian/tmp-$(curpass)/$(call xx,slibdir)/ld-*.so)" ; \
-	soname="$$(LANG=C LC_ALL=C readelf -d $$ld_so | grep 'Library soname:' | sed -e 's/.*Library soname: \[\(.*\)\]/\1/g')" ; \
-	target="$$(basename $$ld_so)" ; \
-	link_name="debian/tmp-$(curpass)/$(call xx,slibdir)/$$soname" ; \
-	ln -sf $$target $$link_name
-	
+	# Move the dynamic linker into the multiarch location and replace it with a symlink.
+	rtld_so=`LANG=C LC_ALL=C readelf -l debian/tmp-$(curpass)/usr/bin/iconv | grep "interpreter" | sed -e 's/.*interpreter: \(.*\)]/\1/g'`; \
+	from=debian/tmp-$(curpass)$$rtld_so \
+	soname=`basename $$rtld_so` \
+	to="debian/tmp-$(curpass)$(call xx,slibdir)/$$soname" ; \
+	if [ $$from != $$to ]; then \
+	  mv -v $$from $$to; \
+	  ln -v -sf $(call xx,slibdir)/$$soname $$from; \
+	fi
 	$(call xx,extra_install)
 endif
 	touch $@

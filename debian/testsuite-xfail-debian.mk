@@ -204,10 +204,6 @@ ifeq ($(config-machine)-$(config-os),x86_64-linux-gnu)
 # This test fails intermittently on amd64. It could be a kernel issue.
 # see https://sourceware.org/bugzilla/show_bug.cgi?id=19004
 test-xfail-tst-robust8 = yes
-
-# invalid SSBD test on AMD CPUs
-# https://sourceware.org/pipermail/libc-alpha/2021-February/122227.html
-test-xfail-tst-cpu-features-cpuinfo = yes
 endif
 
 
@@ -222,12 +218,6 @@ test-xfail-tst-pkey = yes
 # In some conditions the kernel might not provide a heap, causing
 # some tests to fail. See bug#889817 for details.
 test-xfail-tst-malloc-usable-tunables = yes
-
-# This test fails when libnss-systemd is configured (LP: #1869364)
-# because getauxval doesn't work when you run a binary as
-# "/lib/ld-linux-aarch64.so.1 binary"
-# (https://sourceware.org/bugzilla/show_bug.cgi?id=23293).
-test-xfail-tst-getpw = yes
 
 endif
 
@@ -598,10 +588,6 @@ test-xfail-tst-minsigstksz-2 = yes
 # Fails with 32 bit userspace on 64 bit kernel:
 # https://sourceware.org/bugzilla/show_bug.cgi?id=26736
 test-xfail-tst-sysvshm-linux = yes
-
-# invalid SSBD test on AMD CPUs
-# https://sourceware.org/pipermail/libc-alpha/2021-February/122227.html
-test-xfail-tst-cpu-features-cpuinfo = yes
 
 # flaky on Ubuntu buildds
 test-xfail-tst-cancel28 = yes
@@ -1228,9 +1214,6 @@ test-xfail-tst-platform-1 = yes
 # Fails on x32 https://sourceware.org/bugzilla/show_bug.cgi?id=26736
 test-xfail-tst-sysvshm-linux = yes
 
-# invalid SSBD test on AMD CPUs
-# https://sourceware.org/pipermail/libc-alpha/2021-February/122227.html
-test-xfail-tst-cpu-features-cpuinfo = yes
 endif
 
 ######################################################################

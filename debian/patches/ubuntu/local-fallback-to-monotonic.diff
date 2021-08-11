@@ -51,25 +51,34 @@ See: https://github.com/microsoft/WSL/issues/4898
  /* We can simply use the syscall.  The CPU clocks are not supported
     with this function.  */
  int
-@@ -42,6 +72,10 @@
- #endif
-   int r = INTERNAL_SYSCALL_CANCEL (clock_nanosleep_time64, clock_id,
- 				   flags, req, rem);
+@@ -47,11 +77,19 @@
+ #ifdef __ASSUME_TIME64_SYSCALLS
+   r = INTERNAL_SYSCALL_CANCEL (clock_nanosleep_time64, clock_id, flags, req,
+ 			       rem);
 +  if (__glibc_unlikely (INTERNAL_SYSCALL_ERRNO (r) == EINVAL
-+                        && clock_id == CLOCK_REALTIME
-+                        && valid_nanosleep_ts(req)))
++			&& clock_id == CLOCK_REALTIME
++			&& valid_nanosleep_ts(req)))
 +    MONOTONIC_FALLBACK;
- 
- #ifndef __ASSUME_TIME64_SYSCALLS
-   if (r == 0 || r != -ENOSYS)
-@@ -57,6 +91,10 @@
-   struct timespec ts32 = valid_timespec64_to_timespec (*req);
-   r = INTERNAL_SYSCALL_CANCEL (clock_nanosleep, clock_id, flags,
-                                &ts32, &tr32);
-+  if (__glibc_unlikely (INTERNAL_SYSCALL_ERRNO (r) == EINVAL
-+                        && clock_id == CLOCK_REALTIME
-+                        && valid_nanosleep_ts(req)))
-+    MONOTONIC_FALLBACK;
-   if (INTERNAL_SYSCALL_ERROR_P (r))
+ #else
+   if (!in_time_t_range (req->tv_sec))
      {
-       if (r == -EINTR && rem != NULL && (flags & TIMER_ABSTIME) == 0)
+       r = INTERNAL_SYSCALL_CANCEL (clock_nanosleep_time64, clock_id, flags,
+ 				   req, rem);
++      if (__glibc_unlikely (INTERNAL_SYSCALL_ERRNO (r) == EINVAL
++			    && clock_id == CLOCK_REALTIME
++			    && valid_nanosleep_ts(req)))
++	MONOTONIC_FALLBACK;
+       if (r == -ENOSYS)
+ 	r = -EOVERFLOW;
+     }
+@@ -61,6 +99,10 @@
+       struct timespec ts32 = valid_timespec64_to_timespec (*req);
+       r = INTERNAL_SYSCALL_CANCEL (clock_nanosleep, clock_id, flags, &ts32,
+ 				   &tr32);
++      if (__glibc_unlikely (INTERNAL_SYSCALL_ERRNO (r) == EINVAL
++			    && clock_id == CLOCK_REALTIME
++			    && valid_nanosleep_ts(req)))
++	MONOTONIC_FALLBACK;
+       if (INTERNAL_SYSCALL_ERROR_P (r))
+ 	{
+ 	  if (r == -EINTR && rem != NULL && (flags & TIMER_ABSTIME) == 0)

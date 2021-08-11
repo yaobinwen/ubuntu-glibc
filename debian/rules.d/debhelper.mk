@@ -83,17 +83,22 @@ ifeq ($(filter nostrip,$(DEB_BUILD_OPTIONS)),)
 endif
 
 	dh_compress -p$(curpass)
-	dh_fixperms -p$(curpass) -Xpt_chown
+	if [ -e debian/$(curpass).fixperms ]; then					\
+	  dh_fixperms -p$(curpass) -Xpt_chown `cat debian/$(curpass).fixperms`;		\
+	else										\
+	  dh_fixperms -p$(curpass) -Xpt_chown;						\
+	fi
 	if [ $(curpass) = locales ] ; then \
 		chmod +x debian/$(curpass)/usr/share/locales/*-language-pack ; \
 	fi
-	# Use this instead of -X to dh_fixperms so that we can use
-	# an unescaped regular expression.  ld.so must be executable;
-	# libc.so and NPTL's libpthread.so print useful version
-	# information when executed.
-	find debian/$(curpass) -type f \( -regex '.*/ld.*so' \
-		-o -regex '.*/libpthread-.*so' \
-		-o -regex '.*/libc-.*so' \) \
+	# Use this instead of -X to dh_fixperms so that we can use an
+	# unescaped regular expression.  libc.so and NPTL's
+	# libpthread.so print useful version information when
+	# executed.
+	rtld_so=`LANG=C LC_ALL=C readelf -l debian/$(curpass)/usr/bin/iconv | grep "interpreter" | sed -e 's/.*interpreter: \(.*\)]/\1/g'`; \
+	find debian/$(curpass) -type f \( 						\
+		-regex '.*/libpthread-.*so'						\
+		-o -regex '.*/libc-.*so' \)						\
 		-exec chmod a+x '{}' ';'
 	dh_makeshlibs -Xgconv/ -p$(curpass) -V "$(call xx,shlib_dep)"
 	# Add relevant udeb: lines in shlibs files
@@ -266,6 +271,7 @@ $(stamp)debhelper_%: $(stamp)debhelper-common $(stamp)install_%
 	    sed -e "s#SLIBDIR#$$slibdir#g" -i $$t; \
 	    sed -e "s#LIBDIR#$$libdir#g" -i $$t; \
 	    sed -e "s#FLAVOR#$$curpass#g" -i $$t; \
+	    sed -e "s#MULTIARCH_RTLD_SO#$$slibdir/`basename $$rtld_so`#g" -i $$t ; \
 	    sed -e "s#RTLD_SO#$$rtld_so#g" -i $$t ; \
 	    sed -e "s#MULTIARCHDIR#$$DEB_HOST_MULTIARCH#g" -i $$t ; \
 	    $(if $(filter $(call xx,mvec),no),sed -e "/libmvec/d" -e "/libm-\*\.a/d" -i $$t ;) \
@@ -303,5 +309,6 @@ clean::
 	rm -f debian/*.triggers
 	rm -f debian/*.service
 	rm -f debian/*.tmpfile
+	rm -f debian/*.fixperms
 
 	rm -f $(stamp)binaryinst*

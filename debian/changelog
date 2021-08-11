@@ -1,3 +1,16 @@
+glibc (2.34-0ubuntu1) impish; urgency=medium
+
+  * New upstream version.
+  * Update patches.
+  * Adapt to upstream changes to install the dynamic linker in its ABI
+    location directly by installing it under its SONAME, but still in the
+    multiarch directory.
+  * Update xfails.
+  * d/patches/ubuntu/fix-iconvconfig-directory.diff: fix the directory path
+    written to the gconv modules cache (BZ #28199).
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 12 Aug 2021 11:15:13 +1200
+
 glibc (2.33-0ubuntu8) impish; urgency=medium
 
   [ Matthias Klose ]

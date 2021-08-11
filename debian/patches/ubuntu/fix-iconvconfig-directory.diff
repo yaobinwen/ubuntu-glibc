@@ -1,0 +1,44 @@
+--- a/iconv/iconvconfig.c
++++ b/iconv/iconvconfig.c
+@@ -168,6 +168,9 @@
+ /* Its length.  */
+ static size_t prefix_len;
+ 
++/* Copy of the un-prefixed directory path currently being handled */
++static char *noprefixdir;
++
+ /* Directory to place output file in.  */
+ static const char *output_file;
+ /* Its length.  */
+@@ -569,7 +572,7 @@
+ 
+ /* Add new module.  */
+ static void
+-add_module (char *rp, const char *directory,
++add_module (char *rp, const char *directory __attribute__ ((__unused__)),
+ 	    size_t dirlen __attribute__ ((__unused__)),
+ 	    int modcount __attribute__ ((__unused__)))
+ {
+@@ -645,7 +648,7 @@
+   assert (strlen (to) + 1 == (size_t) (module - to));
+   assert (strlen (module) + 1 == (size_t) (wp - module));
+ 
+-  new_module (from, to - from, to, module - to, directory, module, wp - module,
++  new_module (from, to - from, to, module - to, noprefixdir, module, wp - module,
+ 	      cost, need_ext);
+ }
+ 
+@@ -658,9 +661,13 @@
+ 
+   char *fulldir = xasprintf ("%s%s%s", dir[0] == '/' ? prefix : "",
+ 			     dir, dir[dirlen - 1] != '/' ? "/" : "");
++  noprefixdir = xasprintf ("%s%s", dir, dir[dirlen - 1] != '/' ? "/" : "");
+ 
+   found = gconv_parseconfdir (fulldir, strlen (fulldir));
+ 
++  free (noprefixdir);
++  noprefixdir = NULL;
++
+   if (!found)
+     {
+       error (0, errno, "failed to open gconv configuration files in `%s'",
