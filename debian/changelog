@@ -1,3 +1,75 @@
+glibc (2.31-14) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update tests.
+  * debian/patches/hurd-i386/tg-eintr.diff: Replace with upstream's
+    more complete git-eintr.diff.
+  * debian/patches/hurd-i386/proc_reauth.diff: Use the new
+    __proc_reauthenticate_complete protocol.
+  * control: Break hurd version that erroneously depended on an update libc0.3
+    for the auth_complete_reauthentication RPC
+  * debian/libc0.3.symbols.hurd-i386: Add missing gsync_wait_intr symbol.
+  * debian/patches/hurd-i386/git-AT_NO_AUTOMOUNT.diff: Fix glib's fileinfo.
+  * debian/patches/hurd-i386/git-ELF_MACHINE_USER_ADDRESS_MASK.diff: Fix
+    ELF_MACHINE_USER_ADDRESS_MASK value.
+  * debian/patches/hurd-i386/tg-bigmem.diff: Relace by git-drop-rmh.diff.
+  * debian/patches/series: Reorder hurd-i386 git patches according to glibc
+    release dates.
+  * debian/patches/hurd-i386/sysvshm-lll.diff: Fold into tg-sysvshm.diff.
+
+  [ Aurelien Jarno ]
+  * Drop debian/patches/arm/local-soname-hack.diff: not needed anymore.
+  * Drop debian/patches/arm/unsubmitted-ldconfig-cache-abi.diff: not needed
+    anymore.
+  * debian/sysdeps/armhf.mk: drop old armhf compat symlink, this is not
+    supported anymore.
+  * debian/control.in/main: remove Adam Conrad from Uploaders. RIP.  Closes:
+    #986951.
+  * debian/testsuite-xfail-debian.mk: drop tst-malloc-usable-tunables from
+    XFAIL, the kernel bug has been fixed. 
+  * debian/control.in/libc, debian/rules.d/debhelper.mk: Drop the depends in
+    libcrypt1 as upgrades from buster to bookworm are not supported. Demote
+    the libnss-nis and libnss-nisplus recommends to suggests.  Closes:
+    #975077.
+  * debian/patches/hppa/git-fcntl.h-update.diff: new patch from upstream to
+    update EFD_NONBLOCK, IN_NONBLOCK, SFD_NONBLOCK and TFD_NONBLOCK on HPPA.
+    Closes: #981650.
+  * debian/debhelper.in/locales.postinst: simplify locales-all detection. 
+  * debian/control.in/main: drop arch specific depends on gcc-10 now that the
+    minimum version is already in bullseye.
+  * debian/debhelper.in/libc.preinst: simplify the version comparison by only
+    comparing the two first parts, now that kernel 2.X are not supported
+    anymore.
+  * debian/debhelper.in/libc.preinst: drop the check for kernel release > 255
+    now that glibc and preinstall script are fixed.  Closes: #987266.
+  * debian/rules.d/build.mk: stop passing --enable-obsolete-rpc.
+  * debian/debhelper.in/libc-dev.install{,.hurd-i386}: do not install
+    librpcsvc.a.
+  * debian/debhelper.in/libc-dev-bin.manpage, debian/local/manpages/rpcgen.1:
+    do not install rpcgen (1) manpage.
+  * debian/rules.d/build.mk: stop deleting <rpcsvc/yppasswd.h> and
+    <rpcsvc/yppasswd.x>.
+  * debian/control.in/libc, debian/rules.d/debhelper.mk: make libc6-dev to
+    depend on rpcsvc-proto, except for stage1 and stage2.
+  * debian/patches/localedata/supported.diff: update to drop all non-UTF-8
+    locales.  Closes: #603914.
+  * debian/patches/localedata/sort-UTF8-first.diff: drop.
+  * debian/script.in/nsscheck.sh: restart openssh-server even if it has been
+    deconfigured during the upgrade.  Closes: #990069.
+
+  [ Helmut Grohne ]
+  * Fix FTCBFS: (Closes: #990031)
+    + debian/control.in/main: Annotate binutils dependency with -for-host.
+    + debian/control.in/main, debian/rules.d/control.mk: Use suffixed cross
+      compilers until there is -for-host.
+    + debian/patches/any/local-cross.patch: LIBGD detection actually works.
+
+  [ Matthias Klose ]
+  * debian/rules, debian/rules.d/build.mk: Run checks for every pass before
+    failing the build.  Closes: #982360.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 17 Aug 2021 16:27:59 +0200
+
 glibc (2.31-13) unstable; urgency=medium
 
   [ Colin Watson ]

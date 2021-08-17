@@ -147,10 +147,6 @@ test-xfail-tst-writev = yes
 # There is not support for protection key on Alpha yet, and there is a
 # disagreement between kernel and glibc how to report that.
 test-xfail-tst-pkey = yes
-
-# In some conditions the kernel might not provide a heap, causing
-# some tests to fail. See bug#889817 for details.
-test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -242,6 +238,7 @@ test-xfail-tst-null-argv = yes
 
 # bounding memory allocation is not supported yet
 tests-unsupported += tst-malloc-thread-fail
+tests-unsupported += tst-malloc-thread-fail-malloc-check
 tests-unsupported += tst-malloc-thread-fail-mcheck
 tests-unsupported += tst-dynarray-fail
 
@@ -345,17 +342,12 @@ test-xfail-tst-support_descriptors = yes
 # new in 2.30
 test-xfail-tst-nss-files-hosts-long = yes
 
-# This redirects realloc with dlsym
-# Problem is: that creates a loop: realloc() calls dlsym() which calls
-# _dlerror_run calls libc_once(init) which calls pthread_key_create which calls
-# realloc() etc.
-test-xfail-tst-res_hconf_reorder = yes
-
 # wants pthread_barrierattr_setpshared
 test-xfail-tst-pututxline-cache = yes
 test-xfail-tst-pututxline-lockfail = yes
 test-xfail-tst-mallocfork2 = yes
 test-xfail-tst-mallocfork2-mcheck = yes
+test-xfail-tst-mallocfork2-malloc-check = yes
 
 # wants /proc/self/fd
 test-xfail-tst-updwtmpx = yes
@@ -398,6 +390,17 @@ test-xfail-tst-spawn4-compat = yes
 
 # new in 2.34
 test-xfail-tst-cpu-features-cpuinfo-static = yes
+test-xfail-test-cxa_atexit-race2 = yes
+test-xfail-tst-itimer = yes
+test-xfail-tst-timespec_getres = yes
+test-xfail-tst-wait3 = yes
+test-xfail-tst-mqueue10 = yes
+test-xfail-tst-closefrom = yes
+test-xfail-tst-spawn5 = yes
+
+# fixed in 2.34
+test-xfail-tst-res_hconf_reorder = yes
+
 
 # actually never succeded
 test-xfail-tst-create_format1 = yes

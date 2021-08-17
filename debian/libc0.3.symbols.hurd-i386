@@ -121,6 +121,7 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  __fsys_set_options@Base 2.11
  __fsys_startup@Base 2.11
  __fsys_syncfs@Base 2.11
+ __gsync_wait_intr@Base 2.31-6~
  __ifsock_getsockaddr@Base 2.11
  __interrupt_operation@Base 2.11
  __io_async@Base 2.11
@@ -338,6 +339,8 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  __proc_reassign@Base 2.11
  __proc_reassign_request@Base 2.11
  __proc_reauthenticate@Base 2.11
+ __proc_reauthenticate_complete@Base 2.31-13+hurd.2~
+ __proc_reauthenticate_reassign@Base 2.31-13+hurd.1~
  __proc_reauthenticate_request@Base 2.11
  __proc_register_version@Base 2.11
  __proc_register_version_request@Base 2.11
@@ -500,6 +503,7 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  fsys_set_options@Base 2.11
  fsys_startup@Base 2.11
  fsys_syncfs@Base 2.11
+ gsync_wait_intr@Base 2.31-6~
  ifsock_getsockaddr@Base 2.11
  interrupt_operation@Base 2.11
  io_async@Base 2.11
@@ -717,6 +721,8 @@ libhurduser.so.0.3 #PACKAGE# #MINVER#
  proc_reassign@Base 2.11
  proc_reassign_request@Base 2.11
  proc_reauthenticate@Base 2.11
+ proc_reauthenticate_complete@Base 2.31-13+hurd.2~
+ proc_reauthenticate_reassign@Base 2.31-13+hurd.1~
  proc_reauthenticate_request@Base 2.11
  proc_register_version@Base 2.11
  proc_register_version_request@Base 2.11

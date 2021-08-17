@@ -109,7 +109,6 @@ endif
 		--without-selinux \
 		--enable-stackguard-randomization \
 		--enable-stack-protector=strong \
-		--enable-obsolete-rpc \
 		--with-pkgversion="Debian GLIBC $(DEB_VERSION)" \
 		--with-bugurl="http://www.debian.org/Bugs/" \
 		$(if $(filter $(pt_chown),yes),--enable-pt_chown) \
@@ -171,15 +170,32 @@ $(stamp)check_%: $(stamp)build_%
 	    echo "+---------------------------------------------------------------------+" ; \
 	    grep -E '^FAIL:' $(DEB_BUILDDIR)/tests.sum | sort ; \
 	    if ! dpkg-parsechangelog | egrep -q '^Version:.*\+deb[0-9]+u[0-9]+' ; then \
-	        exit 1 ; \
+	        touch $@_failed ; \
 	    fi ; \
 	  else \
 	    echo "+---------------------------------------------------------------------+" ; \
 	    echo "| Passed regression testing.  Give yourself a hearty pat on the back. |" ; \
 	    echo "+---------------------------------------------------------------------+" ; \
+	    touch $@_passed ; \
 	  fi ; \
 	fi
 	touch $@
+
+build-arch-post-check: $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES))
+	@echo "CHECK SUMMARY"
+	@for pass in $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES)); do \
+	  if [ -f $${pass}_passed ]; then \
+	    echo "check for $$(basename $$pass) passed"; \
+	  fi; \
+	done
+	@fail=0; \
+	for pass in $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES)); do \
+	  if [ -f $${pass}_failed ]; then \
+	    echo "check for $$(basename $$pass) failed"; \
+	    fail=1; \
+	  fi; \
+	done; \
+	exit $$fail
 
 # Make sure to use the just built iconvconfig for native builds. When
 # cross-compiling use the system iconvconfig. A cross-specific
@@ -245,11 +261,6 @@ else
 	  $(MAKE) -f debian/generate-supported.mk IN=localedata/SUPPORTED \
 	    OUT=debian/tmp-$(curpass)/usr/share/i18n/SUPPORTED; \
 	fi
-
-	# Remove yppasswd.h and yppasswd.x as they are shipped by libnsl-dev
-	# This could probably be removed once we stop using --enable-obsolete-rpc.
-	rm $(CURDIR)/debian/tmp-$(curpass)/usr/include/rpcsvc/yppasswd.h
-	rm $(CURDIR)/debian/tmp-$(curpass)/usr/include/rpcsvc/yppasswd.x
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
 	# Install the Python pretty printers
