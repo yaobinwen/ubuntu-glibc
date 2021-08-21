@@ -35,6 +35,13 @@ static void *init_routine (void);
    want to change it yet.  */
 void *(*_cthread_init_routine) (void) = &init_routine;
 
+static void
+reset_pthread_total (void)
+{
+  /* Only current thread remains */
+  __pthread_total = 1;
+}
+
 /* This function is called from the Hurd-specific startup code.  It
    should return a new stack pointer for the main thread.  The caller
    will switch to this new stack before doing anything serious.  */
@@ -70,6 +77,11 @@ _init_routine (void *stack)
      to the new stack.  Pretend it wasn't allocated so that it remains
      valid if the main thread terminates.  */
   thread->stack = 0;
+  thread->tcb = THREAD_SELF;
+
+#ifndef PAGESIZE
+  __pthread_default_attr.__guardsize = __vm_page_size;
+#endif
 
   ___pthread_self = thread;
 
@@ -77,6 +89,10 @@ _init_routine (void *stack)
      signal thread (which will be created by the glibc startup code
      when we return from here) shouldn't be seen as a user thread.  */
   __pthread_total--;
+
+  __pthread_atfork (NULL, NULL, reset_pthread_total);
+
+  GL(dl_init_static_tls) = &__pthread_init_static_tls;
 
   /* Make MiG code thread aware.  */
   __mig_init (thread->stackaddr);

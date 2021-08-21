@@ -24,12 +24,14 @@
 int
 pthread_barrier_wait (pthread_barrier_t *barrier)
 {
-  __pthread_spin_lock (&barrier->__lock);
+  __pthread_spin_wait (&barrier->__lock);
   if (--barrier->__pending == 0)
     {
       barrier->__pending = barrier->__count;
 
-      if (barrier->__count > 1)
+      if (barrier->__count == 1)
+	__pthread_spin_unlock (&barrier->__lock);
+      else
 	{
 	  struct __pthread *wakeup;
 	  unsigned n = 0;

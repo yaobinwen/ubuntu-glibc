@@ -85,8 +85,9 @@ _hurd_thread_sigstate (thread_t thread)
       ss = malloc (sizeof (*ss));
       if (ss == NULL)
 	__libc_fatal ("hurd: Can't allocate sigstate\n");
-      ss->thread = thread;
+      __spin_lock_init (&ss->critical_section_lock);
       __spin_lock_init (&ss->lock);
+      ss->thread = thread;
 
       /* Initialize default state.  */
       __sigemptyset (&ss->blocked);
@@ -97,6 +98,9 @@ _hurd_thread_sigstate (thread_t thread)
       ss->suspended = MACH_PORT_NULL;
       ss->intr_port = MACH_PORT_NULL;
       ss->context = NULL;
+      ss->active_resources = NULL;
+      ss->cancel = 0;
+      ss->cancel_hook = NULL;
 
       if (thread == MACH_PORT_NULL)
 	{
@@ -560,8 +564,8 @@ abort_all_rpcs (int signo, struct machine_thread_all_state *state, int live)
       }
 }
 
-/* Wake up any sigsuspend call that is blocking SS->thread.  SS must be
-   locked.  */
+/* Wake up any sigsuspend or pselect call that is blocking SS->thread.  SS must
+   be locked.  */
 static void
 wake_sigsuspend (struct hurd_sigstate *ss)
 {
@@ -591,8 +595,8 @@ sigset_t _hurdsig_preempted_set;
 weak_alias (_hurdsig_preemptors, _hurdsig_preempters)
 
 /* Mask of stop signals.  */
-#define STOPSIGS (sigmask (SIGTTIN) | sigmask (SIGTTOU) \
-		  | sigmask (SIGSTOP) | sigmask (SIGTSTP))
+#define STOPSIGS (__sigmask (SIGTTIN) | __sigmask (SIGTTOU) \
+		  | __sigmask (SIGSTOP) | __sigmask (SIGTSTP))
 
 /* Actual delivery of a single signal.  Called with SS unlocked.  When
    the signal is delivered, return SS, locked (or, if SS was originally

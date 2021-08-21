@@ -20,6 +20,7 @@
 #define _CPU_FEATURES_AARCH64_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define MIDR_PARTNUM_SHIFT	4
 #define MIDR_PARTNUM_MASK	(0xfff << MIDR_PARTNUM_SHIFT)
@@ -51,8 +52,8 @@
 
 #define IS_PHECDA(midr) (MIDR_IMPLEMENTOR(midr) == 'h'			      \
                         && MIDR_PARTNUM(midr) == 0x000)
-#define IS_ARES(midr) (MIDR_IMPLEMENTOR(midr) == 'A'			      \
-			&& MIDR_PARTNUM(midr) == 0xd0c)
+#define IS_NEOVERSE_N1(midr) (MIDR_IMPLEMENTOR(midr) == 'A'		      \
+			      && MIDR_PARTNUM(midr) == 0xd0c)
 
 #define IS_EMAG(midr) (MIDR_IMPLEMENTOR(midr) == 'P'			      \
                        && MIDR_PARTNUM(midr) == 0x000)
@@ -64,6 +65,7 @@ struct cpu_features
 {
   uint64_t midr_el1;
   unsigned zva_size;
+  bool bti;
 };
 
 #endif /* _CPU_FEATURES_AARCH64_H  */
