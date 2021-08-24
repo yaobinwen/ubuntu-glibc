@@ -3,6 +3,7 @@ git-updates.diff
 locale/check-unknown-symbols.diff
 locale/locale-print-LANGUAGE.diff
 locale/LC_IDENTIFICATION-optional-fields.diff
+localedata/sort-UTF8-first.diff
 localedata/supported.diff
 localedata/locale-eu_FR.diff
 localedata/locale-ku_TR.diff
@@ -65,6 +66,7 @@ hurd-i386/git-eintr.diff
 # 2.35
 hurd-i386/git-drop-rmh.diff
 hurd-i386/git-AT_NO_AUTOMOUNT.diff
+hurd-i386/git-get_errlist.diff
 
 hurd-i386/local-enable-ldconfig.diff
 hurd-i386/tg-sysvshm.diff
@@ -89,6 +91,7 @@ hurd-i386/local-no_unsupported_ioctls.diff
 hurd-i386/local-exec_filename.diff
 hurd-i386/local-tls-ie-align.diff
 hurd-i386/proc_reauth.diff
+hurd-i386/local-stack_chk_guard.diff
 
 i386/local-biarch.diff
 i386/unsubmitted-quiet-ldconfig.diff
