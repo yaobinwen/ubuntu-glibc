@@ -1,3 +1,13 @@
+glibc (2.34-0ubuntu2) impish; urgency=medium
+
+  * d/patches/ubuntu/Fix-close_range-closefrom-tests.patch: Patch from
+    upstream to fix test failures in autopkgtest environment (which has a
+    pair of fds open that the test suite did not cope with).
+  * d/debhelper.in/libc.postinst: go back to restarting systemd on libc6
+    upgrade, but carefully. LP: #1942276
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Fri, 03 Sep 2021 09:26:51 +1200
+
 glibc (2.34-0ubuntu1) impish; urgency=medium
 
   * New upstream version.

@@ -1,0 +1,573 @@
+From e814f4b04ee413a7bb3dfa43e74c8fb4abf58359 Mon Sep 17 00:00:00 2001
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Date: Tue, 24 Aug 2021 16:12:24 -0300
+Subject: [PATCH 1/2] support: Add support_open_dev_null_range
+
+It returns a range of file descriptor referring to the '/dev/null'
+pathname.  The function takes care of restarting the open range
+if a file descriptor is found within the specified range and
+also increases RLIMIT_NOFILE if required.
+
+Checked on x86_64-linux-gnu.
+---
+ support/Makefile                          |   2 +
+ support/support-open-dev-null-range.c     | 134 +++++++++++++++++++
+ support/support.h                         |   8 ++
+ support/tst-support-open-dev-null-range.c | 155 ++++++++++++++++++++++
+ 4 files changed, 299 insertions(+)
+ create mode 100644 support/support-open-dev-null-range.c
+ create mode 100644 support/tst-support-open-dev-null-range.c
+
+diff --git a/support/Makefile b/support/Makefile
+index a462781718..6332e7b607 100644
+--- a/support/Makefile
++++ b/support/Makefile
+@@ -66,6 +66,7 @@ libsupport-routines = \
+   support_path_support_time64 \
+   support_process_state \
+   support_ptrace \
++  support-open-dev-null-range \
+   support_openpty \
+   support_paths \
+   support_quote_blob \
+@@ -264,6 +265,7 @@ tests = \
+   tst-support_capture_subprocess \
+   tst-support_descriptors \
+   tst-support_format_dns_packet \
++  tst-support-open-dev-null-range \
+   tst-support-process_state \
+   tst-support_quote_blob \
+   tst-support_quote_string \
+diff --git a/support/support-open-dev-null-range.c b/support/support-open-dev-null-range.c
+new file mode 100644
+index 0000000000..80d9dba504
+--- /dev/null
++++ b/support/support-open-dev-null-range.c
+@@ -0,0 +1,134 @@
++/* Return a range of open file descriptors.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#include <errno.h>
++#include <fcntl.h>
++#include <support/support.h>
++#include <support/check.h>
++#include <support/xunistd.h>
++#include <stdlib.h>
++#include <sys/resource.h>
++
++static void
++increase_nofile (void)
++{
++  struct rlimit rl;
++  if (getrlimit (RLIMIT_NOFILE, &rl) == -1)
++    FAIL_EXIT1 ("getrlimit (RLIMIT_NOFILE): %m");
++
++  rl.rlim_cur += 128;
++
++  if (setrlimit (RLIMIT_NOFILE, &rl) == 1)
++    FAIL_EXIT1 ("setrlimit (RLIMIT_NOFILE): %m");
++}
++
++static int
++open_dev_null (int flags, mode_t mode)
++{
++ int fd = open64 ("/dev/null", flags, mode);
++ if (fd > 0)
++   return fd;
++
++ if (fd < 0 && errno != EMFILE)
++   FAIL_EXIT1 ("open64 (\"/dev/null\", 0x%x, 0%o): %m", flags, mode);
++
++ increase_nofile ();
++
++ return xopen ("/dev/null", flags, mode);
++}
++
++struct range
++{
++  int lowfd;
++  size_t len;
++};
++
++struct range_list
++{
++  size_t total;
++  size_t used;
++  struct range *ranges;
++};
++
++static void
++range_init (struct range_list *r)
++{
++  r->total = 8;
++  r->used = 0;
++  r->ranges = xmalloc (r->total * sizeof (struct range));
++}
++
++static void
++range_add (struct range_list *r, int lowfd, size_t len)
++{
++  if (r->used == r->total)
++    {
++      r->total *= 2;
++      r->ranges = xrealloc (r->ranges, r->total * sizeof (struct range));
++    }
++  r->ranges[r->used].lowfd = lowfd;
++  r->ranges[r->used].len = len;
++  r->used++;
++}
++
++static void
++range_close (struct range_list *r)
++{
++  for (size_t i = 0; i < r->used; i++)
++    {
++      int minfd = r->ranges[i].lowfd;
++      int maxfd = r->ranges[i].lowfd + r->ranges[i].len;
++      for (int fd = minfd; fd < maxfd; fd++)
++	xclose (fd);
++    }
++  free (r->ranges);
++}
++
++int
++support_open_dev_null_range (int num, int flags, mode_t mode)
++{
++  /* We keep track of the ranges that hit an already opened descriptor, so
++     we close them after we get a working range.  */
++  struct range_list rl;
++  range_init (&rl);
++
++  int lowfd = open_dev_null (flags, mode);
++  int prevfd = lowfd;
++  while (true)
++    {
++      int i = 1;
++      for (; i < num; i++)
++	{
++	  int fd = open_dev_null (flags, mode);
++	  if (fd != lowfd + i)
++	    {
++	      range_add (&rl, lowfd, prevfd - lowfd + 1);
++
++	      prevfd = lowfd = fd;
++	      break;
++	    }
++	  prevfd = fd;
++	}
++      if (i == num)
++	break;
++    }
++
++  range_close (&rl);
++
++  return lowfd;
++}
+diff --git a/support/support.h b/support/support.h
+index 834dba9097..e6911e193a 100644
+--- a/support/support.h
++++ b/support/support.h
+@@ -193,6 +193,14 @@ struct support_stack support_stack_alloc (size_t size);
+ /* Deallocate the STACK.  */
+ void support_stack_free (struct support_stack *stack);
+ 
++
++/* Create a range of NUM opened '/dev/null' file descriptors using FLAGS and
++   MODE.  The function takes care of restarting the open range if a file
++   descriptor is found within the specified range and also increases
++   RLIMIT_NOFILE if required.
++   The returned value is the lowest file descriptor number.  */
++int support_open_dev_null_range (int num, int flags, mode_t mode);
++
+ __END_DECLS
+ 
+ #endif /* SUPPORT_H */
+diff --git a/support/tst-support-open-dev-null-range.c b/support/tst-support-open-dev-null-range.c
+new file mode 100644
+index 0000000000..8e29def1ce
+--- /dev/null
++++ b/support/tst-support-open-dev-null-range.c
+@@ -0,0 +1,155 @@
++/* Tests for support_open_dev_null_range.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#include <errno.h>
++#include <dirent.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <support/check.h>
++#include <support/support.h>
++#include <support/xunistd.h>
++#include <sys/resource.h>
++#include <stdlib.h>
++
++#ifndef PATH_MAX
++# define PATH_MAX 1024
++#endif
++
++#include <stdio.h>
++
++static void
++check_path (int fd)
++{
++  char *proc_fd_path = xasprintf ("/proc/self/fd/%d", fd);
++  char file_path[PATH_MAX];
++  ssize_t file_path_length
++    = readlink (proc_fd_path, file_path, sizeof (file_path));
++  free (proc_fd_path);
++  if (file_path_length < 0)
++    FAIL_EXIT1 ("readlink (%s, %p, %zu)", proc_fd_path, file_path,
++		sizeof (file_path));
++  file_path[file_path_length] = '\0';
++  TEST_COMPARE_STRING (file_path, "/dev/null");
++}
++
++static int
++number_of_opened_files (void)
++{
++  DIR *fds = opendir ("/proc/self/fd");
++  if (fds == NULL)
++    FAIL_EXIT1 ("opendir (\"/proc/self/fd\"): %m");
++
++  int r = 0;
++  while (true)
++    {
++      errno = 0;
++      struct dirent64 *e = readdir64 (fds);
++      if (e == NULL)
++        {
++          if (errno != 0)
++            FAIL_EXIT1 ("readdir: %m");
++          break;
++        }
++
++      if (e->d_name[0] == '.')
++        continue;
++
++      char *endptr;
++      long int fd = strtol (e->d_name, &endptr, 10);
++      if (*endptr != '\0' || fd < 0 || fd > INT_MAX)
++        FAIL_EXIT1 ("readdir: invalid file descriptor name: /proc/self/fd/%s",
++                    e->d_name);
++
++      /* Skip the descriptor which is used to enumerate the
++         descriptors.  */
++      if (fd == dirfd (fds))
++        continue;
++
++      r = r + 1;
++    }
++
++  closedir (fds);
++
++  return r;
++}
++
++static int
++do_test (void)
++{
++  const int nfds1 = 8;
++  int lowfd = support_open_dev_null_range (nfds1, O_RDONLY, 0600);
++  for (int i = 0; i < nfds1; i++)
++    {
++      TEST_VERIFY (fcntl (lowfd + i, F_GETFL) > -1);
++      check_path (lowfd + i);
++    }
++
++  /* create some gaps.  */
++  xclose (lowfd + 1);
++  xclose (lowfd + 5);
++  xclose (lowfd + 6);
++
++  const int nfds2 = 16;
++  int lowfd2 = support_open_dev_null_range (nfds2, O_RDONLY, 0600);
++  for (int i = 0; i < nfds2; i++)
++    {
++      TEST_VERIFY (fcntl (lowfd2 + i, F_GETFL) > -1);
++      check_path (lowfd2 + i);
++    }
++
++  /* Decrease the maximum number of files.  */
++  {
++    struct rlimit rl;
++    if (getrlimit (RLIMIT_NOFILE, &rl) == -1)
++      FAIL_EXIT1 ("getrlimit (RLIMIT_NOFILE): %m");
++    
++    rl.rlim_cur = number_of_opened_files ();
++
++    if (setrlimit (RLIMIT_NOFILE, &rl) == 1)
++      FAIL_EXIT1 ("setrlimit (RLIMIT_NOFILE): %m");
++  }
++
++  const int nfds3 = 16;
++  int lowfd3 = support_open_dev_null_range (nfds3, O_RDONLY, 0600);
++  for (int i = 0; i < nfds3; i++)
++    {
++      TEST_VERIFY (fcntl (lowfd3 + i, F_GETFL) > -1);
++      check_path (lowfd3 + i);
++    }
++
++  /* create a lot of gaps to trigger the range extension.  */
++  xclose (lowfd3 + 1);
++  xclose (lowfd3 + 3);
++  xclose (lowfd3 + 5);
++  xclose (lowfd3 + 7);
++  xclose (lowfd3 + 9);
++  xclose (lowfd3 + 11);
++  xclose (lowfd3 + 13);
++
++  const int nfds4 = 16;
++  int lowfd4 = support_open_dev_null_range (nfds4, O_RDONLY, 0600);
++  for (int i = 0; i < nfds4; i++)
++    {
++      TEST_VERIFY (fcntl (lowfd4 + i, F_GETFL) > -1);
++      check_path (lowfd4 + i);
++    }
++
++  return 0;
++}
++
++#include <support/test-driver.c>
+-- 
+2.25.1
+
+From 6b20880b22d1d0fce7e9f506baa6fe2d5c7fcfdc Mon Sep 17 00:00:00 2001
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Date: Tue, 24 Aug 2021 16:15:50 -0300
+Subject: [PATCH 2/2] Use support_open_dev_null_range io/tst-closefrom,
+ misc/tst-close_range, and posix/tst-spawn5 (BZ #28260)
+
+It ensures a continuous range of file descriptor and avoid hitting
+the RLIMIT_NOFILE.
+
+Checked on x86_64-linux-gnu.
+---
+ io/tst-closefrom.c                        | 21 +++++----------
+ posix/tst-spawn5.c                        | 13 +---------
+ sysdeps/unix/sysv/linux/tst-close_range.c | 31 ++++++++---------------
+ 3 files changed, 17 insertions(+), 48 deletions(-)
+
+diff --git a/io/tst-closefrom.c b/io/tst-closefrom.c
+index d4c187073c..395ec0d894 100644
+--- a/io/tst-closefrom.c
++++ b/io/tst-closefrom.c
+@@ -24,31 +24,22 @@
+ #include <support/check.h>
+ #include <support/descriptors.h>
+ #include <support/xunistd.h>
++#include <support/support.h>
+ 
+ #include <array_length.h>
+ 
+ #define NFDS 100
+ 
+-static int
+-open_multiple_temp_files (void)
+-{
+-  /* Check if the temporary file descriptor has no no gaps.  */
+-  int lowfd = xopen ("/dev/null", O_RDONLY, 0600);
+-  for (int i = 1; i <= NFDS; i++)
+-    TEST_COMPARE (xopen ("/dev/null", O_RDONLY, 0600), lowfd + i);
+-  return lowfd;
+-}
+-
+ static int
+ closefrom_test (void)
+ {
+   struct support_descriptors *descrs = support_descriptors_list ();
+ 
+-  int lowfd = open_multiple_temp_files ();
++  int lowfd = support_open_dev_null_range (NFDS, O_RDONLY, 0600);
+ 
+-  const int maximum_fd = lowfd + NFDS;
++  const int maximum_fd = lowfd + NFDS - 1;
+   const int half_fd = lowfd + NFDS / 2;
+-  const int gap = maximum_fd / 4;
++  const int gap = lowfd + NFDS / 4;
+ 
+   /* Close half of the descriptors and check result.  */
+   closefrom (half_fd);
+@@ -58,7 +49,7 @@ closefrom_test (void)
+       TEST_COMPARE (fcntl (i, F_GETFL), -1);
+       TEST_COMPARE (errno, EBADF);
+     }
+-  for (int i = 0; i < half_fd; i++)
++  for (int i = lowfd; i < half_fd; i++)
+     TEST_VERIFY (fcntl (i, F_GETFL) > -1);
+ 
+   /* Create some gaps, close up to a threshold, and check result.  */
+@@ -74,7 +65,7 @@ closefrom_test (void)
+       TEST_COMPARE (fcntl (i, F_GETFL), -1);
+       TEST_COMPARE (errno, EBADF);
+     }
+-  for (int i = 0; i < gap; i++)
++  for (int i = lowfd; i < gap; i++)
+     TEST_VERIFY (fcntl (i, F_GETFL) > -1);
+ 
+   /* Close the remmaining but the last one.  */
+diff --git a/posix/tst-spawn5.c b/posix/tst-spawn5.c
+index ac66738004..a95199af6b 100644
+--- a/posix/tst-spawn5.c
++++ b/posix/tst-spawn5.c
+@@ -47,17 +47,6 @@ static int initial_argv_count;
+ 
+ #define NFDS 100
+ 
+-static int
+-open_multiple_temp_files (void)
+-{
+-  /* Check if the temporary file descriptor has no no gaps.  */
+-  int lowfd = xopen ("/dev/null", O_RDONLY, 0600);
+-  for (int i = 1; i <= NFDS; i++)
+-    TEST_COMPARE (xopen ("/dev/null", O_RDONLY, 0600),
+-		  lowfd + i);
+-  return lowfd;
+-}
+-
+ static int
+ parse_fd (const char *str)
+ {
+@@ -185,7 +174,7 @@ spawn_closefrom_test (posix_spawn_file_actions_t *fa, int lowfd, int highfd,
+ static void
+ do_test_closefrom (void)
+ {
+-  int lowfd = open_multiple_temp_files ();
++  int lowfd = support_open_dev_null_range (NFDS, O_RDONLY, 0600);
+   const int half_fd = lowfd + NFDS / 2;
+ 
+   /* Close half of the descriptors and check result.  */
+diff --git a/sysdeps/unix/sysv/linux/tst-close_range.c b/sysdeps/unix/sysv/linux/tst-close_range.c
+index dccb6189c5..f5069d1b8a 100644
+--- a/sysdeps/unix/sysv/linux/tst-close_range.c
++++ b/sysdeps/unix/sysv/linux/tst-close_range.c
+@@ -36,23 +36,12 @@
+ 
+ #define NFDS 100
+ 
+-static int
+-open_multiple_temp_files (void)
+-{
+-  /* Check if the temporary file descriptor has no no gaps.  */
+-  int lowfd = xopen ("/dev/null", O_RDONLY, 0600);
+-  for (int i = 1; i <= NFDS; i++)
+-    TEST_COMPARE (xopen ("/dev/null", O_RDONLY, 0600),
+-		  lowfd + i);
+-  return lowfd;
+-}
+-
+ static void
+ close_range_test_max_upper_limit (void)
+ {
+   struct support_descriptors *descrs = support_descriptors_list ();
+ 
+-  int lowfd = open_multiple_temp_files ();
++  int lowfd = support_open_dev_null_range (NFDS, O_RDONLY, 0600);
+ 
+   {
+     int r = close_range (lowfd, ~0U, 0);
+@@ -68,7 +57,7 @@ close_range_test_max_upper_limit (void)
+ static void
+ close_range_test_common (int lowfd, unsigned int flags)
+ {
+-  const int maximum_fd = lowfd + NFDS;
++  const int maximum_fd = lowfd + NFDS - 1;
+   const int half_fd = lowfd + NFDS / 2;
+   const int gap_1 = maximum_fd - 8;
+ 
+@@ -121,7 +110,7 @@ close_range_test (void)
+   struct support_descriptors *descrs = support_descriptors_list ();
+ 
+   /* Check if the temporary file descriptor has no no gaps.  */
+-  int lowfd = open_multiple_temp_files ();
++  int lowfd = support_open_dev_null_range (NFDS, O_RDONLY, 0600);
+ 
+   close_range_test_common (lowfd, 0);
+ 
+@@ -146,7 +135,7 @@ close_range_test_subprocess (void)
+   struct support_descriptors *descrs = support_descriptors_list ();
+ 
+   /* Check if the temporary file descriptor has no no gaps.  */
+-  int lowfd = open_multiple_temp_files ();
++  int lowfd = support_open_dev_null_range (NFDS, O_RDONLY, 0600);
+ 
+   struct support_stack stack = support_stack_alloc (4096);
+ 
+@@ -184,7 +173,7 @@ close_range_unshare_test (void)
+   struct support_descriptors *descrs1 = support_descriptors_list ();
+ 
+   /* Check if the temporary file descriptor has no no gaps.  */
+-  int lowfd = open_multiple_temp_files ();
++  int lowfd = support_open_dev_null_range (NFDS, O_RDONLY, 0600);
+ 
+   struct support_descriptors *descrs2 = support_descriptors_list ();
+ 
+@@ -200,7 +189,7 @@ close_range_unshare_test (void)
+ 
+   support_stack_free (&stack);
+ 
+-  for (int i = 0; i < NFDS; i++)
++  for (int i = lowfd; i < lowfd + NFDS; i++)
+     TEST_VERIFY (fcntl (i, F_GETFL) > -1);
+ 
+   support_descriptors_check (descrs2);
+@@ -226,9 +215,9 @@ static void
+ close_range_cloexec_test (void)
+ {
+   /* Check if the temporary file descriptor has no no gaps.  */
+-  const int lowfd = open_multiple_temp_files ();
++  int lowfd = support_open_dev_null_range (NFDS, O_RDONLY, 0600);
+ 
+-  const int maximum_fd = lowfd + NFDS;
++  const int maximum_fd = lowfd + NFDS - 1;
+   const int half_fd = lowfd + NFDS / 2;
+   const int gap_1 = maximum_fd - 8;
+ 
+@@ -251,13 +240,13 @@ close_range_cloexec_test (void)
+   /* Create some gaps, close up to a threshold, and check result.  */
+   static int gap_close[] = { 57, 78, 81, 82, 84, 90 };
+   for (int i = 0; i < array_length (gap_close); i++)
+-    xclose (gap_close[i]);
++    xclose (lowfd + gap_close[i]);
+ 
+   TEST_COMPARE (close_range (half_fd + 1, gap_1, CLOSE_RANGE_CLOEXEC), 0);
+   for (int i = half_fd + 1; i < gap_1; i++)
+     {
+       int flags = fcntl (i, F_GETFD);
+-      if (is_in_array (gap_close, array_length (gap_close), i))
++      if (is_in_array (gap_close, array_length (gap_close), i - lowfd))
+         TEST_COMPARE (flags, -1);
+       else
+         {
+-- 
+2.25.1
+
