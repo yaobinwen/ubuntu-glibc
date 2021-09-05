@@ -1,3 +1,36 @@
+glibc (2.32-1) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/riscv64/git-riscv64-gnu-ifunc.diff: backport GNU indirect
+    function from upstream to fix failures in the testsuite with binutils
+    2.37.
+  * debian/rules, rules.d/build.mk, rules.d/debhelper.mk,
+    debian/libc*.symbols*, debhelper.in/*install*: drop support for building
+    with libcrypt now that the transition has been done in bullseye.
+  * debian/libc6.symbols.hppa: drop symbol overrides for linuxthreads -> NPTL
+    transition.
+  * debian/libc6.symbols.sparc, debian/libc6-sparc.symbols.sparc64: drop symbol
+    overrides for SPARCV8 -> SPARCV8PLUS ABI transition.
+  * debian/libc6.symbols.arm: drop file, the arm architecture is not supported
+    anymore for quite some time.
+  * debian/libc6.symbols.armel, debian/libc6.symbols.armhf: drop symbol
+    overrides for make/get/set/swapcontext.
+  * debian/libc6-i386.symbols.x32, debian/libc6.symbols.i386: drop symbol
+    overrides for TLS support.
+  * debian/libc6.symbols.powerpc: drop symbol overrides for TLS support.
+  * debian/libc6.symbols.mips, debian/libc6.symbols.mipsel: drop symbol
+    overrides for TLS support.
+  * debian/rules.d/debhelper.mk: drop workaround for an old dpkg-shlibdeps
+    bugs (see #433723).
+  * debian/debhelper.in/libc-dev.install, debian/debhelper.in/libc.install,
+    debian/control.in/libc: move sotruss-lib.so from libc6 to libc6-dev.
+    Closes: #976133.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-msync.diff: Fix msync.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 05 Sep 2021 22:21:47 +0200
+
 glibc (2.32-0experimental1) experimental; urgency=medium
 
   [ Samuel Thibault ]
@@ -158,7 +191,7 @@ glibc (2.31-14) unstable; urgency=medium
   * debian/control.in/main: remove Adam Conrad from Uploaders. RIP.  Closes:
     #986951.
   * debian/testsuite-xfail-debian.mk: drop tst-malloc-usable-tunables from
-    XFAIL, the kernel bug has been fixed. 
+    XFAIL, the kernel bug has been fixed.
   * debian/control.in/libc, debian/rules.d/debhelper.mk: Drop the depends in
     libcrypt1 as upgrades from buster to bookworm are not supported. Demote
     the libnss-nis and libnss-nisplus recommends to suggests.  Closes:
@@ -166,7 +199,7 @@ glibc (2.31-14) unstable; urgency=medium
   * debian/patches/hppa/git-fcntl.h-update.diff: new patch from upstream to
     update EFD_NONBLOCK, IN_NONBLOCK, SFD_NONBLOCK and TFD_NONBLOCK on HPPA.
     Closes: #981650.
-  * debian/debhelper.in/locales.postinst: simplify locales-all detection. 
+  * debian/debhelper.in/locales.postinst: simplify locales-all detection.
   * debian/control.in/main: drop arch specific depends on gcc-10 now that the
     minimum version is already in bullseye.
   * debian/debhelper.in/libc.preinst: simplify the version comparison by only
