@@ -218,6 +218,7 @@ test-xfail-tst-setcontext7 = yes
 test-xfail-tst-stack4 = yes
 # The following tests sometimes fail due to timeouts.
 test-xfail-tst-barrier5 = yes
+test-xfail-tst-cond24 = yes
 test-xfail-tst-cond25 = yes
 
 # The following tests fail as xsigstack.c does not allocate stack
@@ -353,6 +354,7 @@ test-xfail-tst-strerror = yes
 test-xfail-tst-single_threaded-pthread = yes
 test-xfail-tst-latepthread = yes
 test-xfail-tst-initfinilazyfail = yes
+test-xfail-tst-kill6 = yes
 
 # new in 2.33
 test-xfail-tst-cpu-features-cpuinfo = yes
@@ -378,6 +380,7 @@ test-xfail-tst-spawn5 = yes
 
 # fixed in 2.34
 test-xfail-tst-res_hconf_reorder = yes
+test-xfail-tst-canon-bz26341 = yes
 
 
 # actually never succeded
