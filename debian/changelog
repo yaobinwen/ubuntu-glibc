@@ -1,3 +1,14 @@
+glibc (2.34-0ubuntu3) impish; urgency=medium
+
+  * d/patches/git-updates.diff: Update from release/2.34/master branch.
+    - d/patches/ubuntu/Fix-close_range-closefrom-tests.patch,
+      d/patches/ubuntu/fix-iconvconfig-directory.diff: removed as now
+      upstream.
+  * d/patches/ubuntu/disable-clone3.patch: Disable use of clone3 syscall
+    to give Electron apps more time to get rebuilt. (LP: #1944468)
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Tue, 28 Sep 2021 14:38:09 +1300
+
 glibc (2.34-0ubuntu2) impish; urgency=medium
 
   * d/patches/ubuntu/Fix-close_range-closefrom-tests.patch: Patch from
