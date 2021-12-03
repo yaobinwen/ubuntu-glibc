@@ -51,7 +51,11 @@ ifeq ($(filter nostrip,$(DEB_BUILD_OPTIONS)),)
 	# work even without that package installed.
 	if test "$(NOSTRIP_$(curpass))" != 1; then					\
 	  if test "$(DEBUG_$(curpass))" = 1; then					\
-	    DH_COMPAT=8 dh_strip -p$(curpass) -Xlibpthread $(DH_STRIP_DEBUG_PACKAGE);	\
+	    if test "$(DEB_HOST_ARCH)" = "armhf"; then					\
+	      dh_strip -p$(curpass) -Xlibpthread -Xld-$(GLIBC_VERSION).so $(DH_STRIP_DEBUG_PACKAGE);	\
+	    else									\
+	      dh_strip -p$(curpass) -Xlibpthread $(DH_STRIP_DEBUG_PACKAGE);		\
+	    fi ;									\
 	    for f in $$(find debian/$(curpass) -name libpthread-\*.so) ; do		\
 	      dbgfile=$$(LC_ALL=C readelf -n $$f | sed -e '/Build ID:/!d'		\
 	        -e "s#^.*Build ID: \([0-9a-f]\{2\}\)\([0-9a-f]\+\)#\1/\2.debug#") ;	\
@@ -63,7 +67,11 @@ ifeq ($(filter nostrip,$(DEB_BUILD_OPTIONS)),)
 	                                 --remove-section=.note $$f ;			\
 	    done ;									\
 	  else										\
-	    DH_COMPAT=8 dh_strip -p$(curpass) -Xlibpthread;				\
+	    if test "$(DEB_HOST_ARCH)" = "armhf"; then					\
+	          dh_strip -p$(curpass) -Xlibpthread -Xld-$(GLIBC_VERSION).so ;		\
+	    else									\
+	          dh_strip -p$(curpass) -Xlibpthread ;					\
+	    fi ;									\
 	  fi ;										\
 	  for f in $$(find debian/$(curpass) -name \*crt\*.o) ; do			\
 	    $(DEB_HOST_GNU_TYPE)-strip --strip-debug --remove-section=.comment		\
@@ -116,7 +124,7 @@ $(patsubst %,$(stamp)binaryinst_%,$(DEB_UDEB_PACKAGES)): debhelper $(patsubst %,
 	dh_testroot
 	dh_installdirs -p$(curpass)
 	dh_install -p$(curpass)
-	DH_COMPAT=8 dh_strip -p$(curpass)
+	dh_strip -p$(curpass)
 	
 	# when you want to install extra packages, use extra_pkg_install.
 	$(call xx,extra_pkg_install)

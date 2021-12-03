@@ -1,3 +1,28 @@
+glibc (2.31-0ubuntu9.4) focal; urgency=medium
+
+  * Update for 20.04. (LP: #1951033)
+
+  [ Balint Reczey ]
+  * Revert backporting TLS surplus accounting changes including updating
+    debian/patches/ubuntu/local-disable-ld_audit.diff
+    (LP: #1926355, LP: #1926379)
+  * Don't strip ld.so on armhf. (LP: #1927192)
+
+  [ Matthias Klose ]
+  * Revert: Use DH_COMPAT=8 for dh_strip to fix debug sections for valgrind.
+    Enables debugging ld.so related issues. (LP: #1918035)
+
+  [ Michael Hudson-Doyle ]
+  * d/local/usr_sbin/update-locale: improve sanity checks. (LP: #1892825)
+  * d/patches/u/aarch64-memcpy-improvements.patch: Backport memcpy
+    improvements. (LP: #1951032)
+
+  [ Heitor Alves de Siqueira ]
+  * d/p/u/git-lp1928508-reversing-calculation-of-__x86_shared_non_temporal.patch:
+    - Fix memcpy() performance regression on x86 AMD systems (LP: #1928508)
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Fri, 03 Dec 2021 16:36:14 +1300
+
 glibc (2.31-0ubuntu9.3) focal; urgency=medium
 
   [ Aurelien Jarno ]

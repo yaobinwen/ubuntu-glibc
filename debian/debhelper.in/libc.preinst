@@ -279,7 +279,7 @@ then
 
     if [ -n "$preversion" ] && [ -x "$(which ischroot)" ] && ! ischroot; then
 	# NSS authentication trouble guard
-	if dpkg --compare-versions "$preversion" lt GLIBC_VERSION; then
+	if dpkg --compare-versions "$preversion" lt GLIBC_VERSION || [ "$preversion" = "2.31-0ubuntu9.3" ]; then
 	    if pidof xscreensaver xlockmore >/dev/null; then
 		if [ "$USE_DEBCONF" ] ; then
 		    db_version 2.0

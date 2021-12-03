@@ -125,7 +125,6 @@ any/submitted-resolv-unaligned.diff
 any/local-cudacc-float128.diff
 any/submitted-ld.so-cache-new-format.diff
 any/local-test-install.diff
-any/git-surplus-tls-accounting.diff
 
 # Ubuntu patches live in their own little world, to maintain sanity
 ubuntu/local-altlocaledir.diff
@@ -144,3 +143,5 @@ ubuntu/local-fallback-to-monotonic.diff
 ubuntu/git-elf-Add-endianness-markup-to-ld.so.cache-bug-27008.patch
 ubuntu/submitted-broadcast-to-prevent-deadlock.diff
 ubuntu/git-aarch64-Accept-PLT-calls-to-__getauxval-within-libc..patch
+ubuntu/git-lp1928508-reversing-calculation-of-__x86_shared_non_temporal.patch
+ubuntu/aarch64-memcpy-improvements.patch
