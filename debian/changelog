@@ -1,3 +1,27 @@
+glibc (2.33-0experimental3) experimental; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update hurd tests.
+  * debian/debhelper.in/libc.preinst: Require gnumach kernel >=
+    1.8+git20210923 for the xrstor fix, needed for the ifunc-optimized memcpy
+    etc.
+  * debian/patches/hurd-i386/git-htl-init_sigset.diff: Fix sudo.
+
+  [ Aurelien Jarno ]
+  * debian/debhelper.in/libc-dev{,-alt}.install, debian/rules.d/build.mk:
+    install an empty libpthread_nonshared.a to support broken closed source
+    software.  Closes: #971273.
+  * debian/sysdeps/arm64.mk: enable Memory Tagging Extension (MTE) (heap)
+    checking on arm64.  Closes: #995269.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/patches/any/local-revert-bz13979.diff: re-add patch removed in
+    2.33-0experimental0, but limited to removing the warning when
+    optimizations are disabled and _FORTIFY_SOURCE > 0. At least cgo and
+    gnucobol3 always invoke the compiler with _FORTIFY_SOURCE > 0, even when
+    the optimizations are disabled.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 05 Dec 2021 19:12:47 +0100
+
 glibc (2.33-0experimental2) experimental; urgency=medium
 
   [ Samuel Thibault ]
@@ -86,6 +110,24 @@ glibc (2.33-0experimental0) experimental; urgency=medium
   * debian/testsuite-xfail-debian.mk: Update tests.
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 06 Sep 2021 07:03:55 +0200
+
+glibc (2.32-5) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/control.in/libc: add a breaks against tinydns (<< 1:1.05-14).
+    Closes: #997912.
+  * debian/debhelper.in/libc-bin.postinst: stop replacing older versions from
+    /etc/nsswitch.conf.  Closes: #998008.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix bad conversion from ISO-2022-JP-3 with iconv (CVE-2021-43396).
+      Closes: #998622.
+  * debian/control.in/main: rename libselinux-dev build-dependency into
+    libselinux1-dev.
+  * debian/patches/any/submitted-localedef-check-magic.patch: new patch to
+    display a proper error message for bad locale-archive files.  Closes:
+    #993772.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 05 Dec 2021 16:46:21 +0100
 
 glibc (2.32-4) unstable; urgency=medium
 

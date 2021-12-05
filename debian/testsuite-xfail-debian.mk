@@ -347,14 +347,12 @@ test-xfail-tst-updwtmpx = yes
 test-xfail-tst-lchmod = yes
 
 # new in 2.32
-test-xfail-tst-safe-linking = yes
 # Assumes some linuxish strings
 test-xfail-tst-strerror = yes
 # We always have several threads
 test-xfail-tst-single_threaded-pthread = yes
 test-xfail-tst-latepthread = yes
 test-xfail-tst-initfinilazyfail = yes
-test-xfail-tst-kill6 = yes
 
 # new in 2.33
 test-xfail-tst-cpu-features-cpuinfo = yes
@@ -388,6 +386,13 @@ test-xfail-tst-pthread_kill-exiting = yes
 test-xfail-tst-compathooks-on = yes
 test-xfail-tst-support-open-dev-null-range = yes
 test-xfail-tst-xreadlink = yes
+test-xfail-tst-audit14-cmp = yes
+test-xfail-tst-audit15-cmp = yes
+test-xfail-tst-audit16-cmp = yes
+test-xfail-tst-sched_getaffinity = yes
+
+# fixed in 2.35
+test-xfail-tst-safe-linking = yes
 
 # actually never succeded
 test-xfail-tst-create_format1 = yes
