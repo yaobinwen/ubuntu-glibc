@@ -6,10 +6,6 @@ test-xfail-tst-cpuclock2 = yes
 test-xfail-tst-cputimer1 = yes
 test-xfail-tst-timer = yes
 
-# This is an upstream regression on multiple architectures
-# see https://sourceware.org/bugzilla/show_bug.cgi?id=19303
-test-xfail-tst-cancel24-static = yes
-
 # Due to the nature of this test, it's very sensitive to system load
 # in that, strangely, it wants more, not less.  Given that's hard to
 # control, we'll just let it fail
@@ -143,10 +139,6 @@ test-xfail-tst-signal3 = yes
 test-xfail-tst-timer4 = yes
 test-xfail-tst-waitid = yes
 test-xfail-tst-writev = yes
-
-# There is not support for protection key on Alpha yet, and there is a
-# disagreement between kernel and glibc how to report that.
-test-xfail-tst-pkey = yes
 endif
 
 
@@ -164,13 +156,6 @@ endif
 # arm64
 ######################################################################
 ifeq ($(config-machine)-$(config-os),aarch64-linux-gnu)
-# There is not support for protection key on ARM64 yet, and there is a
-# disagreement between kernel and glibc how to report that.
-test-xfail-tst-pkey = yes
-
-# In some conditions the kernel might not provide a heap, causing
-# some tests to fail. See bug#889817 for details.
-test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -178,9 +163,6 @@ endif
 # armel
 ######################################################################
 ifeq ($(config-machine)-$(config-os),arm-linux-gnueabi)
-# There is not support for protection key on ARM yet, and there is a
-# disagreement between kernel and glibc how to report that.
-test-xfail-tst-pkey = yes
 endif
 
 
@@ -188,9 +170,6 @@ endif
 # armhf
 ######################################################################
 ifeq ($(config-machine)-$(config-os),arm-linux-gnueabihf)
-# There is not support for protection key on ARM yet, and there is a
-# disagreement between kernel and glibc how to report that.
-test-xfail-tst-pkey = yes
 endif
 
 
@@ -378,6 +357,7 @@ test-xfail-tst-mqueue10 = yes
 test-xfail-tst-closefrom = yes
 test-xfail-tst-spawn5 = yes
 test-xfail-tst-nss-compat1 = yes
+test-xfail-test-fesetexcept-traps = yes
 
 # new in 2.35
 test-xfail-tst-pthread_kill-exited = yes
@@ -783,6 +763,7 @@ endif
 ######################################################################
 ifneq (,$(filter $(config-machine)-$(config-os), mips-linux-gnu mipsel-linux-gnu mips64-linux-gnuabi64 mips64el-linux-gnuabi64 mips64-linux-gnuabin32 mips64el-linux-gnuabin32))
 test-xfail-tst-stack4 = yes
+test-xfail-tst-ro-dynamic = yes
 
 # MIPS GCC does not use PT_GNU_STACK markers (this is a GCC issue)
 test-xfail-check-execstack = yes
@@ -808,10 +789,6 @@ test-xfail-test-float32-float64-sub = yes
 # the conversion and a new qNaN is generated.
 test-xfail-tst-strfrom = yes
 test-xfail-tst-strfrom-locale = yes
-
-# There is not support for protection key on MIPS yet, and there is a
-# disagreement between kernel and glibc how to report that.
-test-xfail-tst-pkey = yes
 endif
 
 
@@ -839,9 +816,6 @@ endif
 # O32 mips*
 ######################################################################
 ifneq (,$(filter $(config-machine)-$(config-os), mips64-linux-gnu mips64el-linux-gnu))
-# In some conditions the kernel might not provide a heap, causing
-# some tests to fail. See bug#889817 for details.
-test-xfail-tst-thread-exit-clobber = yes
 endif
 
 
@@ -849,9 +823,6 @@ endif
 # N64 mips*
 ######################################################################
 ifneq (,$(filter $(config-machine)-$(config-os), mips64-linux-gnuabi64 mips64el-linux-gnuabi64))
-# In some conditions the kernel might not provide a heap, causing
-# some tests to fail. See bug#889817 for details.
-test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -859,13 +830,6 @@ endif
 # ppc64el
 ######################################################################
 ifeq ($(config-machine)-$(config-os),powerpc64le-linux-gnu)
-# In some conditions the kernel might not provide a heap, causing
-# some tests to fail. See bug#889817 for details.
-test-xfail-tst-malloc-usable-tunables = yes
-
-# The glibc implementation of pkey_get and pkey_set are the stub
-# implementations.
-test-xfail-tst-pkey = yes
 endif
 
 
@@ -877,14 +841,6 @@ test-xfail-tst-backtrace5 = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-waitid = yes
-
-# In some conditions the kernel might not provide a heap, causing
-# some tests to fail. See bug#889817 for details.
-test-xfail-tst-malloc-usable-tunables = yes
-
-# The glibc implementation of pkey_get and pkey_set are the stub
-# implementations.
-test-xfail-tst-pkey = yes
 endif
 
 
@@ -896,10 +852,6 @@ test-xfail-tst-backtrace5 = yes
 test-xfail-tst-backtrace6 = yes
 test-xfail-tst-mqueue5 = yes
 test-xfail-tst-waitid = yes
-
-# The glibc implementation of pkey_get and pkey_set are the stub
-# implementations.
-test-xfail-tst-pkey = yes
 endif
 
 
@@ -942,10 +894,6 @@ endif
 ifeq ($(config-machine)-$(config-os),s390x-linux-gnu)
 test-xfail-tst-protected1a = yes
 test-xfail-tst-protected1b = yes
-
-# In some conditions the kernel might not provide a heap, causing
-# some tests to fail. See bug#889817 for details.
-test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 
@@ -996,10 +944,6 @@ test-xfail-tst-protected1b = yes
 test-xfail-tst-realloc = yes
 test-xfail-tst-waitid = yes
 test-xfail-test-float64x-float128-mul=yes
-
-# In some conditions the kernel might not provide a heap, causing
-# some tests to fail. See bug#889817 for details.
-test-xfail-tst-malloc-usable-tunables = yes
 endif
 
 

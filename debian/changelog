@@ -1,3 +1,23 @@
+glibc (2.34-0experimental1) experimental; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update hurd tests.
+  * debian/patches/hurd-i386/git-machrules-chk_fail.diff: Fix static link.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/patches/arm/local-vfp-sysdeps.diff: drop, causes issues with GCC
+    11, the other compilers have probably been fixed during the last 9 years.
+  * debian/testsuite-xfail-debian.mk: whitelist failing new test on mips*.
+  * debian/testsuite-xfail-debian.mk: drop whitelist for kernel bug #889817
+    now that oldstable and newer kernels are fixed.
+  * debian/testsuite-xfail-debian.mk: drop whitelist for tst-cancel24-static,
+    fixed since glibc 2.25.
+  * debian/testsuite-xfail-debian.mk: drop whitelist for test-xfail-tst-pkey,
+    fixed since glibc 2.31.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 18 Dec 2021 00:15:36 +0100
+
 glibc (2.34-0experimental0) experimental; urgency=medium
 
   [ Aurelien Jarno ]
