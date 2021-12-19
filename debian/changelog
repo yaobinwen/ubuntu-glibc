@@ -1,3 +1,16 @@
+glibc (2.34-0experimental2) experimental; urgency=medium
+
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debhelper.in/libc.lintian-overrides, debhelper.in/libc.lintian-overrides,
+    debhelper.in/libc-otherbuild.lintian-overrides: use wildcards to match the
+    dynamic linker name. This changes the overrides files to be identical on
+    all architectures and make them multiarch installable.  Closes: #1001967.
+  * debian/libc-dev.lintian-overrides, debian/libc-dev-alt.lintian-overrides:
+    add lintian overrides for now empty libpthread.a, libdl.a, libutil.a,
+    and libanl.a.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 20 Dec 2021 00:01:20 +0100
+
 glibc (2.34-0experimental1) experimental; urgency=medium
 
   [ Samuel Thibault ]
