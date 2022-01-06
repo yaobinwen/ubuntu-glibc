@@ -1,3 +1,23 @@
+glibc (2.33-2) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/unsubmitted-getaux_at_secure.diff: Fix according
+    to new __getauxval2 function.
+  * debian/libc0.3.symbols.hurd-i386: Add vm_region_create_proxy.
+  * debian/patches/hurd-i386/git-lib-map.diff: Unlock libraries load
+    addresses.
+  * debian/patches/hurd-i386/git-large-text.diff: Fix clang startup.
+  * debian/patches/hurd-i386/git-get_dtable.diff: Implement msg_get_dtable.
+  * debian/patches/hurd-i386/git-auth-leak.diff: Fix auth port leaks.
+  * debian/patches/hurd-i386/git-nuke_ports_on_exec.diff: Fix ports leaks.
+  * debian/testsuite-xfail-debian.mk: Update hurd tests.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix syscall() on ppc64 with POWER9 CPUs.  Closes: #1003201.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 06 Jan 2022 22:32:53 +0100
+
 glibc (2.33-1) unstable; urgency=medium
 
   * Upload to unstable.
