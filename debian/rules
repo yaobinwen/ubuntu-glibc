@@ -95,7 +95,7 @@ crypt = no
 BASE_CC = gcc
 BASE_CXX = g++
 BASE_MIG = mig
-DEB_GCC_VERSION ?= -10
+DEB_GCC_VERSION ?=
 
 RUN_TESTSUITE = yes
 TIMEOUTFACTOR = 25
@@ -227,8 +227,7 @@ post-check: $(patsubst %,$(stamp)check_%,$(GLIBC_PASSES))
 	exit $$fail
 
 ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
-build-arch: $(stamp)build_C.UTF-8 \
-	$(stamp)build_locales-all
+build-arch: $(stamp)build_locales-all
 endif
 
 build-indep: $(stamp)source $(stamp)build_libc

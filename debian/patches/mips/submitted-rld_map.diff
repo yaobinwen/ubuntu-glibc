@@ -7,15 +7,15 @@
  sysdeps/mips/dl-machine.h |    3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
---- a/sysdeps/mips/dl-machine.h
-+++ b/sysdeps/mips/dl-machine.h
-@@ -78,7 +78,8 @@
- 	 ptr += (l)->l_info[DT_MIPS (RLD_MAP_REL)]->d_un.d_val; \
- 	 *(ElfW(Addr) *)ptr = (ElfW(Addr)) (r); \
-        } \
--     else if ((l)->l_info[DT_MIPS (RLD_MAP)]) \
-+     else if ((l)->l_info[DT_MIPS (RLD_MAP)] && \
-+	 (l)->l_info[DT_MIPS (RLD_MAP)]->d_un.d_ptr) \
-        *(ElfW(Addr) *)((l)->l_info[DT_MIPS (RLD_MAP)]->d_un.d_ptr) = \
-        (ElfW(Addr)) (r); \
-    } while (0)
+--- a/sysdeps/mips/dl-debug.h
++++ b/sysdeps/mips/dl-debug.h
+@@ -33,7 +33,8 @@
+       ptr += l->l_info[DT_MIPS (RLD_MAP_REL)]->d_un.d_val;
+       *(ElfW(Addr) *) ptr = (ElfW(Addr)) r;
+     }
+-  else if (l->l_info[DT_MIPS (RLD_MAP)] != NULL)
++  else if ((l)->l_info[DT_MIPS (RLD_MAP)] &&
++    (l)->l_info[DT_MIPS (RLD_MAP)]->d_un.d_ptr)
+     *(ElfW(Addr) *) (l->l_info[DT_MIPS (RLD_MAP)]->d_un.d_ptr)
+       = (ElfW(Addr)) r;
+ }

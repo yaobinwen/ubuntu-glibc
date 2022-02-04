@@ -50,13 +50,15 @@ test-xfail-tst-leaks2 = yes
 # LP: #1891403 needs good entropy source
 test-xfail-tst-getrandom = yes
 
-
 # LP: #1894447 detected as unsupported during build, fails in autopkgtest
 test-xfail-tst-localedef-path-norm = yes
 test-xfail-tst-localedef-hardlinks = yes
 test-xfail-tst-pthread-getattr = yes
 test-xfail-tst-strerror = yes
 test-xfail-tst-strsignal = yes
+
+# https://sourceware.org/bugzilla/show_bug.cgi?id=28838
+test-xfail-tst-p_align3 = yes
 
 ######################################################################
 # alpha (including optimized flavours)
@@ -204,6 +206,10 @@ ifeq ($(config-machine)-$(config-os),x86_64-linux-gnu)
 # This test fails intermittently on amd64. It could be a kernel issue.
 # see https://sourceware.org/bugzilla/show_bug.cgi?id=19004
 test-xfail-tst-robust8 = yes
+
+# fails on prodstack5 https://sourceware.org/bugzilla/show_bug.cgi?id=28692
+test-xfail-tst-cpu-features-cpuinfo = yes
+test-xfail-tst-cpu-features-cpuinfo-static = yes
 endif
 
 
@@ -588,6 +594,10 @@ test-xfail-tst-minsigstksz-2 = yes
 # Fails with 32 bit userspace on 64 bit kernel:
 # https://sourceware.org/bugzilla/show_bug.cgi?id=26736
 test-xfail-tst-sysvshm-linux = yes
+
+# fails on prodstack5 https://sourceware.org/bugzilla/show_bug.cgi?id=28692
+test-xfail-tst-cpu-features-cpuinfo = yes
+test-xfail-tst-cpu-features-cpuinfo-static = yes
 
 # flaky on Ubuntu buildds
 test-xfail-tst-cancel28 = yes
@@ -1214,6 +1224,9 @@ test-xfail-tst-platform-1 = yes
 # Fails on x32 https://sourceware.org/bugzilla/show_bug.cgi?id=26736
 test-xfail-tst-sysvshm-linux = yes
 
+# fails on prodstack5 https://sourceware.org/bugzilla/show_bug.cgi?id=28692
+test-xfail-tst-cpu-features-cpuinfo = yes
+test-xfail-tst-cpu-features-cpuinfo-static = yes
 endif
 
 ######################################################################

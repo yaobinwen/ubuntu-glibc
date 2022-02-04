@@ -1,3 +1,34 @@
+glibc (2.35-0ubuntu1) jammy; urgency=medium
+
+  * New upstream version.
+  * Update control files for new version.
+  * Remove d/patches/git-updates.diff and refresh other patches.
+  * d/patches/localedata/locale-C.diff: Remove as upstream now ships a C
+    locale.
+  * d/patches/ubuntu/disable-clone3.patch: Remove, electron apps have had
+    long enough to get updated now.
+  * d/patches/arm/local-vfp-sysdeps.diff: Remove, incompatible with modern
+    binutils.
+  * d/patches/all/submitted-po-fr-fixes.diff: Remove, included upstream.
+  * Stop building the C.UTF-8 locale files separately now that upstream
+    includes it, but still include them in the libc-bin package.
+  * d/patches/ubuntu/sdt-headers.patch: borrow patch from fedora to fix build
+    failure on s390x.
+  * Update xfails:
+    - tst-cpu-features-cpuinfo{,-static} fail on some builders due to old
+      kernels.
+    - tst-p_align3: Fails depending on fine details of binutils behaviour.
+  * Build with default gcc (i.e. 11).
+  * Remove the 'catchsegv' binary from the libc-bin package, removed upstream.
+  * Update "./debian/rules update-from-upstream" to work better with how I
+    maintain my git tree.
+  * Add d/patches/git-updates.diff with first few patches after release:
+    - posix: Fix tst-spawn6 terminal handling (BZ #28853)
+    - linux: __get_nprocs_sched: do not feed CPU_COUNT_S with garbage [BZ #28850]
+    - linux: Fix missing __convert_scm_timestamps (BZ #28860)
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Fri, 04 Feb 2022 13:59:11 +1300
+
 glibc (2.34-0ubuntu3) impish; urgency=medium
 
   * d/patches/git-updates.diff: Update from release/2.34/master branch.
@@ -31,6 +62,18 @@ glibc (2.34-0ubuntu1) impish; urgency=medium
     written to the gconv modules cache (BZ #28199).
 
  -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 12 Aug 2021 11:15:13 +1200
+
+glibc (2.33-0ubuntu9) impish; urgency=medium
+
+  * debian/patches/git-updates.diff: update from upstream stable branch
+    - CVE-2021-33574: The mq_notify function has a potential use-after-free
+      issue when using a notification type of SIGEV_THREAD and a thread
+      attribute with a non-default affinity mask.
+    - [15271] dlfcn function failure after dlmopen terminates process.
+    - [27646] gethostbyname and NSS crashes after dlmopen.
+    - x86_64: Remove unneeded static PIE check for undefined weak diagnostic.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 13 Jul 2021 08:26:17 +0200
 
 glibc (2.33-0ubuntu8) impish; urgency=medium
 
