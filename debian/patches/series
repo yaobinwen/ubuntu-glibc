@@ -144,4 +144,3 @@ ubuntu/git-elf-Add-endianness-markup-to-ld.so.cache-bug-27008.patch
 ubuntu/submitted-broadcast-to-prevent-deadlock.diff
 ubuntu/git-aarch64-Accept-PLT-calls-to-__getauxval-within-libc..patch
 ubuntu/git-lp1928508-reversing-calculation-of-__x86_shared_non_temporal.patch
-ubuntu/aarch64-memcpy-improvements.patch

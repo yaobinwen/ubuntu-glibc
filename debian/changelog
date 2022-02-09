@@ -1,3 +1,10 @@
+glibc (2.31-0ubuntu9.5) focal; urgency=medium
+
+  * Remove d/patches/u/aarch64-memcpy-improvements.patch again until it can be
+    verified that it does not regress performance on all microarchitectures.
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 10 Feb 2022 12:54:20 +1300
+
 glibc (2.31-0ubuntu9.4) focal; urgency=medium
 
   * Update for 20.04. (LP: #1951033)
