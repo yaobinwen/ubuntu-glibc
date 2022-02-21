@@ -110,6 +110,7 @@ endif
 		--disable-crypt \
 		--enable-stackguard-randomization \
 		--enable-stack-protector=strong \
+		--with-default-link=no \
 		--with-pkgversion="Debian GLIBC $(DEB_VERSION)" \
 		--with-bugurl="http://www.debian.org/Bugs/" \
 		$(if $(filter $(pt_chown),yes),--enable-pt_chown) \
@@ -333,7 +334,25 @@ ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
 	      sed -i '/RTLDLIST=/s,=\(.*\),="\1 /lib/ld-linux.so.3",' debian/tmp-$(curpass)/usr/bin/ldd;; \
 	  esac; \
 	fi
-	
+
+	# Move the dynamic linker into the slibdir location and replace it with
+	# a symlink. This is needed:
+	# - for TCC which is not able to find the dynamic linker if it is not
+	#   in a lib directory.
+	# - for co-installation for multiarch and biarch libraries
+	# In case slibdir and rtlddir are the same directory (for instance on
+	# libc6-amd64:i386), we instead rename the dynamic linker to ld.so
+	rtld_so=`LANG=C LC_ALL=C readelf -l debian/tmp-$(curpass)/usr/bin/iconv | sed -e '/interpreter:/!d;s/.*interpreter: .*\/\(.*\)]/\1/g'`; \
+	rtlddir=$(call xx,rtlddir) ; \
+	slibdir=$(call xx,slibdir) ; \
+	if [ "$$rtlddir" = "$$slibdir" ] ; then \
+	  mv debian/tmp-$(curpass)$$slibdir/$$rtld_so debian/tmp-$(curpass)$$slibdir/ld.so ; \
+	  ln -s $$slibdir/ld.so debian/tmp-$(curpass)$$slibdir/$$rtld_so ; \
+	else \
+	  mv debian/tmp-$(curpass)$$rtlddir/$$rtld_so debian/tmp-$(curpass)$$slibdir ; \
+	  ln -s $$slibdir/$$rtld_so debian/tmp-$(curpass)$$rtlddir/$$rtld_so ; \
+	fi
+
 	$(call xx,extra_install)
 endif
 	touch $@

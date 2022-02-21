@@ -1,3 +1,32 @@
+glibc (2.34-0experimental3) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/testsuite-xfail-debian.mk: whitelist again test-xfail-tst-pkey on
+    powerpc, as 32-bit protection key support on powerpc is unclear.
+  * debian/testsuite-xfail-debian.mk: whitelist dirent/tst-readdir64-compat
+    and signal/tst-minsigstksz-5.  Closes: #1002041.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/rules.d/build.mk: Move the dynamic linker into the slibdir location
+    and replace it with a symlink. This is needed for TCC which is not able to
+    find the dynamic linker if it is not in a lib directory.
+  * debian/rules.d/build.mk, debian/debhelper.in/libc.postrm: correctly
+    recreate the dynamic linker symlink with the new naming scheme.
+  * debian/libc*.symbols.*: force __sysconf@GLIBC_2.* and sysconf@GLIBC_2.*
+    dependencies to 2.34 to correctly support the new definition of MINSIGSTKSZ
+    and SIGSTKSZ.
+  * debian/debhelper.in/libc*.fixperms: remove, they are ignored by
+    dh_fixperms.
+  * debian/debhelper.in/libc-alt.lintian-overrides: adjust overrides for the
+    case slibdir = rtlddir.
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update hurd tests.
+  * debian/patches/hurd-i386/git-random-getrandom.diff: Fix random translator
+    startup.
+  * debian/control: Break hurd << 1:0.9.git20211230-2 accordingly.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 21 Feb 2022 12:53:23 +0100
+
 glibc (2.34-0experimental2) experimental; urgency=medium
 
   * debian/patches/git-updates.diff: update from upstream stable branch.
@@ -80,6 +109,102 @@ glibc (2.34-0experimental0) experimental; urgency=medium
   * debian/patches/hurd-i386/local-mach_print.diff: Drop patch.
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 12 Dec 2021 23:52:06 +0100
+
+glibc (2.33-7) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/rules.d/build.mk: pass --with-default-link=no to configure to
+    ensure that libio vtable protection is enabled.
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix wrong fallback of strncmp-avx2-rtm and wcsncmp-avx2-rtm fallback to
+      non-rtm variants when avoiding overflow.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 21 Feb 2022 09:47:11 +0100
+
+glibc (2.33-6) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/pthread_once.diff: Fix pthread_key safety.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix HTM aborts in AVX2 multiarch string functions
+    - Fix an overflow bug in some implementation of wcsnlen, wmemchr, and
+      wcsncat
+    - Fix an overflow bug in wcsncmp_avx2 and wcsncmp_evex
+    - Fix a race condition in __opensock
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 15 Feb 2022 12:21:20 +0100
+
+glibc (2.33-5) unstable; urgency=medium
+
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix build failure on hppa and ia64.  Closes: #1004390.
+    - Fix autopkgtest failure on arm64.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 26 Jan 2022 23:01:02 +0100
+
+glibc (2.33-4) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix FTBFS on powerpc and ppc64 with recent binutils snapshots.
+    - Fix autopkgtest on armhf.
+    - Fix an unexpected return value from realpath() for too long results
+      (CVE-2021-3998).
+    - Fix a an off-by-one buffer overflow/underflow in getcwd()
+      (CVE-2021-3999).
+    - debian/patches/any/local-ldso-disable-hwcap.diff: rebase.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-pthread_kill_exited.diff: Fix pthread_kill on
+    exiting/ted thread.
+  * debian/patches/hurd-i386/git-reply_bogus.diff: Fix cleaning the reply
+    port.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 25 Jan 2022 00:13:12 +0100
+
+glibc (2.33-3) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-ttydefaults.diff: New patch to fix default
+    character for termio cc[VSTATE].
+  * debian/patches/hurd-i386/git-const.diff: Constify RPCs server-side.
+    - debian/control: Bump mig build-dep accordingly.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix FTBFS on ppc64el with recent binutils snapshots.  Closes: #1003847.
+    - Fix crashes in bzero/memset on i386 with SSE2 when the cache size cannot
+      be determined.  Closes: #1003574, #1003610.
+    - Fix a buffer overflow in sunrpc svcunix_create (CVE-2022-23218).
+    - Fix a buffer overflow in sunrpc clnt_create (CVE-2022-23219).
+
+  [ Gunnar Hjalmarsson ]
+  * debian/local/usr_sbin/update-locale: tweak validation of args to
+    update-locale().
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 18 Jan 2022 19:06:44 +0100
+
+glibc (2.33-2) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/unsubmitted-getaux_at_secure.diff: Fix according
+    to new __getauxval2 function.
+  * debian/libc0.3.symbols.hurd-i386: Add vm_region_create_proxy.
+  * debian/patches/hurd-i386/git-lib-map.diff: Unlock libraries load
+    addresses.
+  * debian/patches/hurd-i386/git-large-text.diff: Fix clang startup.
+  * debian/patches/hurd-i386/git-get_dtable.diff: Implement msg_get_dtable.
+  * debian/patches/hurd-i386/git-auth-leak.diff: Fix auth port leaks.
+  * debian/patches/hurd-i386/git-nuke_ports_on_exec.diff: Fix ports leaks.
+  * debian/testsuite-xfail-debian.mk: Update hurd tests.
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix syscall() on ppc64 with POWER9 CPUs.  Closes: #1003201.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 06 Jan 2022 22:32:53 +0100
 
 glibc (2.33-1) unstable; urgency=medium
 
