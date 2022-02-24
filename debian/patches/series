@@ -178,3 +178,11 @@ ubuntu/local-pldd-root.diff
 ubuntu/local-fallback-to-monotonic.diff
 ubuntu/submitted-broadcast-to-prevent-deadlock.diff
 ubuntu/disable-clone3.patch
+any/CVE-2021-3998-pre1.patch
+any/CVE-2021-3998-1.patch
+any/CVE-2021-3998-2.patch
+any/CVE-2021-3999-1.patch
+any/CVE-2021-3999-2.patch
+any/CVE-2022-23218-pre1.patch
+any/CVE-2022-23218.patch
+any/CVE-2022-23219.patch

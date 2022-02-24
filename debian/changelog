@@ -1,3 +1,39 @@
+glibc (2.34-0ubuntu3.2) impish-security; urgency=medium
+
+
+  * SECURITY UPDATE: Unexpected return value from realpath()
+    - debian/patches/any/CVE-2021-3998-pre1.patch: add helpers to create
+      paths longer than PATH_MAX in support/temp_file.c,
+      support/temp_file.h.
+    - debian/patches/any/CVE-2021-3998-1.patch: set errno to ENAMETOOLONG
+      for result larger than PATH_MAX in stdlib/Makefile,
+      stdlib/canonicalize.c, stdlib/tst-realpath-toolong.c.
+    - debian/patches/any/CVE-2021-3998-2.patch: avoid overwriting
+      preexisting error in stdlib/canonicalize.c.
+    - CVE-2021-3998
+  * SECURITY UPDATE: Off-by-one buffer overflow/underflow in getcwd()
+    - debian/patches/any/CVE-2021-3999-1.patch: set errno to ERANGE for
+      size == 1 in sysdeps/posix/getcwd.c,
+      sysdeps/unix/sysv/linux/Makefile,
+      sysdeps/unix/sysv/linux/tst-getcwd-smallbuff.c.
+    - debian/patches/any/CVE-2021-3999-2.patch: detect user namespace
+      support in sysdeps/unix/sysv/linux/tst-getcwd-smallbuff.c.
+    - CVE-2021-3999
+  * SECURITY UPDATE: DoS via long svcunix_create path argument
+    - debian/patches/any/CVE-2022-23218-pre1.patch: add the
+      __sockaddr_un_set function in include/sys/un.h, socket/Makefile,
+      socket/sockaddr_un_set.c, socket/tst-sockaddr_un_set.c.
+    - debian/patches/any/CVE-2022-23218.patch: fix buffer overflow in
+      sunrpc/Makefile, sunrpc/svc_unix.c, sunrpc/tst-bug28768.c.
+    - CVE-2022-23218
+  * SECURITY UPDATE: DoS via long clnt_create hostname argument
+    - debian/patches/any/CVE-2022-23219.patch: fix buffer overflow in
+      sunrpc/clnt_gen.c.
+    - CVE-2022-23219
+  * debian/rules.d/build.mk: build with --with-default-link=no.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Thu, 24 Feb 2022 14:45:39 -0500
+
 glibc (2.34-0ubuntu3) impish; urgency=medium
 
   * d/patches/git-updates.diff: Update from release/2.34/master branch.
