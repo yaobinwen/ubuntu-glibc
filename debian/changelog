@@ -1,3 +1,79 @@
+glibc (2.31-0ubuntu9.7) focal-security; urgency=medium
+
+  * SECURITY UPDATE: infinite loop in iconv
+    - debian/patches/any/CVE-2016-10228-1.patch: rewrite iconv option
+      parsing in iconv/Makefile, iconv/Versions, iconv/gconv_charset.c,
+      iconv/gconv_charset.h, iconv/gconv_int.h, iconv/gconv_open.c,
+      iconv/iconv_open.c, iconv/iconv_prog.c, iconv/tst-iconv-opt.c,
+      iconv/tst-iconv_prog.sh, intl/dcigettext.c.
+    - debian/patches/any/CVE-2016-10228-2.patch: handle translation output
+      codesets with suffixes in iconv/Versions, iconv/gconv_charset.c,
+      iconv/gconv_charset.h, iconv/gconv_int.h, iconv/iconv_open.c,
+      iconv/iconv_prog.c, intl/dcigettext.c, intl/tst-codeset.c.
+    - CVE-2016-10228
+  * SECURITY UPDATE: buffer over-read in iconv
+    - debian/patches/any/CVE-2019-25013.patch: fix buffer overrun in EUC-KR
+      conversion module in iconvdata/bug-iconv13.c, iconvdata/euc-kr.c,
+      iconvdata/ksc5601.h.
+    - CVE-2019-25013
+  * SECURITY UPDATE: another infinite loop in iconv
+    - debian/patches/any/CVE-2020-27618.patch: fix issue in
+      iconv/tst-iconv_prog.sh, iconvdata/ibm1364.c.
+    - CVE-2020-27618
+  * SECURITY UPDATE: DoS via assert in iconv
+    - debian/patches/any/CVE-2020-29562.patch: fix incorrect UCS4 inner
+      loop bounds in iconv/Makefile, iconv/gconv_simple.c,
+      iconv/tst-iconv8.c.
+    - CVE-2020-29562
+  * SECURITY UPDATE: signed comparison issue in ARMv7 memcpy
+    - debian/patches/any/CVE-2020-6096-pre1.patch: add
+      support_blob_repeat_allocate_shared in support/blob_repeat.c,
+      support/blob_repeat.h, support/tst-support_blob_repeat.c.
+    - debian/patches/any/CVE-2020-6096-1.patch: add test case in
+      string/Makefile, string/tst-memmove-overflow.c.
+    - debian/patches/any/CVE-2020-6096-2.patch: mark test as as XFAIL in
+      string/tst-memmove-overflow.c, sysdeps/arm/Makefile.
+    - debian/patches/any/CVE-2020-6096-3.patch: fix memcpy and memmove for
+      negative length  in sysdeps/arm/memcpy.S, sysdeps/arm/memmove.S.
+    - debian/patches/any/CVE-2020-6096-4.patch: fix multiarch memcpy for
+      negative length in sysdeps/arm/armv7/multiarch/memcpy_impl.S.
+    - debian/patches/any/CVE-2020-6096-5.patch: remove
+      string/tst-memmove-overflow XFAIL in sysdeps/arm/Makefile.
+    - CVE-2020-6096
+  * SECURITY UPDATE: double-free in nscd
+    - debian/patches/any/CVE-2021-27645.patch: track live allocation better
+      in nscd/netgroupcache.c.
+    - CVE-2021-27645
+  * SECURITY UPDATE: assertion fail in iconv
+    - debian/patches/any/CVE-2021-3326.patch: fix assertion failure in
+      ISO-2022-JP-3 module in iconvdata/Makefile, iconvdata/bug-iconv14.c,
+      iconvdata/iso-2022-jp-3.c.
+    - CVE-2021-3326
+  * SECURITY UPDATE: overflow in wordexp via crafted pattern
+    - debian/patches/any/CVE-2021-35942.patch: handle overflow in
+      positional parameter number in posix/wordexp-test.c, posix/wordexp.c.
+    - CVE-2021-35942
+  * SECURITY UPDATE: Off-by-one buffer overflow/underflow in getcwd()
+    - debian/patches/any/CVE-2021-3999.patch: set errno to ERANGE for
+      size == 1 in sysdeps/posix/getcwd.c.
+    - CVE-2021-3999
+  * SECURITY UPDATE: DoS via long svcunix_create path argument
+    - debian/patches/any/CVE-2022-23218-pre1.patch: add the
+      __sockaddr_un_set function in include/sys/un.h, socket/Makefile,
+      socket/sockaddr_un_set.c, socket/tst-sockaddr_un_set.c.
+    - debian/patches/any/CVE-2022-23218.patch: fix buffer overflow in
+      sunrpc/svc_unix.c.
+    - CVE-2022-23218
+  * SECURITY UPDATE: DoS via long clnt_create hostname argument
+    - debian/patches/any/CVE-2022-23219.patch: fix buffer overflow in
+      sunrpc/clnt_gen.c.
+    - CVE-2022-23219
+  * debian/rules.d/build.mk: build with --with-default-link=no.
+  * This package does _NOT_ contain the changes from (2.31-0ubuntu9.5) in
+    focal-proposed.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Thu, 24 Feb 2022 14:42:40 -0500
+
 glibc (2.31-0ubuntu9.2) focal; urgency=medium
 
   * Drop check preventing using float128 which breaks new icc (LP: #1895358)

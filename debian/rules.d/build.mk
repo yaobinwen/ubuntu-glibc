@@ -90,6 +90,7 @@ $(stamp)configure_%: $(stamp)config_sub_guess $(stamp)patch $(KERNEL_HEADER_DIR)
 		--enable-obsolete-rpc \
 		--enable-obsolete-nsl \
 		--with-pkgversion="Ubuntu GLIBC $(DEB_VERSION)" \
+		--with-default-link=no \
 		--with-bugurl="https://bugs.launchpad.net/ubuntu/+source/glibc/+bugs" \
 		$(if $(filter $(pt_chown),yes),--enable-pt_chown) \
 		$(if $(filter $(threads),no),--disable-nscd) \
