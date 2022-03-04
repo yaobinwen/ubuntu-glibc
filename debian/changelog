@@ -1,3 +1,29 @@
+glibc (2.35-0ubuntu2) jammy; urgency=medium
+
+  * d/patches/arm/local-vfp-sysdeps.diff: Restore, and add another EABI
+    attribute to hopefully avoid upsetting current binutils.
+  * debian/debhelper.in/libc.preinst: drop the check for kernel release
+    > 255 now that glibc and preinstall script are fixed. (LP: #1962225)
+  * Fix "./debian/rules update-from-upstream" to replace rather than append to
+    git-updates.diff.
+  * Update d/patches/git-updates.diff:
+    - linux: fix accuracy of get_nprocs and get_nprocs_conf [BZ #28865]
+    - linux: Use socket-constants-time64.h on tst-socket-timestamp-compat
+    - string: Add a testcase for wcsncmp with SIZE_MAX [BZ #28755]
+    - x86: Fallback {str|wcs}cmp RTM in the ncmp overflow case [BZ #28896]
+    - x86: Test wcscmp RTM in the wcsncmp overflow case [BZ #28896]
+    - x86: Fix TEST_NAME to make it a string in tst-strncmp-rtm.c
+    - elf: Check invalid hole in PT_LOAD segments [BZ #28838]
+    - elf: Replace tst-audit24bmod2.so with tst-audit24bmod2
+    - resolv: Fix tst-resolv tests for 2.35 ABIs and later
+    - localedef: Update LC_MONETARY handling (Bug 28845)
+    - localedata: Do not generate output if warnings were present.
+    - localedef: Handle symbolic links when generating locale-archive
+    - nptl: Fix cleanups for stack grows up [BZ# 28899]
+  * Remove tst-p_align3 from xfails.
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Fri, 04 Mar 2022 15:38:35 +1300
+
 glibc (2.35-0ubuntu1) jammy; urgency=medium
 
   * New upstream version.

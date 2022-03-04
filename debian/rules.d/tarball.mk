@@ -18,6 +18,8 @@ $(DEB_ORIG):
 
 update-from-upstream:
 	dh_testdir
-	echo "" >> $(GIT_UPDATES_DIFF)
 	git fetch origin
+	h=$$(git log -n 1 --format=%H origin/$(GLIBC_BRANCH)); \
+	echo "GIT update of $(GLIBC_GIT)/$(GLIBC_BRANCH) from $(GLIBC_TAG) to $$h" > $(GIT_UPDATES_DIFF)
+	echo "" >> $(GIT_UPDATES_DIFF)
 	git diff --no-renames $(GLIBC_TAG) origin/$(GLIBC_BRANCH) >> $(GIT_UPDATES_DIFF)

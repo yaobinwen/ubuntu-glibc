@@ -57,9 +57,6 @@ test-xfail-tst-pthread-getattr = yes
 test-xfail-tst-strerror = yes
 test-xfail-tst-strsignal = yes
 
-# https://sourceware.org/bugzilla/show_bug.cgi?id=28838
-test-xfail-tst-p_align3 = yes
-
 ######################################################################
 # alpha (including optimized flavours)
 ######################################################################
