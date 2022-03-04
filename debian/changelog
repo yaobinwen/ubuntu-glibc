@@ -1,3 +1,9 @@
+glibc (2.35-0ubuntu3) jammy; urgency=medium
+
+  * debian/rules.d/build.mk: build with --with-default-link=no.
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Fri, 04 Mar 2022 15:54:17 +1300
+
 glibc (2.35-0ubuntu2) jammy; urgency=medium
 
   * d/patches/arm/local-vfp-sysdeps.diff: Restore, and add another EABI
