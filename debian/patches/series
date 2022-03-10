@@ -159,3 +159,7 @@ any/CVE-2021-3999.patch
 any/CVE-2022-23218-pre1.patch
 any/CVE-2022-23218.patch
 any/CVE-2022-23219.patch
+ubuntu/git-aarch64-Accept-PLT-calls-to-__getauxval-within-libc..patch
+ubuntu/submitted-broadcast-to-prevent-deadlock.diff
+ubuntu/git-lp1928508-reversing-calculation-of-__x86_shared_non_temporal.patch
+ubuntu/aarch64-memcpy-improvements.patch

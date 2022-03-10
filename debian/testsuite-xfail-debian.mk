@@ -1008,6 +1008,7 @@ test-xfail-tst-stack4 = yes
 # needs investigation, fail on launchpad
 test-xfail-tst-mxfast = yes
 test-xfail-tst-mutex10 = yes
+test-xtail-test-float64x-yn = yes
 endif
 
 ######################################################################
