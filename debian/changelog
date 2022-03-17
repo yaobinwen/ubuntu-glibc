@@ -1,3 +1,25 @@
+glibc (2.31-13+deb11u3) bullseye; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fix bad conversion from ISO-2022-JP-3 with iconv (CVE-2021-43396).
+      Closes: #998622.
+    - Remove PIE check on amd64 to fix FTBFS with binutils 2.37.
+    - Fix a buffer overflow in sunrpc svcunix_create (CVE-2022-23218).
+    - Fix a buffer overflow in sunrpc clnt_create (CVE-2022-23219).
+  * debian/debhelper.in/libc-bin.postinst: stop replacing older versions from
+    /etc/nsswitch.conf.  Closes: #998008.
+  * debian/debhelper.in/libc.preinst: simplify the version comparison by only
+    comparing the two first parts, now that kernel 2.X are not supported
+    anymore.  Closes: #1004861.
+  * debian/debhelper.in/libc.preinst: drop the check for kernel release > 255
+    now that glibc and preinstall script are fixed.  Closes: #987266.
+  * debian/patches/local-CVE-2021-33574-mq_notify-use-after-free.diff:
+    fix a possible use-after-free in mq_notify (CVE-2021-33574).  Closes:
+    #989147.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 17 Mar 2022 22:37:00 +0100
+
 glibc (2.31-13+deb11u2) bullseye; urgency=medium
 
   [ Aurelien Jarno ]
