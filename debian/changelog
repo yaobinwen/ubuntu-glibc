@@ -1,3 +1,11 @@
+glibc (2.31-0ubuntu9.9) focal; urgency=medium
+
+  * Disable testsuite on riscv64. It is failing maths tests intermittently in
+    ways that cannot be a glibc regression and is disabled in later series
+    anyway.
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 07 Apr 2022 13:24:41 +1200
+
 glibc (2.31-0ubuntu9.8) focal; urgency=medium
 
   * Update for 20.04. (LP: #1951033)
