@@ -1,3 +1,17 @@
+glibc (2.34-0experimental4) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * debian/patches/git-updates.diff: update from upstream stable branch:
+    - Fixes spurious EINTR when thread cancellation is disabled.  Closes:
+      #1008174.
+    - debian/patches/any/local-revert-bz13979.diff: refresh.
+
+  [ Johannes Schauer Marin Rodrigues ]
+  * debian/debhelper.in/libc.postinst: do not re-exec init if DPKG_ROOT is
+    set.  Closes: #1006692.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 16 Apr 2022 13:10:56 +0200
+
 glibc (2.34-0experimental3) experimental; urgency=medium
 
   [ Aurelien Jarno ]
