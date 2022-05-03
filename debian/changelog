@@ -1,3 +1,14 @@
+glibc (2.27-3ubuntu1.6) bionic; urgency=medium
+
+  [ Gunnar Hjalmarsson ]
+  * d/local/usr_sbin/update-locale: improve sanity checks. (LP: #1892825)
+
+  [ Aurelien Jarno ]
+  * debian/debhelper.in/libc.preinst: drop the check for kernel release
+    > 255 now that glibc and preinstall script are fixed. (LP: #1962225)
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Tue, 03 May 2022 22:19:39 +1200
+
 glibc (2.27-3ubuntu1.5) bionic-security; urgency=medium
 
   * SECURITY UPDATE: infinite loop in iconv
