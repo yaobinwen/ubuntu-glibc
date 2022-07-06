@@ -1,0 +1,211 @@
+YES
+LP#1971612
+FirstPatch: 0001-S390-Add-new-s390-platform-z16.patch
+6583d534458e7f8beec8d0766b6db0bdaae6749c S390: Add new s390 platform z16.
+
+YES
+LP#1978130
+FirstPatch: 0002-powerpc-Fix-VSX-register-number-on-__strncpy_power9-.patch
+0a1572b8bb880a63d50a63b2afe4bb67704ac23e powerpc: Fix VSX register number on __strncpy_power9 [BZ #29197]
+
+LATER
+3149f47b808288ccfbf4e56234bc07bdae139708 io: Add fsync call in tst-stat
+
+LATER
+c54c5cd8e30ef82041b525ca4880685c673357ee nss: Do not mention NSS test modules in <gnu/lib-names.h>
+
+LATER
+123bd1ec66d2d7ea4683e9563bd94adc67f41544 nss: Protect against errno changes in function lookup (bug 28953)
+
+NO
+# lol hppa
+01d5214bb44990323fa8474b7e4119949ac9733f hppa: Implement swapcontext in assembler (bug 28960)
+9be62976af04f4166a2c1cc5a842ef07bf223860 hppa: Use END instead of PSEUDO_END in swapcontext.S
+
+LATER
+db03235895150a91fb5bd84dd3f49b4d8ec8bc72 NEWS: Move PLT tracking slowdown to glibc 2.35.
+
+LATER
+cc9a4a664faac44fe62b6300b878cf5be514658b elf: Fix memory leak in _dl_find_object_update (bug 29062)
+
+LATER
+ba9c42ac0e265bf1e4ec1075fa20e7166fda8bfc nptl: Handle spurious EINTR when thread cancellation is disabled (BZ#29029)
+68d3a9a69696b46f2e552330dd0de5512c36302d nptl: Fix pthread_cancel cancelhandling atomic operations
+
+NO
+bd415684df590b14d4970acc93ad28719fffe4c1 hurd: Fix arbitrary error code
+
+NO
+8e8d46d59809824054dde501b0ba0e331a747078 mips: Fix mips64n32 64 bit time_t stat support (BZ#29069)
+
+NO
+d3feff2232ec27f05ca619ca8b314155d9018224 m68k: Handle fewer relocations for RTLD_BOOTSTRAP (#BZ29071)
+
+LATER
+70f1eecdc12dbfc742f29844be215eacf51c5014 scripts: Add glibcelf.py module
+499a60179657d2945c6ad01bdac90e8427a6310e Default to --with-default-link=no (bug 25812)
+e5cf8ccca655c0eb831574785a6087f3950852eb INSTALL: Rephrase -with-default-link documentation
+cb4d670d8f0f6ef4725094ea18a62729d852ce67 scripts/glibcelf.py: Mark as UNSUPPORTED on Python 3.5 and earlier
+
+LATER
+c8ee1c85c07b3c9eaef46355cb1095300855e8fa misc: Fix rare fortify crash on wchar funcs. [BZ 29030]
+
+LATER
+106b7e0e45b258672a9c6f0e1de96baeb17a513f dlfcn: Do not use rtld_active () to determine ld.so state (bug 29078)
+
+LATER
+10fe3cd309b32c003a6b98e08928e7d6007caecf elf: Fix DFS sorting algorithm for LD_TRACE_LOADED_OBJECTS with missing libraries (BZ #28868)
+
+LATER
+ef875993483a1fa5253f98f8341f717ea5e53f53 linux: Fix missing internal 64 bit time_t stat usage
+
+LATER
+14b1e32a4d366efacd6c54e7be8c2bfcc088dd6f i386: Regenerate ulps
+
+LATER
+7d96aa2d7dba5a7d9c80334f1860445bd76fdc7b linux: Fix fchmodat with AT_SYMLINK_NOFOLLOW for 64 bit time_t (BZ#29097)
+
+LATER
+dde291ab531010d604e8cda4483a2e94fc5d606d posix/glob.c: update from gnulib
+
+LATER
+edc06fdd62331d400553675b79c30ce77bef4357 Update syscall lists for Linux 5.17
+e72c363a15402ea2714d3519f2e126a416d1123b Update kernel version to 5.16 in tst-mman-consts.py
+eed29011f9b29317a4025b2a6e04a531663a1023 Update kernel version to 5.17 in tst-mman-consts.py
+95759abbf3c33e66e1e2663f80406eae3dd66587 Add SOL_MPTCP, SOL_MCTP from Linux 5.16 to bits/socket.h
+0bcba53020b8f4363acefb1697cf6f026cbaa170 Add HWCAP2_AFP, HWCAP2_RPRES from Linux 5.17 to AArch64 bits/hwcap.h
+
+LATER
+ec5b79aac7688bb1ff807376acfcc9b9afd4dcbf manual: Clarify that abbreviations of long options are allowed
+
+NO
+# Maybe it's cowardly but I don't really want to backport a bunch of performance
+# optimizations that too a few goes to get right unless someone asks for them
+# specifically...
+b68e782f8e16fc3f45ab967c291cfb9628e59f6e x86: Optimize strcmp-avx2.S
+34ef8109458ff5d7263892f330cc06ad3e19d6a7 x86: Optimize strcmp-evex.S
+250e277797b8e368ce55e0101c76864f52d2b29e x86-64: Fix strcmp-avx2.S
+36766c02afa5255fbd8676e5d25eaa9ca07141de x86-64: Fix strcmp-evex.S
+58596411ade4cacb76f4144117c40ab28e823b03 x86: Improve vec generation in memset-vec-unaligned-erms.S
+0bf9c8b5feb8c73517ab4dbf47533875021e7c1c x86: Remove SSSE3 instruction for broadcast in memset.S (SSE2 Only)
+de0cd691b2095912f9128fabfb572d835938d655 x86-64: Optimize bzero
+c394d7e11a2cc5d99dc1ba3833727c37536d4838 x86: Set .text section in memset-vec-unaligned-erms
+676f7bcf11ad0bdae098a45fd7d48c1040cde4e1 x86: Fix bug in strncmp-evex and strncmp-avx2 [BZ #28895]
+059e36d9ed5f5c3c6fc1ab8e12cd0cf226dd3e0a x86: Fix fallback for wcsncmp_avx2 in strcmp-avx2.S [BZ #28896]
+
+LATER
+5c0d94d780598a298c9e8685fd811fab9664c368 linux: Fix posix_spawn return code if clone fails (BZ#29109)
+bbb017a2bb2983de297f3d443c59221fbff92e30 NEWS: Add a bug fix entry for BZ #29109
+
+NO
+78f82ab4ef839b52df022234aff63e2d4d7f264f manual: Document the dlinfo function
+28ea43f8d64f0dd1f2de75525157730e1532e600 dlfcn: Implement the RTLD_DI_PHDR request type for dlinfo
+
+LATER
+58947e1fa593cff7b5513d5e8e0c81b0131984b4 fortify: Ensure that __glibc_fortify condition is a constant [BZ #29141]
+
+NO
+d422197a6974390f7f46ffdd64df72e778bb4ae7 x86: Improve L to support L(XXX_SYMBOL (YYY, ZZZ))
+
+NO
+18baf86f51dc34bcdd1f4b26018795908dd46477 x86_64/multiarch: Sort sysdep_routines and put one entry per line
+
+NO
+a1336230489a2ff4ff3e8da9c96227de69ba19e5 x86-64: Remove bzero weak alias in SS2 memset
+
+NO
+f0a53588da7d6b642eeabdbd934d799ed0df2b8f x86-64: Define __memcmpeq in ld.so
+
+NO
+0a10b8b181d0ad84c5f8a7c42f4932528b2964bc x86_64: Remove bcopy optimizations
+
+NO
+# more string optimizations that can wait for explicit request
+424bbd4d2502c43cf36372d588cbca161cafea43 x86: Code cleanup in strchr-avx2 and comment justifying branch
+ff9772ac190c101a5f6e68f4fb7ce852326ffe27 x86: Code cleanup in strchr-evex and comment justifying branch
+3214c878f2a4546f296d9892169c06b3676c3133 x86: Optimize strcspn and strpbrk in strcspn-c.c
+1ed2813eb14526934091ecf65184747b4b5582dc x86: Optimize strspn in strspn-c.c
+2fef1961a7ba992c51df04dc6c5bffdfd5adb41b x86: Remove strcspn-sse2.S and use the generic implementation
+4b61d7652164786786c4b154e2903929281fd09e x86: Remove strpbrk-sse2.S and use the generic implementation
+420cd6f155bf3dd4ff252843991ebe896e35c7ec x86: Remove strspn-sse2.S and use the generic implementation
+283982b36211e694755ef74592f2a1d70369aff3 x86: Optimize str{n}casecmp TOLOWER logic in strcmp.S
+3496d64d6934ba34d636864a550dcf1828b5a987 x86: Optimize str{n}casecmp TOLOWER logic in strcmp-sse42.S
+33fcf8344fe037dab408d2fe057a9d5f9abb05b7 x86: Add AVX2 optimized str{n}casecmp
+fc5d42bf826b37e56b3a4f41e63e31c6d4ea5f8e x86: Add EVEX optimized str{n}casecmp
+3b710e32d8381809c69a6d9b2a1ee9c8afb2c3c2 x86: Remove AVX str{n}casecmp
+af0865571a973d72da8cec29001ed411e12556b0 x86: Small improvements for wcslen
+5a8df6485c584e2b0e957ec6b9070437a724911a x86: Optimize memcmp SSE2 in memcmp.S
+0909286ffabddd7e59cf85a539e8d43406819952 x86: Remove memcmp-sse4.S
+cee9939f67607483110bad9db84c62ce9d71721b x86: Cleanup page cross code in memcmp-avx2-movbe.S
+4d1841deb740f23ab063a65fd875e53934b65883 x86: Fix missing __wmemcmp def for disable-multiarch build
+bc35e22be4ca69f3e2c2e1403ac30d028e092a38 x86-64: Fix SSE2 memcmp and SSSE3 memmove for x32
+b05c0c8b285f3531aa48e9cef9d507804c6db77e x86: Optimize {str|wcs}rchr-sse2
+fdbc8439acfd42149fdad411df7f74dcb1b3a168 x86: Optimize {str|wcs}rchr-avx2
+2c4fc8e5ca742c6a3a1933799495bb0b00a807f0 x86: Optimize {str|wcs}rchr-evex
+ac87df8d750b0734e20ffb82d1d0d0efbe4b6212 x86: Fallback {str|wcs}cmp RTM in the ncmp overflow case [BZ #29127]
+
+NO
+# seems like a minor optimization
+756d583c9eca5aa494822963a5063cfa214d1e11 elf: Merge dl-sysdep.c into the Linux version
+1695c5e0f66d2714b1f4bf0e38b20ebebbc6d1d2 Linux: Remove HAVE_AUX_SECURE, HAVE_AUX_XID, HAVE_AUX_PAGESIZE
+29f833f5abe03f89cc830e362474b389545aa139 Linux: Remove DL_FIND_ARG_COMPONENTS
+3948c6ca896bdbf4d1ce08afac8a477d990c03cd Linux: Assume that NEED_DL_SYSINFO_DSO is always defined
+150039ff07d19d2566c9d91b2a1368fb05451639 Linux: Consolidate auxiliary vector parsing
+788eb21ff0deb0ef7cb203de5e4df7898ca1d82c Revert "Linux: Consolidate auxiliary vector parsing"
+76304dfdaf0b979fdb2797787ec75e46aea0e8b4 Linux: Include <dl-auxv.h> in dl-sysdep.c only for SHARED
+0a5c6c9d99073c0772a9753600f0d8885efa9163 Linux: Consolidate auxiliary vector parsing (redo)
+
+NO
+58bb3aeaae711d2229bacfc784b7879af2e4f771 elf: Remove __libc_init_secure
+
+NO
+d1772c937680eac35256434eca70f6d396f4b7f5 i386: Remove OPTIMIZE_FOR_GCC_5 from Linux libc-do-syscall.S
+a7b122a7b45d0cffebbe94e7aedf8634f74d84b9 i386: Honor I386_USE_SYSENTER for 6-argument Linux system calls
+d66cca3fbb12539aa72a4c24c2f5b2bb0197b306 Linux: Define MMAP_CALL_INTERNAL
+55ee3afa0d1d09ea1b3eeba9b59281c7e3fc3e17 ia64: Always define IA64_USE_NEW_STUB as a flag macro
+2d05ba7f8ef979947e910a37ae8115a816eb4d08 Linux: Implement a useful version of _startup_fatal
+b5ddf33c6e63d89658450da4c85362349c7fe522 Linux: Introduce __brk_call for invoking the brk system call
+72d9dcfd16468ed143a2800288476835f7a8c2a4 csu: Implement and use _dl_early_allocate during static startup
+
+NO
+# doesn't really seem appropriate for a LTS update to me
+04892c543e08a8974ffc14f53e24e2b00810978c S390: Enable static PIE
+
+LATER
+f5f7144dfcbf2a11fd2c17316c213928307c1db3 rtld: Use generic argv adjustment in ld.so [BZ #23293]
+2b128a7d30f5f808c5246034f71d249010521f1b linux: Add a getauxval test [BZ #23293]
+
+LATER
+478cd506eaa5bbc81e3de6593a5064fa5f36fea9 string.h: fix __fortified_attr_access macro call [BZ #29162]
+
+LATER
+6abb4002df97df668f40b0da84ab6261498a8541 Fix deadlock when pthread_atfork handler calls pthread_atfork or dlclose
+
+LATER
+cb49c141838d34b653389d60c857dca91bceaf5d misc: Use 64 bit stat for daemon (BZ# 29203)
+37c94dc999dbd624cf6ecc3fd6e823cd442858d1 misc: Use 64 bit stat for getusershell (BZ# 29204)
+45e5d0f533c90d40914aa8d737695e5bd5ccae5e posix: Use 64 bit stat for posix_fallocate fallback (BZ# 29207)
+9bcf5b12f8254ca118304e4e5c3fe82a42df8823 posix: Use 64 bit stat for fpathconf (_PC_ASYNC_IO) (BZ# 29208)
+6ea3c0aba4e8b70344a134224ac29f18063a0e61 socket: Use 64 bit stat for isfdtype (BZ# 29209)
+e4296958051874e2987719341f1a739642b9e8c7 inet: Use 64 bit stat for ruserpass (BZ# 29210)
+c5a75ecec8d7a54da7e53c7e64ba00d8673fe619 catgets: Use 64 bit stat for __open_catalog (BZ# 29211)
+d7d1eebd4d5806be55ffacbf18917ad68d4ae7fd iconv: Use 64 bit stat for gconv_parseconfdir (BZ# 29213)
+fe9ca732ace94cb49e4d4846a4492db40cde34e4 socket: Fix mistyped define statement in socket/sys/socket.h (BZ #29225)
+
+LATER
+97dd8b3f705b23de1f84713082b631189084a33b nptl: Fix __libc_cleanup_pop_restore asynchronous restore (BZ#29214)
+
+LATER
+99978cd42c55ee427fb512de69638045f6d525c7 NEWS: Add a bug fix entry for BZ #29225
+
+NO
+8468be8433c8c4cc0c17a1811a9b0f439043644a hppa: Remove _dl_skip_args usage (BZ# 29165)
+9d8ae95604feff154a92e1963d3c08d715407e26 nios2: Remove _dl_skip_args usage (BZ# 29187)
+
+LATER
+ccac2d6d95600e790e0411eab0511493ae409c1f nss: add assert to DB_LOOKUP_FCT (BZ #28752)
+b6aade18a7e5719c942aa2da6cf3157aca993fa4 nss: handle stat failure in check_reload_and_get (BZ #28752)
+
+LATER
+cd4f43be3d60384009e9a928d82db815f77ef9b7 linux: Fix mq_timereceive check for 32 bit fallback code (BZ 29304)
+

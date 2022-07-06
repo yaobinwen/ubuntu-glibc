@@ -1,3 +1,13 @@
+glibc (2.35-0ubuntu3.1) jammy; urgency=medium
+
+  * debian/maint: add a script to manage backports of patches from upstream
+    maintenance branch.
+  * Cherry-pick patches from upstream maintenance branch:
+    - 0001-S390-Add-new-s390-platform-z16.patch (LP: #1971612)
+    - 0002-powerpc-Fix-VSX-register-number-on-__strncpy_power9-.patch (LP: #1978130)
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 07 Jul 2022 11:23:23 +1200
+
 glibc (2.35-0ubuntu3) jammy; urgency=medium
 
   * debian/rules.d/build.mk: build with --with-default-link=no.

@@ -1,3 +1,6 @@
+upstream-updates/0001-S390-Add-new-s390-platform-z16.patch
+upstream-updates/0002-powerpc-Fix-VSX-register-number-on-__strncpy_power9-.patch
+
 git-updates.diff
 
 locale/check-unknown-symbols.diff
