@@ -1,3 +1,126 @@
+glibc (2.35-0experimental0) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * New upstream release:
+    - Fixes performance issues in dynamic loader.  Closes: #896008.
+    - debian/symbols.wildcard: add 2.35.
+    - debian/patches/localedata/locale-C.diff: upstreamed.
+    - debian/patches/alpha/local-string-functions.diff: rebased.
+    - debian/patches/hurd-i386/git-drop-rmh.diff: upstreamed.
+    - debian/patches/hurd-i386/git-AT_NO_AUTOMOUNT.diff: upstreamed.
+    - debian/patches/hurd-i386/git-get_errlist.diff: upstreamed.
+    - debian/patches/hurd-i386/git-msync.diff: upstreamed.
+    - debian/patches/hurd-i386/git-htl-init_sigset.diff: upstreamed.
+    - debian/patches/hurd-i386/git-machrules-chk_fail.diff: upstreamed.
+    - debian/patches/hurd-i386/git-random-getrandom.diff: upstreamed.
+    - debian/patches/hurd-i386/git-lib-map.diff: upstreamed.
+    - debian/patches/hurd-i386/git-large-text.diff: upstreamed.
+    - debian/patches/hurd-i386/git-get_dtable.diff: upstreamed.
+    - debian/patches/hurd-i386/git-auth-leak.diff: upstreamed.
+    - debian/patches/hurd-i386/git-nuke_ports_on_exec.diff: upstreamed.
+    - debian/patches/hurd-i386/git-ttydefaults.diff: upstreamed.
+    - debian/patches/hurd-i386/git-const.diff: upstreamed.
+    - debian/patches/hurd-i386/git-pthread_kill_exited.diff: upstreamed.
+    - debian/patches/hurd-i386/git-reply_bogus.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-EIEIO-fr.diff: upstreamed.
+    - debian/patches/hurd-i386/tg-EGREGIOUS-fr.diff: upstreamed.
+    - debian/patches/hurd-i386/local-tls-ie-align.diff: dropped, obsolete.
+    - debian/patches/kfreebsd/submitted-auxv.diff: rebased.
+    - debian/patches/mips/submitted-rld_map.diff: rebased.
+    - debian/patches/all/submitted-po-fr-fixes.diff: upstreamed.
+    - debian/patches/any/local-ldconfig-ignore-ld.so.diff: rebased.
+    - debian/patches/any/git-localedef-check-magic.patch: upstreamed.
+    - debian/debhelper.in/libc-bin.{install,manpages}: stop installing
+      catchsegv, removed upstream.  Closes: #775716, #946606.
+  * debian/sysdeps/{amd64,arm64,i386,x32}.mk: stop passing --enable-static-pie
+    to configure as it is now the default.
+  * debian/debhelper.in/libc-bin.install: install /usr/bin/ld.so in libc-bin.
+  * debian/rules.d/build.mk: remove the C.utf8 locale from locales-all to
+    avoid conflicts with the one in libc-bin. Unfortunately we can't use the
+    one build in locales-all for libc-bin, as locales-all currently can't be
+    cross-compiled.
+  * debian/rules.d/debhelper.mk: do not offer C.UTF-8 in the list of locales
+    that can be generated through the debconf template, as it is already
+    provided by libc-bin.
+  * debian/testsuite-xfail-debian.mk: add new math tests that are also
+    affected by the Octeon 3 and XBurst tininess detection.
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/local-fix-nss.diff: Refresh.
+  * debian/patches/hurd-i386/submitted-net.diff: Refresh.
+  * debian/patches/hurd-i386/tg-bits_atomic.h_multiple_threads.diff: Refresh.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 07 Aug 2022 22:25:02 +0200
+
+glibc (2.34-1) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/submitted-net.diff: Refresh.
+  * debian/testsuite-xfail-debian.mk: Disable tst-pthread_cancel-select-loop
+    which overflows pflocal.
+  * debian/patches/hurd-i386/git-htl-pthread-self-early.diff: Fix calling
+    pthread_self very early.  Closes: #1016106.
+
+  [ Aurelien Jarno ]
+  * debian/control.in/libc: Update breaks against libnetcdf-dev.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/control.in/libc: Add breaks in libc6-dev against dev packages that
+    provide static libraries using __res_* symbols that have been moved from
+    libresolv.a to libc.a:
+    - heimdal-multidev (<= 7.7.0+dfsg-4)
+    - igblast (<= 1.19.0-1)
+    - libasyncns-dev (<= 0.8-6+b2)
+    - libatm1-dev (<= 1:2.5.1-4)
+    - libaws20-dev (<= 20.2-2+b1)
+    - libboinc-app-dev (<= 7.20.2+dfsg-1)
+    - libcups2-dev (<= 2.4.2-1)
+    - libdkim-dev (<= 1:1.0.21-4+b2)
+    - libghc-resolv-dev (<= 0.1.2.0-3)
+    - libghc-resolv-prof (<= 0.1.2.0-3)
+    - libglib2.0-dev (<= 2.72.3-1)
+    - libgloox-dev (<= 1.0.24-2+b1)
+    - libhesiod-dev (<= 3.2.1-3.1+b1)
+    - libinfinity-0.7-dev (<= 0.7.2-1+b1)
+    - libldap-dev (<= 2.5.12+dfsg-2)
+    - libloudmouth1-dev (<= 1.5.4-1)
+    - libmongoc-dev (<= 1.22.1-1)
+    - libmysqlclient-dev (<= 8.0.29-1)
+    - libnfsidmap-dev (<= 1:2.6.1-2)
+    - libola-dev (<= 0.10.8.nojsmin-2)
+    - libopenafs-dev (<= 1.8.8.1-3)
+    - libopendkim-dev (<= 2.11.0~beta2-7)
+    - libopendmarc-dev (<= 1.4.2-1)
+    - libopenzwave1.6-dev (<= 1.6.1914+ds-1)
+    - libpg-query-dev (<= 13-2.1.2-2)
+    - librbl-dev (<= 2.11.0~beta2-7)
+    - libre-dev (<= 1.1.0-1+b1)
+    - libshishi-dev (<= 1.0.2-11)
+    - libslurm-dev (<= 21.08.8.2-1)
+    - libsocksd0-dev (<= 1.4.2+dfsg-7+b4)
+    - libspf2-dev (<= 1.2.10-7.1+b1)
+    - libstrophe-dev (<= 0.12.1-2)
+    - libtaningia-dev (<= 0.2.2-2+b1)
+    - libvbr-dev (<= 2.11.0~beta2-7)
+    - open-vm-tools-dev (<= 2:12.0.5-2)
+    - pidgin-librvp (<= 0.9.7cvs-3)
+    - proftpd-dev (<= 1.3.7d+dfsg-2)
+    - slurm-wlm-basic-plugins-dev (<= 21.08.8.2-1)
+  * debian/debhelper.in/libc-dev.NEWS: New file to explain how to update
+    programs to use the TI-RPC library instead of the Sun RPC one.  Closes:
+    #1014735.
+  * debian/control.in/main: tighten build-dependency on g++-11 on riscv64 to
+    get the fix for GCC PR95115.
+  * debian/patches/riscv64/local-asin-acos-raise-invalid.diff: Drop now that
+    GCC is fixed.
+  * debian/debhelper.in/*.lintian-overrides: update lintian override once
+    more, sigh.
+  * debian/debhelper.in/libc-bin.install, debian/rules.d/build.mk,
+    debian/rules: rename the C.UTF-8 locale into C.utf8 to match upstream
+    naming.
+  * debian/control.in/libc: Update breaks against libvtk7-dev.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 07 Aug 2022 22:00:25 +0200
+
 glibc (2.34-0experimental5) experimental; urgency=medium
 
   [ Aurelien Jarno ]
