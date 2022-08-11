@@ -98,9 +98,9 @@
  #define _DL_HWCAP_TLS_MASK (1LL << 63)
    uint64_t hwcap_exclude = ~((GLRO (dl_hwcap) & hwcap_mask)
  			     | _DL_HWCAP_PLATFORM | _DL_HWCAP_TLS_MASK);
-@@ -300,6 +308,8 @@
- 		      if (GLRO (dl_osversion)
- 			  && libnew->osversion > GLRO (dl_osversion))
+@@ -297,6 +305,8 @@
+ 
+ 		      if ((libnew->hwcap & hwcap_exclude) && !named_hwcap)
  			continue;
 +		      if (disable_hwcap && libnew->hwcap != 0)
 +			      continue;

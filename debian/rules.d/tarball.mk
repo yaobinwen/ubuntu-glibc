@@ -23,3 +23,11 @@ update-from-upstream:
 	echo "GIT update of $(GLIBC_GIT)/$(GLIBC_BRANCH) from $(GLIBC_TAG) to $$h" > $(GIT_UPDATES_DIFF)
 	echo "" >> $(GIT_UPDATES_DIFF)
 	git diff --no-renames $(GLIBC_TAG) origin/$(GLIBC_BRANCH) >> $(GIT_UPDATES_DIFF)
+
+make-new-snapshot:
+	git fetch origin
+	d=$$(git describe origin/master); \
+	v=$$(echo $$d | sed 's/-/_/'); \
+	dv=$$(echo $$v | sed 's/.*_//')-0ubuntu1; \
+	git archive --prefix=$$d/ origin/master | xz -9evk > ../$$v.orig.tar.xz; \
+	dch -v $$dv ''

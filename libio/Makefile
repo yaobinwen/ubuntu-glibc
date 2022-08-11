@@ -23,7 +23,7 @@ subdir	:= libio
 include ../Makeconfig
 
 headers	:= stdio.h \
-	   bits/stdio.h bits/stdio2.h bits/stdio-ldbl.h \
+	   bits/stdio.h bits/stdio2.h bits/stdio2-decl.h bits/stdio-ldbl.h \
 	   bits/types/FILE.h bits/types/__FILE.h bits/types/struct_FILE.h \
 	   bits/types/__fpos_t.h bits/types/__fpos64_t.h \
 	   bits/types/cookie_io_functions_t.h
@@ -66,7 +66,7 @@ tests = tst_swprintf tst_wprintf tst_swscanf tst_wscanf tst_getwc tst_putwc   \
 	tst-fwrite-error tst-ftell-partial-wide tst-ftell-active-handler \
 	tst-ftell-append tst-fputws tst-bz22415 tst-fgetc-after-eof \
 	tst-sprintf-ub tst-sprintf-chk-ub tst-bz24051 tst-bz24153 \
-	tst-wfile-sync
+	tst-wfile-sync tst-bz28828
 
 tests-internal = tst-vtables tst-vtables-interposed
 

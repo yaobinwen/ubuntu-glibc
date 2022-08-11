@@ -47,7 +47,7 @@ glibc.malloc.mxfast: 0x0 (min: 0x0, max: 0xffffffffffffffff)
 glibc.elision.skip_lock_busy: 3 (min: -2147483648, max: 2147483647)
 glibc.malloc.top_pad: 0x0 (min: 0x0, max: 0xffffffffffffffff)
 glibc.cpu.x86_rep_stosb_threshold: 0x800 (min: 0x1, max: 0xffffffffffffffff)
-glibc.cpu.x86_non_temporal_threshold: 0xc0000 (min: 0x0, max: 0xffffffffffffffff)
+glibc.cpu.x86_non_temporal_threshold: 0xc0000 (min: 0x4040, max: 0x0fffffffffffffff)
 glibc.cpu.x86_shstk:
 glibc.cpu.hwcap_mask: 0x6 (min: 0x0, max: 0xffffffffffffffff)
 glibc.malloc.mmap_max: 0 (min: -2147483648, max: 2147483647)
@@ -484,7 +484,7 @@ capabilities at runtime, thus disabling use of those extensions.
 The @code{glibc.cpu.hwcaps=-xxx,yyy,-zzz...} tunable allows the user to
 enable CPU/ARCH feature @code{yyy}, disable CPU/ARCH feature @code{xxx}
 and @code{zzz} where the feature name is case-sensitive and has to match
-the ones in @code{sysdeps/x86/cpu-features.h}.
+the ones in @code{sysdeps/x86/include/cpu-features.h}.
 
 This tunable is specific to i386 and x86-64.
 @end deftp
@@ -601,6 +601,9 @@ tagged memory, with each allocation being assigned a random tag.
 Bit 1 enables precise faulting mode for tag violations on systems that
 support deferred tag violation reporting.  This may cause programs
 to run more slowly.
+
+Bit 2 enables either precise or deferred faulting mode for tag violations
+whichever is preferred by the system.
 
 Other bits are currently reserved.
 

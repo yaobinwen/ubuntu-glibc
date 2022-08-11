@@ -1,3 +1,31 @@
+glibc (2.36-0ubuntu1) kinetic; urgency=medium
+
+  [ Simon Chopin ]
+  * New upstream release.
+  * d/p/kfreebsd/local-getaddrinfo-freebsd-kernel.diff: refreshed to take
+    refactor into account
+  * Cherry-pick patches from upstream maintenance branch:
+    - 0001-stdlib-Suppress-gcc-diagnostic-that-char8_t-is-a-key.patch
+    - 0002-dlfcn-Pass-caller-pointer-to-static-dlopen-implement.patch
+    - 0003-Update-syscall-lists-for-Linux-5.19.patch
+
+  [ Michael Hudson-Doyle ]
+  * debian/rules.d/tarball.mk: Add "make-new-snapshot" target.
+  * debian/maint: add a script to manage backports of patches from upstream
+    maintenance branch.
+  * Patches:
+    - d/p/any/submittest-resolv-unaligned.diff: removed, applied upstream
+    - d/p/powerpc/local-powerpc8xx.dcbz.diff: disabled, doesn't apply and
+      irrelevant for Ubuntu
+    - Other patches refreshed
+    - d/p/git-updates.diff: removed, due to new upstream release
+  * debian/testsuite-xfail-debian.mk: remove xfail on container tests, as the
+    patch causing the failure was removed in 2.31-12
+  * Build with GCC 11 due to failures in math tests on amd64 and ppc64el with
+    GCC 12 (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=106574).
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Fri, 12 Aug 2022 11:14:36 +1200
+
 glibc (2.35-0ubuntu3) jammy; urgency=medium
 
   * debian/rules.d/build.mk: build with --with-default-link=no.

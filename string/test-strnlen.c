@@ -42,11 +42,10 @@
 #endif /* !WIDE */
 
 typedef size_t (*proto_t) (const CHAR *, size_t);
-size_t SIMPLE_STRNLEN (const CHAR *, size_t);
 
-IMPL (SIMPLE_STRNLEN, 0)
 IMPL (STRNLEN, 1)
 
+/* Naive implementation to verify results.  */
 size_t
 SIMPLE_STRNLEN (const CHAR *s, size_t maxlen)
 {
@@ -97,6 +96,8 @@ do_overflow_tests (void)
 
   for (i = 0; i < 750; ++i)
     {
+      do_test (1, i, SIZE_MAX, BIG_CHAR);
+
       do_test (0, i, SIZE_MAX - i, BIG_CHAR);
       do_test (0, i, i - buf_addr, BIG_CHAR);
       do_test (0, i, -buf_addr - i, BIG_CHAR);

@@ -24,29 +24,6 @@ test-xfail-tst-nss-test3 = yes
 # https://sourceware.org/bugzilla/show_bug.cgi?id=19329
 test-xfail-tst-stack4 = yes
 
-# new upstream container tests that don't set up the environment right for
-# Debian's multiarch paths.
-# https://sourceware.org/bugzilla/show_bug.cgi?id=25652
-test-xfail-tst-dlopen-self-container = yes
-test-xfail-tst-dlopen-tlsmodid-container = yes
-test-xfail-tst-ldconfig-bad-aux-cache = yes
-test-xfail-tst-ldconfig-ld_so_conf-update = yes
-test-xfail-tst-pldd = yes
-test-xfail-tst-nss-db-endpwent = yes
-test-xfail-tst-nss-db-endgrent = yes
-test-xfail-tst-nss-files-hosts-long = yes
-test-xfail-tst-system = yes
-test-xfail-tst-glibc-hwcaps-2-cache = yes
-test-xfail-tst-glibc-hwcaps-cache = yes
-test-xfail-tst-glibc-hwcaps-prepend-cache = yes
-test-xfail-tst-preload-pthread-libc = yes
-test-xfail-tst-initgroups1 = yes
-test-xfail-tst-initgroups2 = yes
-test-xfail-tst-reload1 = yes
-test-xfail-tst-reload2 = yes
-test-xfail-bug-ga2 = yes
-test-xfail-tst-leaks2 = yes
-
 # LP: #1891403 needs good entropy source
 test-xfail-tst-getrandom = yes
 

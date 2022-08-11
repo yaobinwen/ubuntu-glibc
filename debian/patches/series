@@ -1,4 +1,6 @@
-git-updates.diff
+upstream-updates/0001-stdlib-Suppress-gcc-diagnostic-that-char8_t-is-a-key.patch
+upstream-updates/0002-dlfcn-Pass-caller-pointer-to-static-dlopen-implement.patch
+upstream-updates/0003-Update-syscall-lists-for-Linux-5.19.patch
 
 locale/check-unknown-symbols.diff
 locale/locale-print-LANGUAGE.diff
@@ -130,7 +132,7 @@ m68k/submitted-gcc34-seccomment.diff
 
 mips/submitted-rld_map.diff
 
-powerpc/local-powerpc8xx-dcbz.diff
+#powerpc/local-powerpc8xx-dcbz.diff
 
 sh4/local-fpscr_values.diff
 
@@ -158,7 +160,6 @@ any/local-revert-bz13979.diff
 any/unsubmitted-ldso-machine-mismatch.diff
 any/local-ldconfig-ignore-ld.so.diff
 any/local-bootstrap-headers.diff
-any/submitted-resolv-unaligned.diff
 any/local-test-install.diff
 
 # Ubuntu patches live in their own little world, to maintain sanity

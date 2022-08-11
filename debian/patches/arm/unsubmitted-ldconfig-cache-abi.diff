@@ -1,7 +1,7 @@
 --- a/sysdeps/unix/sysv/linux/arm/readelflib.c
 +++ b/sysdeps/unix/sysv/linux/arm/readelflib.c
-@@ -27,6 +27,131 @@
- 			unsigned int *isa_level, char **soname,
+@@ -23,6 +23,131 @@
+ 			int *flag, unsigned int *isa_level, char **soname,
  			void *file_contents, size_t file_length);
  
 +/* Read an unsigned leb128 value from P, store the value in VAL, return
@@ -132,7 +132,7 @@
  /* Returns 0 if everything is ok, != 0 in case of error.  */
  int
  process_elf_file (const char *file_name, const char *lib, int *flag,
-@@ -49,6 +174,8 @@
+@@ -45,6 +170,8 @@
  	    *flag = FLAG_ARM_LIBHF|FLAG_ELF_LIBC6;
  	  else if (elf32_header->e_flags & EF_ARM_ABI_FLOAT_SOFT)
  	    *flag = FLAG_ARM_LIBSF|FLAG_ELF_LIBC6;

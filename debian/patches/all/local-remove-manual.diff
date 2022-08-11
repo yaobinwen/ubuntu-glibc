@@ -10,9 +10,9 @@ so that no target depends on manual/*.texi files.
 
 --- a/stdio-common/Makefile
 +++ b/stdio-common/Makefile
-@@ -92,7 +92,7 @@
- 	     tst-printf-fp-leak.mtrace tst-printf-fp-leak-mem.out
- endif
+@@ -242,7 +242,7 @@
+   # generated
+ endif # $(run-built-tests)
  
 -tests-special += $(objpfx)tst-errno-manual.out
 +# tests-special += $(objpfx)tst-errno-manual.out

@@ -1,0 +1,21 @@
+YES
+# If I understand correctly, without this anyone using gcc 13 with the specific options will get warnings when including that header. If so, I think it's worth including.
+FirstPatch: 0001-stdlib-Suppress-gcc-diagnostic-that-char8_t-is-a-key.patch
+c3fda489cfdb2260f9fec706e6fd7259858c4467 stdlib: Suppress gcc diagnostic that char8_t is a keyword in C++20 in uchar.h.
+
+YES
+FirstPatch: 0002-dlfcn-Pass-caller-pointer-to-static-dlopen-implement.patch
+c74bb93cfdb04d49155b0e30983a3c866167bbca dlfcn: Pass caller pointer to static dlopen implementation (bug 29446)
+
+YES
+# 5.19 is currently in -proposed
+FirstPatch: 0003-Update-syscall-lists-for-Linux-5.19.patch
+ac47d8f6cf9744139adb12f540fb9cc610cac579 Update syscall lists for Linux 5.19
+
+NO
+# We don't seem to hit this particular issue?
+33f1b4c1452b33991e670f636ebe98b90a405e10 wcsmbs: Add missing test-c8rtomb/test-mbrtoc8 dependency
+
+LATER
+302bc33bc53c787da6e74162a7092e9c0fb964a8 elf: Replace `strcpy` call with `memcpy` [BZ #29454]
+
