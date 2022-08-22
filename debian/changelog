@@ -1,3 +1,25 @@
+glibc (2.36-0ubuntu2) kinetic; urgency=medium
+
+  * Add patches to fix build with GCC 12:
+    - d/patches/0001-Avoid-undefined-behaviour-in-ibm128-implementation-o.patch
+    - d/patches/0001-Ensure-calculations-happen-with-desired-rounding-mod.patch
+    - d/patches/0001-Fix-BZ-29463-in-the-ibm128-implementation-of-y1l-too.patch
+  * Switch back to building with the default GCC (i.e. 12)
+  * Add patches to fix incompatibility between kernel and glibc mount.h
+    headers (LP: #1985956):
+    - d/patches/0001-glibcextract.py-Add-compile_c_snippet.patch
+    - d/patches/0003-linux-Mimic-kernel-defition-for-BLOCK_SIZE.patch
+    - d/patches/0004-linux-Use-compile_c_snippet-to-check-linux-mount.h-a.patch
+    - d/patches/0005-linux-Fix-sys-mount.h-usage-with-kernel-headers.patch
+    - d/patches/0006-Linux-Fix-enum-fsconfig_command-detection-in-sys-mou.patch
+  * Add patch to restore DT_HASH tag/SHT_HASH section (see
+    https://sourceware.org/bugzilla/show_bug.cgi?id=29456):
+    - d/patches/restore-libc-DT_HASH.patch
+  * Add nss/tst-reload2 to xfails as it fails in autopkgtests in check_prof
+    run.
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Mon, 22 Aug 2022 13:24:16 +1200
+
 glibc (2.36-0ubuntu1) kinetic; urgency=medium
 
   [ Simon Chopin ]

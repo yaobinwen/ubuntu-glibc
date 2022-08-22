@@ -24,6 +24,10 @@ test-xfail-tst-nss-test3 = yes
 # https://sourceware.org/bugzilla/show_bug.cgi?id=19329
 test-xfail-tst-stack4 = yes
 
+# nss/tst-reload2 fails for obscure reasons in the check_prof test run
+# (trying to create a directory that already exists)
+test-xfail-tst-reload2 = yes
+
 # LP: #1891403 needs good entropy source
 test-xfail-tst-getrandom = yes
 

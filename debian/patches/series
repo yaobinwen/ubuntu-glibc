@@ -177,3 +177,12 @@ ubuntu/local-pldd-root.diff
 ubuntu/local-fallback-to-monotonic.diff
 ubuntu/submitted-broadcast-to-prevent-deadlock.diff
 ubuntu/sdt-headers.patch
+0001-Ensure-calculations-happen-with-desired-rounding-mod.patch
+0001-Avoid-undefined-behaviour-in-ibm128-implementation-o.patch
+0001-Fix-BZ-29463-in-the-ibm128-implementation-of-y1l-too.patch
+0001-glibcextract.py-Add-compile_c_snippet.patch
+0003-linux-Mimic-kernel-defition-for-BLOCK_SIZE.patch
+0004-linux-Use-compile_c_snippet-to-check-linux-mount.h-a.patch
+0005-linux-Fix-sys-mount.h-usage-with-kernel-headers.patch
+0006-Linux-Fix-enum-fsconfig_command-detection-in-sys-mou.patch
+restore-libc-DT_HASH.patch
