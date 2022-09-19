@@ -1,4 +1,4 @@
-From 2955ef4b7c9b56fcd7abfeddef7ee83c60abff98 Mon Sep 17 00:00:00 2001
+From 3bd3c612e98a53ce60ed972f5cd2b90628b3cba5 Mon Sep 17 00:00:00 2001
 From: Florian Weimer <fweimer@redhat.com>
 Date: Tue, 16 Aug 2022 09:25:23 +0200
 Subject: [PATCH] Linux: Fix enum fsconfig_command detection in <sys/mount.h>
@@ -9,6 +9,8 @@ the <linux/mount.h> contents did not matter.
 
 Fixes commit 774058d72942249f71d74e7f2b639f77184160a6
 ("linux: Fix sys/mount.h usage with kernel headers").
+
+(cherry picked from commit 2955ef4b7c9b56fcd7abfeddef7ee83c60abff98)
 ---
  sysdeps/unix/sysv/linux/sys/mount.h | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)

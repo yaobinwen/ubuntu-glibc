@@ -1,7 +1,7 @@
-From 774058d72942249f71d74e7f2b639f77184160a6 Mon Sep 17 00:00:00 2001
+From bb1e8b0ca99b5cbedfae3e6245528a87d95ff3e2 Mon Sep 17 00:00:00 2001
 From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
 Date: Wed, 10 Aug 2022 14:24:47 -0300
-Subject: [PATCH 5/5] linux: Fix sys/mount.h usage with kernel headers
+Subject: [PATCH] linux: Fix sys/mount.h usage with kernel headers
 
 Now that kernel exports linux/mount.h and includes it on linux/fs.h,
 its definitions might clash with glibc exports sys/mount.h.  To avoid
@@ -27,6 +27,7 @@ linux/mount.h after and before sys/mount.h does work.
 Checked on x86_64-linux-gnu.
 
 Reviewed-by: Florian Weimer <fweimer@redhat.com>
+(cherry picked from commit 774058d72942249f71d74e7f2b639f77184160a6)
 ---
  sysdeps/unix/sysv/linux/Makefile             |  8 +++
  sysdeps/unix/sysv/linux/sys/mount.h          | 71 +++++++++++++++++---
@@ -35,7 +36,7 @@ Reviewed-by: Florian Weimer <fweimer@redhat.com>
  create mode 100755 sysdeps/unix/sysv/linux/tst-mount-compile.py
 
 diff --git a/sysdeps/unix/sysv/linux/Makefile b/sysdeps/unix/sysv/linux/Makefile
-index 3f31c19e4a..60e4cb1521 100644
+index a139a16532..3ceda9fdbf 100644
 --- a/sysdeps/unix/sysv/linux/Makefile
 +++ b/sysdeps/unix/sysv/linux/Makefile
 @@ -265,6 +265,14 @@ $(objpfx)tst-mount-consts.out: ../sysdeps/unix/sysv/linux/tst-mount-consts.py

@@ -1,3 +1,49 @@
+glibc (2.36-0ubuntu3) kinetic; urgency=medium
+
+  * Remove patches that are now in upstream release branch:
+    - d/patches/0001-glibcextract.py-Add-compile_c_snippet.patch
+    - d/patches/0003-linux-Mimic-kernel-defition-for-BLOCK_SIZE.patch
+    - d/patches/0004-linux-Use-compile_c_snippet-to-check-linux-mount.h-a.patch
+    - d/patches/0005-linux-Fix-sys-mount.h-usage-with-kernel-headers.patch
+    - d/patches/0006-Linux-Fix-enum-fsconfig_command-detection-in-sys-mou.patch
+  * Cherry-pick patches from upstream maintenance branch:
+    - 0004-Linux-Terminate-subprocess-on-late-failure-in-tst-pi.patch
+    - 0005-alpha-Fix-generic-brk-system-call-emulation-in-__brk.patch
+    - 0006-socket-Check-lengths-before-advancing-pointer-in-CMS.patch
+    - 0007-NEWS-Add-entry-for-bug-28846.patch
+    - 0008-01-glibcextract.py-Add-compile_c_snippet.patch
+    - 0008-02-linux-Use-compile_c_snippet-to-check-linux-pidfd.h-a.patch
+    - 0008-03-linux-Mimic-kernel-defition-for-BLOCK_SIZE.patch
+    - 0008-04-linux-Use-compile_c_snippet-to-check-linux-mount.h-a.patch
+    - 0008-05-linux-Fix-sys-mount.h-usage-with-kernel-headers.patch
+    - 0008-06-Linux-Fix-enum-fsconfig_command-detection-in-sys-mou.patch
+    - 0009-syslog-Fix-large-messages-BZ-29536.patch
+    - 0010-elf-Call-__libc_early_init-for-reused-namespaces-bug.patch
+    - 0011-Apply-asm-redirections-in-wchar.h-before-first-use.patch
+    - 0012-elf-Restore-how-vDSO-dependency-is-printed-with-LD_T.patch
+    - 0013-syslog-Remove-extra-whitespace-between-timestamp-and.patch
+    - 0014-Add-NEWS-entry-for-CVE-2022-39046.patch
+    - 0015-nscd-Fix-netlink-cache-invalidation-if-epoll-is-used.patch
+    - 0016-01-resolv-Add-tst-resolv-byaddr-for-testing-reverse-loo.patch
+    - 0016-02-resolv-Add-tst-resolv-aliases.patch
+    - 0016-03-resolv-Add-internal-__res_binary_hnok-function.patch
+    - 0016-04-resolv-Add-the-__ns_samebinaryname-function.patch
+    - 0016-05-resolv-Add-internal-__ns_name_length_uncompressed-fu.patch
+    - 0016-06-resolv-Add-DNS-packet-parsing-helpers-geared-towards.patch
+    - 0016-07-nss_dns-Split-getanswer_ptr-from-getanswer_r.patch
+    - 0016-08-nss_dns-Rewrite-_nss_dns_gethostbyaddr2_r-and-getans.patch
+    - 0016-09-nss_dns-Remove-remnants-of-IPv6-address-mapping.patch
+    - 0016-10-nss_dns-Rewrite-getanswer_r-to-match-getanswer_ptr-b.patch
+    - 0016-11-nss_dns-In-gaih_getanswer_slice-skip-strange-aliases.patch
+    - 0016-12-resolv-Add-new-tst-resolv-invalid-cname.patch
+    - 0016-13-nss_dns-Rewrite-_nss_dns_gethostbyname4_r-using-curr.patch
+    - 0016-14-resolv-Fix-building-tst-resolv-invalid-cname-for-ear.patch
+    - 0017-NEWS-Note-bug-12154-and-bug-29305-as-fixed.patch
+    - 0018-elf-Run-tst-audit-tlsdesc-tst-audit-tlsdesc-dlopen-e.patch
+    - 0019-elf-Fix-hwcaps-string-size-overestimation.patch
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Tue, 20 Sep 2022 11:53:55 +1200
+
 glibc (2.36-0ubuntu2) kinetic; urgency=medium
 
   * Add patches to fix build with GCC 12:

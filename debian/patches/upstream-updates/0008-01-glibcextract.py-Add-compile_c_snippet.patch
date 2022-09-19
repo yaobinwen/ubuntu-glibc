@@ -1,12 +1,13 @@
-From 841afa116e32b3c7195475769c26bf46fd870d32 Mon Sep 17 00:00:00 2001
+From 0062e7dd1c3674ece2daca53a898badd28b60421 Mon Sep 17 00:00:00 2001
 From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
 Date: Wed, 10 Aug 2022 16:24:06 -0300
-Subject: [PATCH 1/5] glibcextract.py: Add compile_c_snippet
+Subject: [PATCH] glibcextract.py: Add compile_c_snippet
 
 It might be used on tests to check if a snippet build with the provided
 compiler and flags.
 
 Reviewed-by: Florian Weimer <fweimer@redhat.com>
+(cherry picked from commit 841afa116e32b3c7195475769c26bf46fd870d32)
 ---
  scripts/glibcextract.py | 19 +++++++++++++++++++
  1 file changed, 19 insertions(+)
