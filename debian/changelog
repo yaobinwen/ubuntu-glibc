@@ -1,3 +1,61 @@
+glibc (2.36-1) experimental; urgency=medium
+
+  [ Aurelien Jarno ]
+  * New upstream release:
+    - Support for DT_RELR relative relocation format has been added.  Closes:
+      #996598.
+    - The Linux kernel version check has been removed.  Closes: #781715, #1004577.
+    - debian/symbols.wildcard: add 2.36 and GLIBC_ABI_DT_RELR.
+    - debian/patches/localedata/sort-UTF8-first.diff: rebased.
+    - debian/patches/localedata/supported.diff: rebased.
+    - debian/patches/arm/unsubmitted-ldso-multilib.diff: rebased.
+    - debian/patches/hurd-i386/git-spawni-reauth.diff: upstreamed.
+    - debian/patches/hurd-i386/pthread_key.diff: upstreamed.
+    - debian/patches/kfreebsd/submitted-waitid.diff: dropped. kfreebsd
+      specific changes moved to debian/patches/kfreebsd/local-sysdeps.diff.
+    - debian/patches/kfreebsd/local-config_h_in.patch: rebased.
+    - debian/patches/kfreebsd/local-getaddrinfo-freebsd-kernel.diff: rebased.
+    - debian/patches/all/local-remove-manual.diff: rebased.
+    - debian/patches/any/local-ldso-disable-hwcap.diff: rebased.
+    - debian/patches/any/unsubmitted-ldso-machine-mismatch.diff: rebased.
+    - debian/patches/any/submitted-resolv-unaligned.diff: upstreamed.
+    - debian/patches/hurd-i386/local-fix-nss.diff: rebased.
+    - debian/patches/hurd-i386/local-no-bootstrap-fs-access.2.diff: rebased.
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update tests results for hurd-i386.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 22 Sep 2022 22:23:11 +0200
+
+glibc (2.35-1) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * debian/patches/hurd-i386/git-strerror_X.diff: Fix tst-sprintf-errno test.
+  * debian/patches/hurd-i386/git-readlink-fifo.diff: Fix readlink() on fifos.
+  * debian/patches/hurd-i386/git-net-route.h.diff: Add ifrtreq structure and
+    fix SIOCADD/DELRT ioctls.
+  * debian/patches/hurd-i386/submitted-net.diff: Drop net/route.h part.
+
+  [ Aurelien Jarno ]
+  * debian/control.in/main: add a breaks against dh-lua (<< 27+nmu1~) to
+    libc-bin. See #1017832.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+  * debian/rules.d/build.mk: fix the pt_chown permissions after installation
+    when running with Rules-Requires-Root=no (for non-Linux systems).
+  * debian/control.in/main: set Rules-Requires-Root: no.
+  * debian/debhelper.in/libc.preinst: only apply NSS workaround when upgrading
+    from glibc < 2.34.
+  * debian/patches/git-updates.diff: update from upstream stable branch.
+
+  [ Luca Boccassi ]
+  * debian/debhelper.in/libc-alt.preinst: libc6-<arch>: create merged-usr
+    symlinks via preinst script.  Closes: #926699.
+
+  [ Gioele Barabucci ]
+  * debian/debhelper.in/libc.preinst: avoid using pidof.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 22 Sep 2022 22:02:00 +0200
+
 glibc (2.35-0experimental3) experimental; urgency=medium
 
   [ Aurelien Jarno ]
@@ -5,6 +63,9 @@ glibc (2.35-0experimental3) experimental; urgency=medium
     See #1017791.
   * debian/debhelper.in/libc-bin.install: install /usr/bin/ld.so.
   * debian/rules.d/build.mk: egrep -> grep -E.
+
+  [ Samuel Thibault ]
+  * debian/testsuite-xfail-debian.mk: Update tests results for hurd-i386.
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 11 Sep 2022 11:40:03 +0200
 

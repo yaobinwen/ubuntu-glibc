@@ -285,9 +285,6 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
         }
     }
 
-  /* Initialize very early so that tunables can use it.  */
-  __libc_init_secure ();
-
   __tunables_init (__environ);
 
   ARCH_INIT_CPU_FEATURES ();
@@ -314,14 +311,6 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
   THREAD_SET_STACK_GUARD (stack_chk_guard);
 # else
   __stack_chk_guard = stack_chk_guard;
-# endif
-
-# ifdef DL_SYSDEP_OSCHECK
-  {
-    /* This needs to run to initiliaze _dl_osversion before TLS
-       setup might check it.  */
-    DL_SYSDEP_OSCHECK (__libc_fatal);
-  }
 # endif
 
   /* Initialize libpthread if linked in.  */
