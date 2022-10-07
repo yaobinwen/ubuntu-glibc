@@ -1,3 +1,26 @@
+glibc (2.36-0ubuntu4) kinetic; urgency=medium
+
+  [ Michael Hudson-Doyle ]
+  * Enable building for the 'arc' architecture. (LP: #1991652)
+  * Cherry-pick patches from upstream maintenance branch (LP: #1991898):
+    - 0020-01-scripts-dso-ordering-test.py-Generate-program-run-ti.patch
+    - 0020-02-elf-Rename-_dl_sort_maps-parameter-from-skip-to-forc.patch
+    - 0021-elf-Implement-force_first-handling-in-_dl_sort_maps_.patch
+    - 0022-gconv-Use-64-bit-interfaces-in-gconv_parseconfdir-bu.patch
+    - 0023-01-x86-include-BMI1-and-BMI2-in-x86-64-v3-level.patch
+    - 0023-02-x86-64-Require-BMI2-for-AVX2-str-n-casecmp-implement.patch
+    - 0023-03-x86-64-Require-BMI2-for-AVX2-strcmp-implementation.patch
+    - 0023-04-x86-64-Require-BMI2-for-AVX2-strncmp-implementation.patch
+    - 0023-05-x86-64-Require-BMI2-for-AVX2-wcs-n-cmp-implementatio.patch
+    - 0023-06-x86-64-Require-BMI2-for-AVX2-raw-w-memchr-implementa.patch
+    - 0023-07-x86-64-Require-BMI2-and-LZCNT-for-AVX2-memrchr-imple.patch
+    - 0023-08-x86-64-Require-BMI1-BMI2-for-AVX2-strrchr-and-wcsrch.patch
+    - 0024-nscd-Drop-local-address-tuple-variable-BZ-29607.patch
+    - 0025-get_nscd_addresses-Fix-subscript-typos-BZ-29605.patch
+    - 0026-stdlib-Fix-__getrandom_nocancel-type-and-arc4random-.patch
+
+ -- Simon Chopin <schopin@ubuntu.com>  Fri, 07 Oct 2022 10:13:35 +0200
+
 glibc (2.36-0ubuntu3) kinetic; urgency=medium
 
   * Remove patches that are now in upstream release branch:

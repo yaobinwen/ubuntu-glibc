@@ -35,6 +35,21 @@ upstream-updates/0016-14-resolv-Fix-building-tst-resolv-invalid-cname-for-ear.pa
 upstream-updates/0017-NEWS-Note-bug-12154-and-bug-29305-as-fixed.patch
 upstream-updates/0018-elf-Run-tst-audit-tlsdesc-tst-audit-tlsdesc-dlopen-e.patch
 upstream-updates/0019-elf-Fix-hwcaps-string-size-overestimation.patch
+upstream-updates/0020-01-scripts-dso-ordering-test.py-Generate-program-run-ti.patch
+upstream-updates/0020-02-elf-Rename-_dl_sort_maps-parameter-from-skip-to-forc.patch
+upstream-updates/0021-elf-Implement-force_first-handling-in-_dl_sort_maps_.patch
+upstream-updates/0022-gconv-Use-64-bit-interfaces-in-gconv_parseconfdir-bu.patch
+upstream-updates/0023-01-x86-include-BMI1-and-BMI2-in-x86-64-v3-level.patch
+upstream-updates/0023-02-x86-64-Require-BMI2-for-AVX2-str-n-casecmp-implement.patch
+upstream-updates/0023-03-x86-64-Require-BMI2-for-AVX2-strcmp-implementation.patch
+upstream-updates/0023-04-x86-64-Require-BMI2-for-AVX2-strncmp-implementation.patch
+upstream-updates/0023-05-x86-64-Require-BMI2-for-AVX2-wcs-n-cmp-implementatio.patch
+upstream-updates/0023-06-x86-64-Require-BMI2-for-AVX2-raw-w-memchr-implementa.patch
+upstream-updates/0023-07-x86-64-Require-BMI2-and-LZCNT-for-AVX2-memrchr-imple.patch
+upstream-updates/0023-08-x86-64-Require-BMI1-BMI2-for-AVX2-strrchr-and-wcsrch.patch
+upstream-updates/0024-nscd-Drop-local-address-tuple-variable-BZ-29607.patch
+upstream-updates/0025-get_nscd_addresses-Fix-subscript-typos-BZ-29605.patch
+upstream-updates/0026-stdlib-Fix-__getrandom_nocancel-type-and-arc4random-.patch
 
 locale/check-unknown-symbols.diff
 locale/locale-print-LANGUAGE.diff
