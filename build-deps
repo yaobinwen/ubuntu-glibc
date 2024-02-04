@@ -1,0 +1,31 @@
+#!/bin/sh
+
+sudo -v
+
+sudo apt-get install -y \
+    binutils \
+    bison \
+    gawk \
+    gcc \
+    gdb \
+    gettext \
+    make \
+    perl \
+    python3 \
+    python3-pexpect \
+    sed \
+    texinfo || exit
+
+apt-cache policy \
+    binutils \
+    bison \
+    gawk \
+    gcc \
+    gdb \
+    gettext \
+    make \
+    perl \
+    python3 \
+    python3-pexpect \
+    sed \
+    texinfo || exit
